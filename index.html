@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>بيت القانون | منظومة إدارة مكاتب المحاماة المتكاملة (ERP المحامي المصري)</title>
+    <meta name="description" content="منظومة بيت القانون: الحل المتكامل لإدارة مكاتب المحاماة على طريقة Odoo. رول الجلسات، ملفات القضايا، الموكلين، صياغة المذكرات بالذكاء الاصطناعي، والخزينة. تجربة مجانية شهر كامل (30 يوماً) بدون بطاقة دفع.">
+    <link rel="icon" type="image/png" href="/static/logo.png?v=20261020">
+
+    <!-- Tailwind CSS 3.4 CDN -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f5fa',
+                            100: '#e1ecf5',
+                            200: '#c2d9ec',
+                            700: '#1d3557',
+                            800: '#0f223d',
+                            900: '#0b1b3d',
+                            950: '#050d1a',
+                        },
+                        odoo: {
+                            purple: '#714B67',
+                            darkPurple: '#56384e',
+                            lightPurple: '#f8f2f6',
+                            teal: '#017E84',
+                            darkTeal: '#005f63',
+                        },
+                        gold: {
+                            50: '#fef9ee',
+                            100: '#fdf1d6',
+                            200: '#fbdfa8',
+                            400: '#f59e0b',
+                            500: '#d97706',
+                            600: '#b45309',
+                            700: '#92400e',
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Cairo, Tajawal, Amiri -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #fafbfc;
+            color: #0f172a;
+            scroll-behavior: smooth;
+        }
+
+        /* Odoo-style Subtle Dot Grid Canvas */
+        .odoo-bg-pattern {
+            background-color: #fafbfc;
+            background-image: radial-gradient(#e2e8f0 1.1px, transparent 1.1px);
+            background-size: 24px 24px;
+        }
+
+        /* 3D Icon Visual System */
+        .icon-3d {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            transform: translateZ(0);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            overflow: hidden;
+        }
+        .icon-3d::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            pointer-events: none;
+        }
+        .icon-3d:hover {
+            transform: translateY(-5px) scale(1.08) rotate(-2deg);
+        }
+
+        /* Presets */
+        .icon-3d-gold {
+            background: linear-gradient(145deg, #fef08a, #d97706 70%, #92400e);
+            color: #0b1b3d;
+            box-shadow: 0 10px 20px -3px rgba(217, 119, 6, 0.35);
+        }
+        .icon-3d-purple {
+            background: linear-gradient(145deg, #a855f7, #714B67 75%, #3b1d34);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -3px rgba(113, 75, 103, 0.35);
+        }
+        .icon-3d-teal {
+            background: linear-gradient(145deg, #2dd4bf, #017E84 75%, #004548);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -3px rgba(1, 126, 132, 0.35);
+        }
+        .icon-3d-blue {
+            background: linear-gradient(145deg, #60a5fa, #2563eb 70%, #1e40af);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -3px rgba(37, 99, 235, 0.35);
+        }
+        .icon-3d-emerald {
+            background: linear-gradient(145deg, #4ade80, #059669 70%, #065f46);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -3px rgba(5, 150, 105, 0.35);
+        }
+        .icon-3d-amber {
+            background: linear-gradient(145deg, #fbbf24, #d97706 70%, #b45309);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -3px rgba(217, 119, 6, 0.35);
+        }
+
+        /* Card depth */
+        .app-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .app-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(113, 75, 103, 0.2);
+        }
+
+        /* Ticker slide animation */
+        @keyframes ticker-slide {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker-slide 20s linear infinite;
+        }
+
+        /* Smooth Tab transition */
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-fade-in {
+            animation: fadeInTab 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="selection:bg-odoo-purple selection:text-white odoo-bg-pattern min-h-screen flex flex-col">
+
+    <!-- ========================================================================= -->
+    <!-- 1. TOP ANNOUNCEMENT BANNER: 1-MONTH FREE TRIAL                            -->
+    <!-- ========================================================================= -->
+    <div class="bg-gradient-to-r from-odoo-purple via-navy-900 to-odoo-darkPurple text-white py-2 px-3 text-center text-xs font-bold border-b border-white/10 flex items-center justify-center gap-2">
+        <span class="px-2 py-0.5 rounded-full bg-gold-500 text-navy-950 text-[10px] font-black animate-pulse">عرض المستشارين</span>
+        <span>🎁 تجربة مجانية كاملة لمدة <strong>شهر كامل (30 يوماً)</strong> لكافة أدوات الذكاء الاصطناعي وإدارة الجلسات بدون أي بطاقة بنكية!</span>
+        <button onclick="openRegisterModal()" class="mr-2 text-gold-300 hover:text-white underline font-black">سجّل مكتبك الآن ←</button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. NAVBAR: Odoo-Style Crisp Header with Apps Mega Menu & Quick CTA        -->
+    <!-- ========================================================================= -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Brand -->
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-odoo-purple to-navy-950 p-2 flex items-center justify-center shadow-md border border-purple-200/50 group-hover:scale-105 transition">
+                    <span class="text-xl">⚖️</span>
+                </div>
+                <div>
+                    <div class="font-black text-lg tracking-tight text-navy-950 flex items-center gap-1.5">
+                        <span>بـيـت الـقـانـون</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-odoo-lightPurple text-odoo-purple font-black border border-purple-200">ERP المحامي</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 font-medium">المنظومة القانونية المتكاملة على طريقة Odoo</div>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden lg:flex items-center gap-7 text-xs font-bold text-slate-700">
+                <a href="#apps-ecosystem" class="hover:text-odoo-purple transition flex items-center gap-1">
+                    <span>التطبيقات المتكاملة (12)</span>
+                    <span class="text-[9px] bg-slate-100 px-1.5 py-0.2 rounded text-slate-500 font-black">All-in-one</span>
+                </a>
+                <a href="#showcase-demo" class="hover:text-odoo-purple transition">معاينة تفاعلية</a>
+                <a href="#comparison" class="hover:text-odoo-purple transition">لماذا بيت القانون؟</a>
+                <a href="#pricing" class="hover:text-odoo-purple transition text-emerald-700">الأسعار وشهر مجاني 🎁</a>
+                <a href="#faq" class="hover:text-odoo-purple transition">الأسئلة الشائعة</a>
+            </nav>
+
+            <!-- Actions (Login & Start Month Free) -->
+            <div class="flex items-center gap-2.5">
+                <button onclick="openLoginModal()" class="text-xs font-bold text-navy-950 hover:text-odoo-purple px-3 py-2 rounded-xl hover:bg-slate-100 transition">
+                    تسجيل الدخول
+                </button>
+                <button onclick="openRegisterModal()" class="px-4 py-2.5 rounded-xl bg-odoo-purple hover:bg-odoo-darkPurple text-white font-black text-xs shadow-md hover:shadow-lg transition flex items-center gap-1.5">
+                    <span>ابدأ مجاناً - شهر كامل</span>
+                    <span class="text-gold-300">⚡</span>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- 3. HERO SECTION: Odoo-Style Spacious All-in-One Showcase                  -->
+    <!-- ========================================================================= -->
+    <section class="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
+            
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-odoo-lightPurple text-odoo-purple border border-purple-200 text-xs font-bold shadow-xs">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>تطبيق واحد يجمع كل أدوات مكتب المحاماة المصري • تجربة مجانية شهر كامل</span>
+            </div>
+
+            <!-- Big Main Headline -->
+            <div class="space-y-3 max-w-4xl mx-auto">
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-navy-950 tracking-tight leading-[1.25]">
+                    جميع تطبيقات مكتبك القانوني..<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-odoo-purple via-amber-600 to-purple-800">
+                        في منظومة واحدة متكاملة وسلسة.
+                    </span>
+                </h1>
+                <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal pt-2">
+                    استبدل شتات الدفاتر الورقية، وجداول الإكسيل المشتتة، ورسائل الواتساب بنظام سحابي ذكي على طريقة Odoo يربط الرول اليومي، القضايا، الموكلين، صياغة المذكرات بالذكاء الاصطناعي، والخزينة بلمسة واحدة من هاتفك أو جهازك.
+                </p>
+            </div>
+
+            <!-- CTAs Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
+                <button onclick="openRegisterModal()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-odoo-purple hover:bg-odoo-darkPurple text-white font-black text-sm shadow-xl hover:shadow-2xl transition flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]">
+                    <span>🚀 ابدأ تجربتك المجانية (شهر كامل - 30 يوماً)</span>
+                </button>
+                <a href="/app" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-navy-950 font-bold text-sm border border-slate-300 shadow-xs transition flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]">
+                    <span>📱 استعراض النسخة الحية على الهاتف</span>
+                    <span class="text-slate-400">←</span>
+                </a>
+            </div>
+
+            <!-- Trust Pills -->
+            <div class="pt-4 flex items-center justify-center gap-4 sm:gap-8 text-xs text-slate-500 font-bold flex-wrap">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-emerald-600 font-black">✓</span>
+                    <span>تجربة مجانية شهر كامل (30 يوماً)</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-emerald-600 font-black">✓</span>
+                    <span>بدون بطاقة ائتمان أو رسوم مسبقة</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-emerald-600 font-black">✓</span>
+                    <span>متوافق مع قانون المرافعات والإجراءات المصري</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-emerald-600 font-black">✓</span>
+                    <span>بيانات مكتبك مشفرة ومحمية بالكامل</span>
+                </div>
+            </div>
+
+            <!-- Live Marquee Ticker (Animated preview of today's roll) -->
+            <div class="max-w-4xl mx-auto mt-8 bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden p-2.5 flex items-center gap-3">
+                <span class="bg-navy-950 text-gold-400 text-[10px] font-black px-2.5 py-1 rounded-lg flex-shrink-0 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span>بث حي للرول</span>
+                </span>
+                <div class="overflow-hidden flex-1 relative whitespace-nowrap text-xs">
+                    <div class="animate-ticker font-bold text-slate-700 flex items-center gap-6">
+                        <span>⚖️ <strong>1425 لسنة 2026 جنح قصر النيل</strong> (رول 14) — تأجيل لتقديم أصل الإيصال والمذكرات</span>
+                        <span class="text-amber-500">•</span>
+                        <span>⚖️ <strong>319 لسنة 2026 أسرة مصر الجديدة</strong> (رول 22) — حجز الدعوى للحكم</span>
+                        <span class="text-amber-500">•</span>
+                        <span>⏱️ <strong>ميعاد حتمي:</strong> استئناف حكم مدني خلال 40 يوماً من صدور الحكم (م 227 مرافعات)</span>
+                        <span class="text-amber-500">•</span>
+                        <span>⚖️ <strong>5521 لسنة 2025 مدني كلي شمال القاهرة</strong> (رول 7) — سداد أمانة الخبير</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 4. APPS ECOSYSTEM: Odoo's Famous 12-App Interactive Grid                  -->
+    <!-- ========================================================================= -->
+    <section id="apps-ecosystem" class="py-16 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="inline-block px-3 py-1 rounded-full bg-odoo-lightPurple text-odoo-purple text-xs font-bold border border-purple-200 mb-2">
+                    المنظومة الشاملة • All-In-One Legal ERP
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-black text-navy-950 tracking-tight">
+                    12 تطبيقاً قضائياً متكاملاً في اشتراك واحد
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-2">
+                    كما تجمع Odoo أقسام الشركة في لوحة موحدة، يجمع بيت القانون كل أداة يحتاجها المحامي في بيئة واحدة متزامنة.
+                </p>
+            </div>
+
+            <!-- The 12 Apps Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                
+                <!-- App 1: Sessions -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-amber flex items-center justify-center text-xl mb-3">⚖️</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">رول الجلسات والأجندة</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-bold">مباشر</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        متابعة رول اليوم، دوائر المحاكم، إشعارات التأجيل، والقرارات السابقة مع تنبيهات فورية داخل الجلسة.
+                    </p>
+                </div>
+
+                <!-- App 2: Cases -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-blue flex items-center justify-center text-xl mb-3">📁</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">إدارة ملفات القضايا</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">أرشيف</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        ملف إلكتروني شامل لكل دعوى (مدني، جنائي، أسرة، إداري) بمراحل التقاضي وحافظة المستندات.
+                    </p>
+                </div>
+
+                <!-- App 3: Clients -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-3">👥</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">سجل الموكلين والتوكيلات</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-900 font-bold">CRM</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        أرشفة التوكيلات الرسمية، مقرات الشهر العقاري، بيانات الخصوم، وتاريخ التواصل وسندات الوكالة.
+                    </p>
+                </div>
+
+                <!-- App 4: Zizo AI -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-3">🤖</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">المستشار زيزو (AI)</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-gold-100 text-gold-900 font-bold">ذكاء قانوني</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        استخراج الدفوع الشكلية والموضوعية، صياغة مذكرات النقض، وتلخيص الأحكام القضائية طبقاً للقانون المصري.
+                    </p>
+                </div>
+
+                <!-- App 5: Templates Bank -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-teal flex items-center justify-center text-xl mb-3">📄</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">بنك الصيغ والعقود (24)</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-900 font-bold">تصدير Word</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        24 صيغة معتمدة تشمل محاضر الشرطة والإنذارات وعقود البيع والإيجار ومذكرات الطعن جاهزة للتحميل والتعديل.
+                    </p>
+                </div>
+
+                <!-- App 6: Deadlines Engine -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-amber flex items-center justify-center text-xl mb-3">⏱️</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">حاسبة المواعيد الحتمية</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-bold">م 18 مرافعات</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        حساب مدد السقوط والطعن بالاستئناف والنقض والمعارضة مع الترحيل التلقائي للعطلات والأعياد الرسمية.
+                    </p>
+                </div>
+
+                <!-- App 7: Finance & Billing -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-3">💰</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">خزينة المكتب والأتعاب</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">مالية</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        متابعة دقيقة للأتعاب المتفق عليها، المقبوضات، متبقي المطالبات، ومصروفات الدعاوى القضائية وأمانات الخبراء.
+                    </p>
+                </div>
+
+                <!-- App 8: Inheritance Calculator -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-blue flex items-center justify-center text-xl mb-3">📐</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">قسمة التركات والمواريث</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">شرعي</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        حاسبة شرعية متكاملة لتوزيع الأنصبة والتركات، تأصيل المسائل، العول، والرد، وتحديد حالات الحجب بدقة.
+                    </p>
+                </div>
+
+                <!-- App 9: OCR Scanner -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-3">📷</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">ماسح المحاضر الضوئي</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-gold-100 text-gold-900 font-bold">OCR</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        تصوير المحاضر الورقية وأحكام المحاكم بالكاميرا وتفريغها لنصوص رقمية قابلة للتعديل والبحث واستخراج الدفوع.
+                    </p>
+                </div>
+
+                <!-- App 10: Courts Directory -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-3">🏛️</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">دليل المحاكم والنيابات</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-900 font-bold">دليل</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        دليل متكامل لجميع محاكم ونيابات الجمهورية، مأموريات الشهر العقاري، ولجان التوفيق وفض المنازعات.
+                    </p>
+                </div>
+
+                <!-- App 11: Legal Library -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-teal flex items-center justify-center text-xl mb-3">📚</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">موسوعة التشريعات والنقض</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-900 font-bold">موسوعة</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        نصوص الدستور، القانون المدني، العقوبات، الإجراءات الجنائية، وأحدث المبادئ القضائية الصادرة عن محكمة النقض.
+                    </p>
+                </div>
+
+                <!-- App 12: Analytics Dashboard -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 app-card cursor-pointer" onclick="openRegisterModal()">
+                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-3">📊</div>
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-black text-sm text-navy-950">لوحة المؤشرات والتقارير</h3>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">تقارير</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        متابعة نبض المكتب اليومي، إحصائيات القضايا المحكومة والمتداولة، وتوزيع العمل على محامي المكتب.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 5. INTERACTIVE DEMO SHOWCASE (Odoo-style Tabs)                             -->
+    <!-- ========================================================================= -->
+    <section id="showcase-demo" class="py-16 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <h2 class="text-2xl sm:text-4xl font-black text-navy-950 tracking-tight">
+                    شاهد المنظومة وهي تعمل بكل تناغم
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-2">
+                    تنقل بين واجهات التطبيقات واستكشف كيف تجعل يومك القضائي أسرع وأكثر تنظيماً.
+                </p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex items-center justify-center gap-2 mb-8 overflow-x-auto pb-2">
+                <button onclick="switchShowcaseTab('sessions')" id="tab-btn-sessions" class="px-4 py-2 rounded-xl text-xs font-black bg-navy-950 text-gold-400 shadow-sm transition">
+                    ⚖️ رول الجلسات الذكي
+                </button>
+                <button onclick="switchShowcaseTab('cases')" id="tab-btn-cases" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-navy-950 bg-white border border-slate-200 transition">
+                    📁 ملفات الدعاوى
+                </button>
+                <button onclick="switchShowcaseTab('zizo')" id="tab-btn-zizo" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-navy-950 bg-white border border-slate-200 transition">
+                    🤖 صياغة المذكرات (زيزو)
+                </button>
+                <button onclick="switchShowcaseTab('finance')" id="tab-btn-finance" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-navy-950 bg-white border border-slate-200 transition">
+                    💰 الخزينة والأتعاب
+                </button>
+            </div>
+
+            <!-- Showcase Card -->
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-lg p-6 sm:p-8 max-w-4xl mx-auto">
+                
+                <!-- View 1: Sessions -->
+                <div id="showcase-view-sessions" class="tab-fade-in space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                            <span class="text-[10px] text-amber-700 font-bold bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">مباشر أمام المحاكم</span>
+                            <h3 class="font-black text-lg text-navy-950 mt-1">جدول الجلسات ورول اليوم أمام الدوائر</h3>
+                        </div>
+                        <a href="/app" class="text-xs font-black text-odoo-purple hover:underline">تجربة الأجندة في التطبيق ←</a>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-navy-950 text-gold-400 font-black text-xs">رول 14</span>
+                                <div>
+                                    <div class="font-black text-navy-950">1425 لسنة 2026 جنح مستأنف قصر النيل</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">المطلوب: تقديم أصل إيصال الأمانة وسماع مرافعة الدفاع</div>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold text-slate-700 bg-white px-2 py-1 rounded border border-slate-200">2026-04-26</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-navy-950 text-gold-400 font-black text-xs">رول 22</span>
+                                <div>
+                                    <div class="font-black text-navy-950">319 لسنة 2026 أسرة مصر الجديدة</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">المطلوب: حجز الدعوى للحكم في طلب الخلع والنفقة</div>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold text-slate-700 bg-white px-2 py-1 rounded border border-slate-200">2026-04-22</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View 2: Cases -->
+                <div id="showcase-view-cases" class="hidden tab-fade-in space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                            <span class="text-[10px] text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">الملف القضائي الذكي</span>
+                            <h3 class="font-black text-lg text-navy-950 mt-1">تتبع مراحل التقاضي وحوافظ المستندات</h3>
+                        </div>
+                        <a href="/app" class="text-xs font-black text-odoo-purple hover:underline">تجربة القضايا في التطبيق ←</a>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="font-black text-navy-950">5521 لسنة 2025 مدني كلي</span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">متداولة</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600">محكمة شمال القاهرة الابتدائية • الدائرة 14</p>
+                            <div class="mt-2 text-[10px] text-slate-500 border-t pt-1 border-slate-200">الموكل: مؤسسة النيل للتجارة والمقاولات</div>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="font-black text-navy-950">7812 لسنة 2026 جنايات</span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">سماع أقوال</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600">محكمة جنايات القاهرة الجديدة (التجمع الخامس)</p>
+                            <div class="mt-2 text-[10px] text-slate-500 border-t pt-1 border-slate-200">الموكل: حسام البدري</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View 3: Zizo -->
+                <div id="showcase-view-zizo" class="hidden tab-fade-in space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                            <span class="text-[10px] text-gold-800 font-bold bg-gold-50 px-2.5 py-0.5 rounded-full border border-gold-300">ذكاء اصطناعي متخصص</span>
+                            <h3 class="font-black text-lg text-navy-950 mt-1">صياغة المذكرات وتفريغ الدفوع القانونية</h3>
+                        </div>
+                        <a href="/app" class="text-xs font-black text-odoo-purple hover:underline">تجربة زيزو في التطبيق ←</a>
+                    </div>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="p-3 bg-navy-950 text-white rounded-2xl rounded-tl-none">
+                            <strong>طلب المحامي:</strong> صياغة دفع ببطلان التفتيش للقبض في غير حالات التلبس وفق المادة 30 إجراءات جنائية.
+                        </div>
+                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl rounded-tr-none text-slate-800 leading-relaxed">
+                            <span class="font-black text-navy-950 block mb-1">💡 مسودة زيزو المعتمدة:</span>
+                            «ندفع ببطلان استيقاف وتفتيش المتهم وما تلاهما من إجراءات لإجرائهما بغير إذن مسبق من النيابة العامة وفي غير حالة من حالات التلبس المنصوص عليها حصراً بالمادتين 30 و34 إجراءات جنائية، استقراراً لأحكام محكمة النقض الصادرة في الطعن رقم ...»
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View 4: Finance -->
+                <div id="showcase-view-finance" class="hidden tab-fade-in space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                            <span class="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300">المالية والحسابات</span>
+                            <h3 class="font-black text-lg text-navy-950 mt-1">إدارة الأتعاب وسندات القبض والصرف</h3>
+                        </div>
+                        <a href="/app" class="text-xs font-black text-odoo-purple hover:underline">تجربة الخزينة في التطبيق ←</a>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="text-[10px] text-slate-500 font-bold">إجمالي الأتعاب</div>
+                            <div class="text-base font-black text-navy-950 mt-0.5">180,000 ج.م</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <div class="text-[10px] text-emerald-700 font-bold">المقبوضات</div>
+                            <div class="text-base font-black text-emerald-700 mt-0.5">115,000 ج.م</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                            <div class="text-[10px] text-amber-700 font-bold">المتبقي للتحصيل</div>
+                            <div class="text-base font-black text-amber-700 mt-0.5">65,000 ج.م</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-purple-50 border border-purple-200">
+                            <div class="text-[10px] text-purple-700 font-bold">رصيد الخزينة الحالي</div>
+                            <div class="text-base font-black text-purple-800 mt-0.5">42,500 ج.م</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 6. WHY SWITCH (Odoo-Style Comparison Table)                                -->
+    <!-- ========================================================================= -->
+    <section id="comparison" class="py-16 bg-white border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center mb-12">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 mb-2">
+                    المقارنة الصريحة
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-black text-navy-950 tracking-tight">
+                    لماذا يفضل المحامون «بيت القانون» على الطرق القديمة؟
+                </h2>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="overflow-x-auto rounded-3xl border border-slate-200 shadow-sm">
+                <table class="w-full text-right text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 text-navy-950 border-b border-slate-200">
+                            <th class="p-4 font-black">وجه المقارنة</th>
+                            <th class="p-4 font-black text-slate-500">الدفاتر الورقية والأجندة العادية</th>
+                            <th class="p-4 font-black text-slate-500">جداول Excel والواتساب</th>
+                            <th class="p-4 font-black bg-odoo-lightPurple text-odoo-purple">منظومة بيت القانون ⚖️</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr>
+                            <td class="p-4 font-bold text-navy-950">رول الجلسات وتنبيهات الحضور</td>
+                            <td class="p-4 text-slate-500">تزاحم وكتابة يدوية معرضة للنسيان</td>
+                            <td class="p-4 text-slate-500">ملفات ثابتة بدون تنبيهات تلقائية</td>
+                            <td class="p-4 bg-purple-50/50 font-bold text-emerald-700">✓ رول مباشر على الموبايل برقم الرول والقرار</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold text-navy-950">حساب مواعيد الطعن والسقوط</td>
+                            <td class="p-4 text-slate-500">حساب يدوي مع خطر فوات الميعاد القانوني</td>
+                            <td class="p-4 text-slate-500">معادلات قد تتجاهل العطلات الرسمية</td>
+                            <td class="p-4 bg-purple-50/50 font-bold text-emerald-700">✓ حاسبة آلية مع ترحيل العطلات (م 18 مرافعات)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold text-navy-950">صياغة المذكرات وتفريغ الدفوع</td>
+                            <td class="p-4 text-slate-500">كتابة تقليدية تستغرق ساعات طويلة</td>
+                            <td class="p-4 text-slate-500">نسخ ولصق بدون تدقيق للدستور أو النقض</td>
+                            <td class="p-4 bg-purple-50/50 font-bold text-emerald-700">✓ مستشار ذكاء اصطناعي وصيغ Word بنقرة واحدة</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold text-navy-950">الوصول من الهاتف في المحكمة</td>
+                            <td class="p-4 text-slate-500">غير ممكن إلا بحمل الدفاتر الثقيلة</td>
+                            <td class="p-4 text-slate-500">تصفح صعب لجداول الشيت على الشاشة</td>
+                            <td class="p-4 bg-purple-50/50 font-bold text-emerald-700">✓ واجهة هاتف فائقة السرعة مهيأة للاستخدام في القاعة</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold text-navy-950">أمان البيانات والخصوصية</td>
+                            <td class="p-4 text-slate-500">معرضة للتلف أو الضياع أو السرقة</td>
+                            <td class="p-4 text-slate-500">معرضة للمسح العرضي بدون نسخ احتياطي</td>
+                            <td class="p-4 bg-purple-50/50 font-bold text-emerald-700">✓ تشفير سحابي تام وبيانات معزولة لكل مكتب</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 7. PRICING & 1-MONTH FREE TRIAL SECTION                                   -->
+    <!-- ========================================================================= -->
+    <section id="pricing" class="py-20 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <div class="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black border border-emerald-200 mb-2">
+                    🎁 شهر كامل مجاناً لجميع المحامين
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-black text-navy-950 tracking-tight">
+                    اختر الباقة المناسبة لمكتبك.. بعد انتهاء الشهر المجاني
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-2">
+                    ابدأ الآن تجربتك الحقيقية لمدة شهر كامل (30 يوماً) مجاناً وبدون أي التزام أو طلب فيزا.
+                </p>
+            </div>
+
+            <!-- Pricing Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+                
+                <!-- Plan 1: Free Month (Featured) -->
+                <div class="bg-white rounded-3xl p-7 border-2 border-odoo-purple shadow-xl relative flex flex-col justify-between">
+                    <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-odoo-purple to-purple-800 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-md">
+                        الأكثر طلباً • تجربة شهر كامل
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-black text-odoo-purple mb-1">الباقة التجريبية الشاملة</div>
+                        <h3 class="text-xl font-black text-navy-950">شهر كامل مجاناً</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">تفعيل فوري لجميع أدوات المنظومة الـ 12 بدون استثناء.</p>
+
+                        <div class="my-6">
+                            <span class="text-4xl font-black text-navy-950">0</span>
+                            <span class="text-xs font-bold text-slate-500">ج.م / أول 30 يوماً</span>
+                        </div>
+
+                        <ul class="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-5">
+                            <li class="flex items-center gap-2 font-bold"><span class="text-emerald-600 font-black">✓</span> 30 يوماً كاملة لكافة الميزات</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> عدد غير محدود من القضايا والجلسات</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> استشارات وصياغة مذكرات مع زيزو AI</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> 24 صيغة ومحضر رسمي وتصدير Word</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> بدون طلب بطاقة ائتمان إطلاقاً</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="openRegisterModal()" class="w-full mt-7 py-3.5 rounded-2xl bg-odoo-purple hover:bg-odoo-darkPurple text-white font-black text-xs shadow-md hover:shadow-lg transition">
+                        🚀 ابدأ شهرك المجاني الآن
+                    </button>
+                </div>
+
+                <!-- Plan 2: Pro Lawyer -->
+                <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-black text-navy-700 mb-1">المحامي المستقل</div>
+                        <h3 class="text-xl font-black text-navy-950">باقة المحامي Pro</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">للمحامين الأفراد الذين يديرون مكتبهم باحترافية.</p>
+
+                        <div class="my-6">
+                            <span class="text-4xl font-black text-navy-950">290</span>
+                            <span class="text-xs font-bold text-slate-500">ج.م / شهرياً (تدفع سنوياً)</span>
+                        </div>
+
+                        <ul class="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-5">
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> كافة ميزات المنظومة الـ 12</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> أرشيف سحابي مشفر 50 جيجابايت</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> دعم فني مخصص عبر الواتساب</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> نسخ احتياطي يومي تلقائي</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="openRegisterModal()" class="w-full mt-7 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-navy-950 font-bold text-xs transition">
+                        تجربة 30 يوماً أولاً
+                    </button>
+                </div>
+
+                <!-- Plan 3: Law Firm Enterprise -->
+                <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-black text-purple-700 mb-1">الشركاء والمؤسسات</div>
+                        <h3 class="text-xl font-black text-navy-950">باقة المكاتب والشركات</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">للمكاتب الكبرى مع فريق عمل متعدد ومحامين زملاء.</p>
+
+                        <div class="my-6">
+                            <span class="text-4xl font-black text-navy-950">590</span>
+                            <span class="text-xs font-bold text-slate-500">ج.م / شهرياً (تدفع سنوياً)</span>
+                        </div>
+
+                        <ul class="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-5">
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> حتى 10 حسابات لفريق العمل</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> إدارة صلاحيات ومسؤوليات القضايا</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> تقارير إنتاجية وتوزيع أتعاب الفريق</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-600 font-black">✓</span> مساحة تخزين سحابية غير محدودة</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="openRegisterModal()" class="w-full mt-7 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-navy-950 font-bold text-xs transition">
+                        تجربة 30 يوماً أولاً
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 8. FAQ SECTION: TRANSPARENT & COMPREHENSIVE                               -->
+    <!-- ========================================================================= -->
+    <section id="faq" class="py-16 bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-black text-navy-950 tracking-tight">
+                    الأسئلة الشائعة حول تجربة الشهر المجاني
+                </h2>
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                    <h3 class="font-black text-xs sm:text-sm text-navy-950 mb-1">هل التجربة المجانية لمدة شهر تتطلب إدخال فيزا أو بطاقة دفع؟</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                        إطلاقاً. التجربة مجانية بالكامل بنسبة 100% لمدة شهر كامل (30 يوماً)، ولا يُطلب منك إدخال أي وسيلة دفع أو بيانات مالية عند التسجيل.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                    <h3 class="font-black text-xs sm:text-sm text-navy-950 mb-1">ماذا يحدث لملفاتي وقضاياي بعد انتهاء الـ 30 يوماً؟</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                        تبقى جميع قضاياك ومذكراتك ومستنداتك محفوظة بأمان تام في بيئتك السحابية ولا يتم حذفها أبداً، وتتاح لك قراءتها وتصديرها، مع خيار الاشتراك لمواصلة التعديل والإضافة.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                    <h3 class="font-black text-xs sm:text-sm text-navy-950 mb-1">هل يعمل النظام بسلاسة على شاشة هاتف الآيفون والأندرويد؟</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                        نعم! المنظومة مصممة وفق أحدث معايير الويب التفاعلية (Mobile-First) بمقاس دقيق للهواتف، وتتيح لك متابعة رول الجلسات ومراجعة القرارات وصياغة المذكرات بنقرة زر واحدة من داخل قاعة المحكمة.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 9. FOOTER: Odoo-Style Corporate Footer                                    -->
+    <!-- ========================================================================= -->
+    <footer class="bg-navy-950 text-white py-12 border-t border-navy-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-navy-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-odoo-purple flex items-center justify-center text-lg">⚖️</div>
+                    <div>
+                        <div class="font-black text-base">منظومة بيت القانون</div>
+                        <div class="text-[11px] text-slate-400">ERP المحامي المصري • إدارة مكاتب ذكية</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6 text-xs text-slate-400 font-bold">
+                    <a href="#apps-ecosystem" class="hover:text-white transition">التطبيقات</a>
+                    <a href="#pricing" class="hover:text-white transition">الأسعار</a>
+                    <a href="/app" class="hover:text-white transition">التطبيق المباشر</a>
+                    <button onclick="openLoginModal()" class="hover:text-gold-400 transition">تسجيل الدخول</button>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 text-center sm:text-right">
+                <p>© 2026 بيت القانون. جميع الحقوق محفوظة لجمهورية مصر العربية.</p>
+                <p>مخصص لنقابة المحامين والمؤسسات القانونية في مصر.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- 10. REGISTRATION MODAL: 30-DAY FREE TRIAL                                  -->
+    <!-- ========================================================================= -->
+    <div id="modal-register" class="hidden fixed inset-0 z-50 bg-navy-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative my-auto">
+            <button onclick="closeModal('modal-register')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold transition">✕</button>
+
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 rounded-2xl bg-odoo-purple text-white mx-auto flex items-center justify-center text-xl mb-2 shadow-md">🎁</div>
+                <h3 class="text-lg font-black text-navy-950">تفعيل تجربة مكتبك (شهر كامل مجاناً)</h3>
+                <p class="text-xs text-slate-500 mt-1">سيبدأ عداد الـ 30 يوماً المجانية فوراً دون أي بطاقة دفع.</p>
+            </div>
+
+            <form onsubmit="handleRegisterSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-navy-950 mb-1">اسم المكتب أو المؤسسة <span class="text-rose-500">*</span></label>
+                    <input type="text" id="reg-office-name" required placeholder="مثال: مكتب المستشار أحمد ممدوح" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-odoo-purple">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] font-bold text-navy-950 mb-1">اسم المحامي المسؤول <span class="text-rose-500">*</span></label>
+                        <input type="text" id="reg-lawyer-name" required placeholder="أ. أحمد ممدوح" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-odoo-purple">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-navy-950 mb-1">رقم الهاتف <span class="text-rose-500">*</span></label>
+                        <input type="tel" id="reg-phone" required placeholder="01012345678" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-odoo-purple">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-navy-950 mb-1">البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="reg-email" placeholder="lawyer@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-odoo-purple">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-navy-950 mb-1">كلمة المرور <span class="text-rose-500">*</span></label>
+                    <input type="password" id="reg-password" required placeholder="اختر كلمة مرور" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-odoo-purple">
+                </div>
+
+                <button type="submit" id="btn-reg-submit" class="w-full py-3 rounded-xl bg-odoo-purple hover:bg-odoo-darkPurple text-white font-black text-xs shadow-lg transition flex items-center justify-center gap-1.5 mt-2">
+                    <span>🚀 تفعيل شهر كامل مجاناً والدخول للمنظومة</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 11. LOGIN MODAL                                                           -->
+    <!-- ========================================================================= -->
+    <div id="modal-login" class="hidden fixed inset-0 z-50 bg-navy-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative my-auto">
+            <button onclick="closeModal('modal-login')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold transition">✕</button>
+
+            <div class="text-center mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-navy-950 text-gold-400 mx-auto flex items-center justify-center text-lg mb-2 shadow">⚖️</div>
+                <h3 class="text-base font-black text-navy-950">تسجيل الدخول إلى مكتبك</h3>
+                <p class="text-xs text-slate-500 mt-0.5">أدخل بيانات الدخول الخاصة بحسابك</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-navy-950 mb-1">رقم الهاتف أو البريد الإلكتروني</label>
+                    <input type="text" id="login-identifier" required placeholder="01012345678 أو البريد" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-900">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-navy-950 mb-1">كلمة المرور</label>
+                    <input type="password" id="login-password" required placeholder="كلمة المرور" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-900">
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="w-full py-2.5 rounded-xl bg-navy-950 hover:bg-navy-900 text-gold-400 font-black text-xs shadow transition">
+                    دخول إلى المنظومة
+                </button>
+
+                <div class="text-center pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modal-login'); openRegisterModal();" class="text-xs text-odoo-purple hover:underline font-bold">
+                        ليس لديك حساب؟ سجّل مكتبك الآن (شهر مجاناً)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- JAVASCRIPT LOGIC                                                          -->
+    <!-- ========================================================================= -->
+    <script>
+        function openRegisterModal() {
+            document.getElementById('modal-register').classList.remove('hidden');
+        }
+        function openLoginModal() {
+            document.getElementById('modal-login').classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Showcase Tabs
+        function switchShowcaseTab(tab) {
+            const tabs = ['sessions', 'cases', 'zizo', 'finance'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`showcase-view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (!view || !btn) return;
+
+                if (t === tab) {
+                    view.classList.remove('hidden');
+                    btn.className = 'px-4 py-2 rounded-xl text-xs font-black bg-navy-950 text-gold-400 shadow-sm transition';
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-navy-950 bg-white border border-slate-200 transition';
+                }
+            });
+        }
+
+        // Handle Register Submission (30-day Free Trial)
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-reg-submit');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="inline-block animate-spin">⏳</span> جارٍ إنشاء المكتب وتفعيل الشهر المجاني...';
+
+            const payload = {
+                office_name: document.getElementById('reg-office-name').value.trim(),
+                lawyer_name: document.getElementById('reg-lawyer-name').value.trim(),
+                phone: document.getElementById('reg-phone').value.trim(),
+                email: document.getElementById('reg-email').value.trim(),
+                password: document.getElementById('reg-password').value
+            };
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('office_token', data.token);
+                    alert(`🎉 مبارك معالي المستشار ${payload.lawyer_name}! تم تفعيل شهر كامل (30 يوماً) تجربة مجانية لمكتبك.`);
+                    window.location.href = '/app';
+                } else {
+                    alert(data.detail || data.message || 'حدث خطأ أثناء التسجيل');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (err) {
+                alert('تعذر الاتصال بالخادم');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // Handle Login Submission
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            btn.disabled = true;
+            btn.textContent = 'جاري التحقق...';
+
+            const ident = document.getElementById('login-identifier').value.trim();
+            const pwd = document.getElementById('login-password').value;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier: ident, password: pwd })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('office_token', data.token);
+                    if (data.is_admin) {
+                        localStorage.setItem('is_admin', 'true');
+                        window.location.href = '/app?view=admin';
+                    } else {
+                        localStorage.removeItem('is_admin');
+                        window.location.href = '/app';
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.detail || 'بيانات الدخول غير صحيحة');
+                    btn.disabled = false;
+                    btn.textContent = 'دخول إلى المنظومة';
+                }
+            } catch (err) {
+                alert('تعذر الاتصال بالخادم');
+                btn.disabled = false;
+                btn.textContent = 'دخول إلى المنظومة';
+            }
+        }
+    </script>
+</body>
+</html>

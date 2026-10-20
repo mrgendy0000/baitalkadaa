@@ -1,0 +1,17 @@
+{
+  "name": "ميزان - المستشار صقر حورس",
+  "short_name": "ميزان القانوني",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1B3D",
+  "theme_color": "#0B1B3D",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/lawyer_bird.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
