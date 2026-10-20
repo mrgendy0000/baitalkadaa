@@ -2256,12 +2256,12 @@ async def simulate_trial_renewal(
     authorization: Optional[str] = Header(None)
 ):
     office = resolve_office(x_office_token, authorization)
-    office["trial_end"] = (datetime.now() + timedelta(days=15)).isoformat()
+    office["trial_end"] = (datetime.now() + timedelta(days=30)).isoformat()
     return {
         "status": "success",
         "message": f"تم تجديد فترة التجربة بنجاح لمكتب {office['name']}",
         "trial_end": office["trial_end"],
-        "days_remaining": 15,
+        "days_remaining": 30,
         "is_expired": False
     }
 
