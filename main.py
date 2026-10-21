@@ -5,15 +5,18 @@ import copy
 import re
 import time
 import secrets
+import hashlib
+import app_security as security
 from uuid import uuid4
 from datetime import datetime, date, timedelta
 from typing import List, Optional, Dict, Any, Union
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Header, Request, Depends, status
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Header, Request, Response, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from assistant_service import AdvisorRequest, answer_query, assistant_status, search_constitution, constitution
 
 app = FastAPI(
     title="بيت القانون | المنظومة الرقمية المتكاملة للمحامي المصري",
@@ -42,58 +45,62 @@ def sanitize_input(val: Any) -> Any:
         return [sanitize_input(i) for i in val]
     return val
 
+ALLOWED_ORIGINS = {"https://baitalkadaa.vercel.app", "http://127.0.0.1:8012", "http://127.0.0.1:8011", "http://127.0.0.1:8000", "http://localhost:8000"}
+if os.environ.get('APP_ORIGIN'): ALLOWED_ORIGINS.add(os.environ['APP_ORIGIN'].rstrip('/'))
+if os.environ.get('VERCEL_URL'): ALLOWED_ORIGINS.add('https://'+os.environ['VERCEL_URL'])
+
 @app.middleware("http")
 async def security_and_rate_limit_middleware(request: Request, call_next):
-    # 1. تحديد هوية العميل عبر IP
-    client_ip = request.client.host if request.client else "unknown"
-    now_ts = time.time()
-    path = request.url.path
+    path=request.url.path
+    context={'office':None}
+    context_token=security.REQUEST_STATE.set(context)
+    try:
+        if path.startswith('/api/'):
+            origin=request.headers.get('origin')
+            if origin and origin not in ALLOWED_ORIGINS:
+                return JSONResponse(status_code=403,content={'detail':'مصدر الطلب غير مسموح.'})
+            try: size=int(request.headers.get('content-length','0'))
+            except ValueError: size=0
+            if size>8*1024*1024:
+                return JSONResponse(status_code=413,content={'detail':'حجم الطلب أكبر من الحد المسموح.'})
+            if request.method in ('POST','PUT','PATCH') and path!='/api/vision/ocr-scan' and 'application/json' not in request.headers.get('content-type',''):
+                return JSONResponse(status_code=415,content={'detail':'يرجى إرسال الطلب بصيغة JSON.'})
+            marker=request.headers.get('x-office-token','')
+            token=request.cookies.get(security.COOKIE) or request.cookies.get(security.LOCAL_COOKIE)
+            if marker in ('token_demo','token_demo_office'):
+                context['office']=copy.deepcopy(OFFICES['office_demo'])
+            elif token and path not in ('/api/auth/login','/api/auth/register','/api/auth/logout'):
+                context['office']=await asyncio.to_thread(security.load_session,token)
+                context['original']=copy.deepcopy(context['office']['data'])
+            elif marker and marker!='cookie_session':
+                raise HTTPException(401,detail='الجلسة القديمة انتهت. سجّل الدخول مجدداً.')
+            elif marker=='cookie_session' and path not in ('/api/auth/login','/api/auth/register'):
+                raise HTTPException(401,detail='انتهت جلسة الدخول. سجّل الدخول مجدداً.')
+            if path in ('/api/auth/login','/api/auth/register') and security.configured():
+                bucket='register' if path.endswith('register') else 'login'
+                ip=request.client.host if request.client else 'unknown'
+                await asyncio.to_thread(security.reserve,bucket+':'+ip,5 if bucket=='register' else 15,3600 if bucket=='register' else 60)
+        response=await call_next(request)
+        office=context.get('office')
+        if office and context.get('original') is not None and response.status_code<400 and request.method in ('POST','PUT','PATCH','DELETE'):
+            await asyncio.to_thread(security.persist,office,context['original'])
+        response.headers['X-Frame-Options']='DENY'
+        response.headers['X-Content-Type-Options']='nosniff'
+        response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy']='camera=(self), microphone=(self), geolocation=()'
+        response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        if request.url.scheme=='https' or os.environ.get('VERCEL'):
+            response.headers['Strict-Transport-Security']='max-age=31536000'
+        if path.startswith('/api/') or path=='/app':
+            response.headers['Cache-Control']='private, no-store'
+            response.headers['Pragma']='no-cache'
+        return response
+    except HTTPException as exc:
+        return JSONResponse(status_code=exc.status_code,content={'detail':exc.detail},headers={'Cache-Control':'no-store'})
+    finally:
+        security.REQUEST_STATE.reset(context_token)
 
-    # 2. حماية نقطة تسجيل الدخول من هجمات التخمين Brute Force (حد أقصى 20 محاولة/دقيقة)
-    if path == "/api/auth/login" and request.method == "POST":
-        attempts = [t for t in LOGIN_ATTEMPTS.get(client_ip, []) if now_ts - t < 60]
-        if len(attempts) >= 20:
-            return JSONResponse(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                content={"status": "error", "message": "تم تجاوز الحد المسموح من محاولات الدخول. برجاء الانتظار دقيقة لأسباب أمنية."}
-            )
-        attempts.append(now_ts)
-        LOGIN_ATTEMPTS[client_ip] = attempts
-
-    # 3. حماية شاملة من هجمات حجب الخدمة (DDoS / Rate Limiting: 240 طلب/دقيقة)
-    if path.startswith("/api/"):
-        reqs = [t for t in RATE_LIMIT_STORE.get(client_ip, []) if now_ts - t < 60]
-        if len(reqs) >= 240:
-            return JSONResponse(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                content={"status": "error", "message": "معدل الطلبات مرتفع جداً. تم الحظر المؤقت لحماية أداء المنظومة."}
-            )
-        reqs.append(now_ts)
-        RATE_LIMIT_STORE[client_ip] = reqs
-
-    # 4. معالجة الطلب وإضافة ترويسات الأمان (Security Headers)
-    response = await call_next(request)
-    
-    # حماية من تضمين الإطارات وسرقة النقرات (Clickjacking)
-    response.headers["X-Frame-Options"] = "SAMEORIGIN"
-    # حماية من تخمين أنواع الملفات (MIME Sniffing)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    # تفعيل فلتر المتصفح للحماية من ثغرات XSS
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    # حماية بيانات الإحالة Referrer
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    # تشفير الاتصال وحماية النطاق
-    response.headers["Permissions-Policy"] = "camera=(self), microphone=(self)"
-    
-    return response
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware,allow_origins=list(ALLOWED_ORIGINS),allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-Office-Token','Authorization'])
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 static_dir = os.path.join(BASE_DIR, "static")
@@ -104,282 +111,225 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 # قاعدة بيانات المنظومة الشاملة المستوحاة من كبرى تطبيقات المحامين في مصر
 # (قانوني، الأجندة القضائية، DP-Lawyer، المحامي برو، دعم المحامي)
 # -----------------------------------------------------------------------------
-DB = {
-    "cases": [
-        {
-            "id": "case-1",
-            "number": "1425 لسنة 2026 جنح قصر النيل",
-            "court": "محكمة جنح مستأنف قصر النيل",
-            "circuit": "الدائرة الجنائية المستأنفة",
-            "client_name": "مروان عصام عبد الرحمن",
-            "client_capacity": "متهم / مستأنف",
-            "opposing_party": "أحمد حسني محمود",
-            "subject": "جنحة خيانة أمانة (إيصال أمانة على بياض)",
-            "stage": "sessions", # study, sessions, judgment, execution
-            "next_session": "2026-04-26",
-            "roll": "14",
-            "fee_total": 45000,
-            "fee_paid": 25000,
-            "notes": "المطلوب: إيداع مذكرة بدفاع المتهم بالطعن بالجهالة وطلب إحالة الورقة للطب الشرعي لبيان المعاصرة."
-        },
-        {
-            "id": "case-2",
-            "number": "5521 لسنة 2025 مدني كلي شمال القاهرة",
-            "court": "شمال القاهرة الابتدائية (العباسية)",
-            "circuit": "الدائرة 14 مدني كلي",
-            "client_name": "مؤسسة النيل للتجارة والمقاولات",
-            "client_capacity": "مدعى عليه",
-            "opposing_party": "شركة الفنار للتوريدات",
-            "subject": "مطالبة مدنية بالتعويض عن إخلال عقدي",
-            "stage": "study",
-            "next_session": "2026-05-10",
-            "roll": "7",
-            "fee_total": 80000,
-            "fee_paid": 40000,
-            "notes": "فحص ملف العقد ومذكرات تبادل المراسلات لسداد أمانة الخبير الهندسي بمكتب خبراء وزارة العدل."
-        },
-        {
-            "id": "case-3",
-            "number": "319 لسنة 2026 أسرة مصر الجديدة",
-            "court": "محكمة أسرة مصر الجديدة",
-            "circuit": "الدائرة 2 أسرة",
-            "client_name": "سارة إبراهيم الدسوقي",
-            "client_capacity": "مدعية",
-            "opposing_party": "كريم فؤاد الشريف",
-            "subject": "دعوى تطليق خلعاً ونفقة صغار",
-            "stage": "judgment",
-            "next_session": "2026-04-22",
-            "roll": "22",
-            "fee_total": 35000,
-            "fee_paid": 35000,
-            "notes": "محجوزة للحكم بجلسة 22 أبريل مع إيداع إنذار عرض مقدم الصداق الثابت بالوثيقة."
-        },
-        {
-            "id": "case-4",
-            "number": "912 لسنة 2024 مدني كلي الجيزة",
-            "court": "محكمة الجيزة الابتدائية (شارع السودان)",
-            "circuit": "الدائرة 6 إيجارات",
-            "client_name": "الحاج فاروق عبد العظيم",
-            "client_capacity": "مدعي (مالك العقار)",
-            "opposing_party": "ورثة المستأجر الأصلي",
-            "subject": "طرد للغصب وإنهاء علاقة إيجارية لانتفاء الامتداد",
-            "stage": "execution",
-            "next_session": "2026-04-30",
-            "roll": "3",
-            "fee_total": 60000,
-            "fee_paid": 55000,
-            "notes": "تم استلام الصيغة التنفيذية وجاري تحديد موعد معاون التنفيذ لإخلاء العين وتسليمها للمالك."
-        },
-        {
-            "id": "case-5",
-            "number": "7812 لسنة 2026 جنايات القاهرة الجديدة",
-            "court": "محكمة جنايات القاهرة (التجمع الخامس)",
-            "circuit": "الدائرة 3 جنايات شمال",
-            "client_name": "شريف عادل المنشاوي",
-            "client_capacity": "متهم ثانٍ",
-            "opposing_party": "النيابة العامة",
-            "subject": "حيازة وإحراز مواد مخدرة وسلاح بدون ترخيص",
-            "stage": "sessions",
-            "next_session": "2026-05-18",
-            "roll": "5",
-            "fee_total": 120000,
-            "fee_paid": 70000,
-            "notes": "الدفع الجوهري: بطلان الاستيقاف وتحوله إلى قبض غير مشروع لانتفاء حالة التلبس استناداً للمادة 54 دستور."
-        }
-    ],
-    "sessions": [
-        {
-            "id": "sess-1",
-            "roll": "14",
-            "case_number": "1425 لسنة 2026 جنح قصر النيل",
-            "court": "محكمة جنح مستأنف قصر النيل",
-            "date": "2026-04-26",
-            "day": "الأحد",
-            "subject": "خيانة أمانة (إيصال أمانة)",
-            "last_decision": "تأجيل لتقديم أصل الإيصال والمذكرات",
-            "action_required": "إيداع مذكرة الدفاع والطعن بالتزوير صلباً وتاريخاً"
-        },
-        {
-            "id": "sess-2",
-            "roll": "22",
-            "case_number": "319 لسنة 2026 أسرة مصر الجديدة",
-            "court": "محكمة أسرة مصر الجديدة",
-            "date": "2026-04-22",
-            "day": "الأربعاء",
-            "subject": "دعوى خلع ونفقة صغار",
-            "last_decision": "حجز الدعوى للحكم",
-            "action_required": "حضور جلسة النطق بالحكم واستلام الصورة الرسمية التنفيذية"
-        },
-        {
-            "id": "sess-3",
-            "roll": "7",
-            "case_number": "5521 لسنة 2025 مدني شمال القاهرة",
-            "court": "محكمة شمال القاهرة الابتدائية",
-            "date": "2026-05-10",
-            "day": "الأحد",
-            "subject": "مطالبة مدنية بالتعويض",
-            "last_decision": "تأجيل لإيداع تقرير خبير وزارة العدل",
-            "action_required": "حضور أمام مكتب الخبراء وتقديم المستندات والرسائل المتبادلة"
-        },
-        {
-            "id": "sess-4",
-            "roll": "5",
-            "case_number": "7812 لسنة 2026 جنايات القاهرة الجديدة",
-            "court": "محكمة جنايات القاهرة (التجمع الخامس)",
-            "date": "2026-05-18",
-            "day": "الإثنين",
-            "subject": "جنايات مخدرات وسلاح",
-            "last_decision": "سماع أقوال ضابط الواقعة",
-            "action_required": "مناقشة الضابط في التلبس وتناقض أقواله بمحضر الضبط مع المعاينة"
-        }
-    ],
-    "clients": [
-        {
-            "id": "cl-1",
-            "name": "مروان عصام عبد الرحمن",
-            "national_id": "28804150102574",
-            "phone": "01098765432",
-            "poa_number": "3824 / ب لسنة 2026 توثيق الأهرام",
-            "poa_type": "توكيل رسمي عام قضايا وبنوك",
-            "active_cases": 1,
-            "address": "15 شارع الدقي - الجيزة"
-        },
-        {
-            "id": "cl-2",
-            "name": "مؤسسة النيل للتجارة والمقاولات",
-            "national_id": "100458921 (سجل تجاري)",
-            "phone": "01234567890",
-            "poa_number": "9124 لسنة 2025 توثيق الاستثمار",
-            "poa_type": "توكيل شركات وتفويض إدارة",
-            "active_cases": 1,
-            "address": "أبراج سيتي ستارز - مدينة نصر"
-        },
-        {
-            "id": "cl-3",
-            "name": "سارة إبراهيم الدسوقي",
-            "national_id": "29508120104822",
-            "phone": "01122334455",
-            "poa_number": "1540 لسنة 2026 توثيق مصر الجديدة",
-            "poa_type": "توكيل قضايا وأحوال شخصية",
-            "active_cases": 1,
-            "address": "شارع النزهة - مصر الجديدة"
-        },
-        {
-            "id": "cl-4",
-            "name": "الحاج فاروق عبد العظيم",
-            "national_id": "25203110103215",
-            "phone": "01001122334",
-            "poa_number": "7812 لسنة 2024 توثيق الجيزة",
-            "poa_type": "توكيل رسمي عام قضايا",
-            "active_cases": 1,
-            "address": "شارع مراد - الجيزة"
-        },
-        {
-            "id": "cl-5",
-            "name": "شريف عادل المنشاوي",
-            "national_id": "29107140101893",
-            "phone": "01555667788",
-            "poa_number": "4102 لسنة 2026 توثيق التجمع الخامس",
-            "poa_type": "توكيل خاص جنايات",
-            "active_cases": 1,
-            "address": "حي النرجس - التجمع الخامس"
-        }
-    ],
-    "finance": {
-        "ledger": [
-            {
-                "id": "trn-1",
-                "date": "2026-04-18",
-                "client": "مروان عصام عبد الرحمن",
-                "case": "1425 لسنة 2026 جنح قصر النيل",
-                "amount": 15000,
-                "type": "income", # income, expense
-                "description": "دفعة أتعاب مرافعة وصياغة مذكرة النقض",
-                "status": "مقبوض نقداً بالخزينة"
-            },
-            {
-                "id": "trn-2",
-                "date": "2026-04-15",
-                "client": "مؤسسة النيل للمقاولات",
-                "case": "5521 لسنة 2025 مدني شمال القاهرة",
-                "amount": 20000,
-                "type": "income",
-                "description": "دفعة مقدم أتعاب الدعوى المدنية",
-                "status": "تحويل إنستاباي InstaPay"
-            },
-            {
-                "id": "trn-3",
-                "date": "2026-04-14",
-                "client": "مصروفات مكتب",
-                "case": "رسوم قضائية وخزينة المحكمة",
-                "amount": 3500,
-                "type": "expense",
-                "description": "سداد رسوم إيداع واستخراج صور رسمية من المحكمة",
-                "status": "مدفوع بإيصال رسمي"
-            },
-            {
-                "id": "trn-4",
-                "date": "2026-04-10",
-                "client": "شريف عادل المنشاوي",
-                "case": "7812 لسنة 2026 جنايات القاهرة",
-                "amount": 40000,
-                "type": "income",
-                "description": "دفعة أولى أتعاب جنايات",
-                "status": "تحويل بنكي CIB"
-            }
-        ]
-    },
-    "reception": [
-        {
-            "id": "rec-1",
-            "time": "09:30 ص",
-            "visitor_name": "المستشار عصام الورداني",
-            "phone": "01012345678",
-            "purpose": "استشارة في نزاع ملكية عقار وتثبيت ملكية بالمعادي",
-            "assigned_to": "أستاذ المحاماة",
-            "status": "قيد المقابلة",
-            "fee": 1500,
-            "is_paid": True,
-            "notes": "معه أصل العقد المسجل ومستندات المساحة"
-        },
-        {
-            "id": "rec-2",
-            "time": "10:15 ص",
-            "visitor_name": "مدام منى عبد العزيز",
-            "phone": "01198765432",
-            "purpose": "قيد دعوى خلع وتمكين من مسكن الحضانة ونفقة صغار",
-            "assigned_to": "أستاذ المحاماة",
-            "status": "بالانتظار",
-            "fee": 2000,
-            "is_paid": True,
-            "notes": "تم استلام وثيقة الزواج وشهادات ميلاد الصغار والإنذار"
-        },
-        {
-            "id": "rec-3",
-            "time": "11:00 ص",
-            "visitor_name": "م. طارق كمال (شركة إيماك)",
-            "phone": "01234567891",
-            "purpose": "إيداع توكيل شركات ومراجعة عقد توريدات مقاولات",
-            "assigned_to": "المكتب الفني",
-            "status": "بالانتظار",
-            "fee": 3000,
-            "is_paid": False,
-            "notes": "مطلوب صياغة شرط التحكيم لمركز القاهرة الإقليمي CRCICA"
-        },
-        {
-            "id": "rec-4",
-            "time": "08:45 ص",
-            "visitor_name": "الحاج فاروق عبد العظيم",
-            "phone": "01001122334",
-            "purpose": "متابعة تنفيذ حكم الطرد وتسليم الشقة للمالك",
-            "assigned_to": "قسم التنفيذ",
-            "status": "تم الإنجاز",
-            "fee": 0,
-            "is_paid": True,
-            "notes": "تم توجيه إنذار معاون التنفيذ بنجاح وسداد الرسم"
-        }
-    ]
-}
+# Public demo records only; no real client identities.
+DB = {'cases': [{'id': 'case-1',
+            'number': 'DEMO-001',
+            'court': 'محكمة جنح مستأنف قصر النيل',
+            'circuit': 'الدائرة الجنائية المستأنفة',
+            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_capacity': 'متهم / مستأنف',
+            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'subject': 'جنحة خيانة أمانة (إيصال أمانة على بياض)',
+            'stage': 'sessions',
+            'next_session': '2026-04-26',
+            'roll': '14',
+            'fee_total': 45000,
+            'fee_paid': 25000,
+            'notes': 'مثال عرض مصطنع غير حقيقي'},
+           {'id': 'case-2',
+            'number': 'DEMO-002',
+            'court': 'شمال القاهرة الابتدائية (العباسية)',
+            'circuit': 'الدائرة 14 مدني كلي',
+            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_capacity': 'مدعى عليه',
+            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'subject': 'مطالبة مدنية بالتعويض عن إخلال عقدي',
+            'stage': 'study',
+            'next_session': '2026-05-10',
+            'roll': '7',
+            'fee_total': 80000,
+            'fee_paid': 40000,
+            'notes': 'مثال عرض مصطنع غير حقيقي'},
+           {'id': 'case-3',
+            'number': 'DEMO-003',
+            'court': 'محكمة أسرة مصر الجديدة',
+            'circuit': 'الدائرة 2 أسرة',
+            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_capacity': 'مدعية',
+            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'subject': 'دعوى تطليق خلعاً ونفقة صغار',
+            'stage': 'judgment',
+            'next_session': '2026-04-22',
+            'roll': '22',
+            'fee_total': 35000,
+            'fee_paid': 35000,
+            'notes': 'مثال عرض مصطنع غير حقيقي'},
+           {'id': 'case-4',
+            'number': 'DEMO-004',
+            'court': 'محكمة الجيزة الابتدائية (شارع السودان)',
+            'circuit': 'الدائرة 6 إيجارات',
+            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_capacity': 'مدعي (مالك العقار)',
+            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'subject': 'طرد للغصب وإنهاء علاقة إيجارية لانتفاء الامتداد',
+            'stage': 'execution',
+            'next_session': '2026-04-30',
+            'roll': '3',
+            'fee_total': 60000,
+            'fee_paid': 55000,
+            'notes': 'مثال عرض مصطنع غير حقيقي'},
+           {'id': 'case-5',
+            'number': 'DEMO-005',
+            'court': 'محكمة جنايات القاهرة (التجمع الخامس)',
+            'circuit': 'الدائرة 3 جنايات شمال',
+            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_capacity': 'متهم ثانٍ',
+            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'subject': 'حيازة وإحراز مواد مخدرة وسلاح بدون ترخيص',
+            'stage': 'sessions',
+            'next_session': '2026-05-18',
+            'roll': '5',
+            'fee_total': 120000,
+            'fee_paid': 70000,
+            'notes': 'مثال عرض مصطنع غير حقيقي'}],
+ 'sessions': [{'id': 'sess-1',
+               'roll': '14',
+               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'court': 'محكمة جنح مستأنف قصر النيل',
+               'date': '2026-04-26',
+               'day': 'الأحد',
+               'subject': 'خيانة أمانة (إيصال أمانة)',
+               'last_decision': 'تأجيل لتقديم أصل الإيصال والمذكرات',
+               'action_required': 'إيداع مذكرة الدفاع والطعن بالتزوير صلباً وتاريخاً'},
+              {'id': 'sess-2',
+               'roll': '22',
+               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'court': 'محكمة أسرة مصر الجديدة',
+               'date': '2026-04-22',
+               'day': 'الأربعاء',
+               'subject': 'دعوى خلع ونفقة صغار',
+               'last_decision': 'حجز الدعوى للحكم',
+               'action_required': 'حضور جلسة النطق بالحكم واستلام الصورة الرسمية التنفيذية'},
+              {'id': 'sess-3',
+               'roll': '7',
+               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'court': 'محكمة شمال القاهرة الابتدائية',
+               'date': '2026-05-10',
+               'day': 'الأحد',
+               'subject': 'مطالبة مدنية بالتعويض',
+               'last_decision': 'تأجيل لإيداع تقرير خبير وزارة العدل',
+               'action_required': 'حضور أمام مكتب الخبراء وتقديم المستندات والرسائل المتبادلة'},
+              {'id': 'sess-4',
+               'roll': '5',
+               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'court': 'محكمة جنايات القاهرة (التجمع الخامس)',
+               'date': '2026-05-18',
+               'day': 'الإثنين',
+               'subject': 'جنايات مخدرات وسلاح',
+               'last_decision': 'سماع أقوال ضابط الواقعة',
+               'action_required': 'مناقشة الضابط في التلبس وتناقض أقواله بمحضر الضبط مع المعاينة'}],
+ 'clients': [{'id': 'cl-1',
+              'name': 'مثال عرض مصطنع غير حقيقي',
+              'national_id': '',
+              'phone': '',
+              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'poa_type': 'توكيل رسمي عام قضايا وبنوك',
+              'active_cases': 1,
+              'address': 'مثال عرض مصطنع غير حقيقي'},
+             {'id': 'cl-2',
+              'name': 'مثال عرض مصطنع غير حقيقي',
+              'national_id': '',
+              'phone': '',
+              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'poa_type': 'توكيل شركات وتفويض إدارة',
+              'active_cases': 1,
+              'address': 'مثال عرض مصطنع غير حقيقي'},
+             {'id': 'cl-3',
+              'name': 'مثال عرض مصطنع غير حقيقي',
+              'national_id': '',
+              'phone': '',
+              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'poa_type': 'توكيل قضايا وأحوال شخصية',
+              'active_cases': 1,
+              'address': 'مثال عرض مصطنع غير حقيقي'},
+             {'id': 'cl-4',
+              'name': 'مثال عرض مصطنع غير حقيقي',
+              'national_id': '',
+              'phone': '',
+              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'poa_type': 'توكيل رسمي عام قضايا',
+              'active_cases': 1,
+              'address': 'مثال عرض مصطنع غير حقيقي'},
+             {'id': 'cl-5',
+              'name': 'مثال عرض مصطنع غير حقيقي',
+              'national_id': '',
+              'phone': '',
+              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'poa_type': 'توكيل خاص جنايات',
+              'active_cases': 1,
+              'address': 'مثال عرض مصطنع غير حقيقي'}],
+ 'finance': {'ledger': [{'id': 'trn-1',
+                         'date': '2026-04-18',
+                         'client': 'مثال عرض مصطنع غير حقيقي',
+                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'amount': 15000,
+                         'type': 'income',
+                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'status': 'مقبوض نقداً بالخزينة'},
+                        {'id': 'trn-2',
+                         'date': '2026-04-15',
+                         'client': 'مثال عرض مصطنع غير حقيقي',
+                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'amount': 20000,
+                         'type': 'income',
+                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'status': 'تحويل إنستاباي InstaPay'},
+                        {'id': 'trn-3',
+                         'date': '2026-04-14',
+                         'client': 'مثال عرض مصطنع غير حقيقي',
+                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'amount': 3500,
+                         'type': 'expense',
+                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'status': 'مدفوع بإيصال رسمي'},
+                        {'id': 'trn-4',
+                         'date': '2026-04-10',
+                         'client': 'مثال عرض مصطنع غير حقيقي',
+                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'amount': 40000,
+                         'type': 'income',
+                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'status': 'تحويل بنكي CIB'}]},
+ 'reception': [{'id': 'rec-1',
+                'time': '09:30 ص',
+                'visitor_name': 'مثال عرض مصطنع غير حقيقي',
+                'phone': '',
+                'purpose': 'استشارة في نزاع ملكية عقار وتثبيت ملكية بالمعادي',
+                'assigned_to': 'مثال عرض مصطنع غير حقيقي',
+                'status': 'قيد المقابلة',
+                'fee': 1500,
+                'is_paid': True,
+                'notes': 'مثال عرض مصطنع غير حقيقي'},
+               {'id': 'rec-2',
+                'time': '10:15 ص',
+                'visitor_name': 'مثال عرض مصطنع غير حقيقي',
+                'phone': '',
+                'purpose': 'قيد دعوى خلع وتمكين من مسكن الحضانة ونفقة صغار',
+                'assigned_to': 'مثال عرض مصطنع غير حقيقي',
+                'status': 'بالانتظار',
+                'fee': 2000,
+                'is_paid': True,
+                'notes': 'مثال عرض مصطنع غير حقيقي'},
+               {'id': 'rec-3',
+                'time': '11:00 ص',
+                'visitor_name': 'مثال عرض مصطنع غير حقيقي',
+                'phone': '',
+                'purpose': 'إيداع توكيل شركات ومراجعة عقد توريدات مقاولات',
+                'assigned_to': 'مثال عرض مصطنع غير حقيقي',
+                'status': 'بالانتظار',
+                'fee': 3000,
+                'is_paid': False,
+                'notes': 'مثال عرض مصطنع غير حقيقي'},
+               {'id': 'rec-4',
+                'time': '08:45 ص',
+                'visitor_name': 'مثال عرض مصطنع غير حقيقي',
+                'phone': '',
+                'purpose': 'متابعة تنفيذ حكم الطرد وتسليم الشقة للمالك',
+                'assigned_to': 'مثال عرض مصطنع غير حقيقي',
+                'status': 'تم الإنجاز',
+                'fee': 0,
+                'is_paid': True,
+                'notes': 'مثال عرض مصطنع غير حقيقي'}]}
 
 # -----------------------------------------------------------------------------
 # سجل مكاتب المحاماة والتجربة المجانية لمدة 15 يوماً وعزل البيانات
@@ -391,135 +341,33 @@ OFFICE_TOKENS: Dict[str, str] = {} # token -> office_id
 
 # تهيئة المكتب التجريبي النموذجي للمعاينة
 demo_office_id = "office_demo"
-demo_token = "token_demo_office"
+demo_token = "token_demo"  # Public preview marker, not an authenticated credential.
 OFFICES[demo_office_id] = {
-    "id": demo_office_id,
-    "name": "مكتب بيت القانون للمحاماة والاستشارات القانونية",
-    "lawyer_name": "معالي المستشار",
-    "email": "demo@baytalqanoon.eg",
-    "phone": "01001234567",
-    "password": "demo",
-    "token": demo_token,
-    "created_at": (datetime.now() - timedelta(days=2)).isoformat(),
-    "trial_start": (datetime.now() - timedelta(days=2)).isoformat(),
-    "trial_end": (datetime.now() + timedelta(days=28)).isoformat(), # 28 يوماً متبقية (شهر كامل مجاناً)
-    "is_active": True,
-    "is_admin": False,
-    "is_demo": True,
-    "plan": "trial_month",
-    "data": copy.deepcopy(DEFAULT_SEED_DB)
+    "id": demo_office_id, "name": "مكتب تجريبي — بيت القانون", "lawyer_name": "زائر المنظومة",
+    "email": "demo@example.invalid", "phone": "", "created_at": datetime.utcnow().isoformat(),
+    "trial_start": datetime.utcnow().isoformat(), "trial_end": (datetime.utcnow()+timedelta(days=30)).isoformat(),
+    "is_active": True, "is_admin": False, "is_demo": True, "plan": "demo", "data": copy.deepcopy(DEFAULT_SEED_DB)
 }
-OFFICE_TOKENS[demo_token] = demo_office_id
 
-# تهيئة حساب مالك المنظومة (Super Admin / Master Control)
-admin_office_id = "office_super_admin"
-admin_token = "tok_owner_master_2026"
-OFFICES[admin_office_id] = {
-    "id": admin_office_id,
-    "name": "الإدارة العليا • مالك منظومة بيت القانون",
-    "lawyer_name": "مالك المنظومة (المشرف العام)",
-    "email": "admin@bayt-alqanoon.eg",
-    "phone": "01000000000",
-    "password": "admin",
-    "token": admin_token,
-    "created_at": "2026-01-01T00:00:00",
-    "trial_start": "2026-01-01T00:00:00",
-    "trial_end": "2030-12-31T23:59:59",
-    "is_active": True,
-    "is_admin": True,
-    "plan": "super_admin",
-    "data": copy.deepcopy(DEFAULT_SEED_DB)
-}
-OFFICE_TOKENS[admin_token] = admin_office_id
+def resolve_office(x_office_token=None, authorization=None, token=None):
+    context = security.REQUEST_STATE.get()
+    if context and context.get('office'):
+        return context['office']
+    provided = token or (x_office_token if isinstance(x_office_token,str) else None)
+    if not provided and isinstance(authorization,str):
+        provided=authorization.removeprefix('Bearer ').strip()
+    if not provided or provided in ('token_demo','token_demo_office'):
+        return copy.deepcopy(OFFICES['office_demo'])
+    raise HTTPException(401, detail='جلسة المكتب غير صالحة. سجّل الدخول مجدداً.')
 
-# مكاتب محامين مسجلة تحت إدارة مالك المنظومة
-offices_seed = [
-    {
-        "id": "office_nile",
-        "token": "tok_nile_2026",
-        "name": "مؤسسة النيل الدولية للمحاماة والتحكيم",
-        "lawyer_name": "المستشار شريف فوزي المحامي بالنقض",
-        "email": "sherif@nilelaw.eg",
-        "phone": "01223456789",
-        "days_left": 185,
-        "is_active": True,
-        "plan": "pro_annual"
-    },
-    {
-        "id": "office_adala",
-        "token": "tok_adala_2026",
-        "name": "مكتب العدالة وحقوق الدفاع",
-        "lawyer_name": "الأستاذة نادية الألفي المحامية",
-        "email": "nadia@adala.eg",
-        "phone": "01123456780",
-        "days_left": 3,
-        "is_active": True,
-        "plan": "trial_15"
-    },
-    {
-        "id": "office_alex",
-        "token": "tok_alex_2026",
-        "name": "مجموعة الإسكندرية للقضايا الجنائية والتجارية",
-        "lawyer_name": "المستشار طارق قاسم",
-        "email": "tarek@alexlaw.eg",
-        "phone": "01099887766",
-        "days_left": 0,
-        "is_active": False,
-        "plan": "expired"
-    }
-]
-for s in offices_seed:
-    OFFICES[s["id"]] = {
-        "id": s["id"],
-        "name": s["name"],
-        "lawyer_name": s["lawyer_name"],
-        "email": s["email"],
-        "phone": s["phone"],
-        "password": "demo",
-        "token": s["token"],
-        "created_at": (datetime.now() - timedelta(days=15)).isoformat(),
-        "trial_start": (datetime.now() - timedelta(days=15)).isoformat(),
-        "trial_end": (datetime.now() + timedelta(days=s["days_left"])).isoformat(),
-        "is_active": s["is_active"],
-        "is_admin": False,
-        "plan": s["plan"],
-        "data": copy.deepcopy(DEFAULT_SEED_DB)
-    }
-    OFFICE_TOKENS[s["token"]] = s["id"]
-
-def resolve_office(
-    x_office_token: Optional[str] = Header(None),
-    authorization: Optional[str] = Header(None),
-    token: Optional[str] = None
-) -> Dict[str, Any]:
-    t = None
-    if x_office_token and x_office_token.strip():
-        t = x_office_token.strip()
-    elif authorization and authorization.strip():
-        parts = authorization.strip().split(" ")
-        if len(parts) == 2 and parts[0].lower() == "bearer":
-            t = parts[1].strip()
-        else:
-            t = authorization.strip()
-    elif token and token.strip():
-        t = token.strip()
-
-    if t:
-        if t in OFFICE_TOKENS and OFFICE_TOKENS[t] in OFFICES:
-            return OFFICES[OFFICE_TOKENS[t]]
-        if t in OFFICES:
-            return OFFICES[t]
-
-    return OFFICES["office_demo"]
-
-def check_trial_permission(office: Dict[str, Any], for_mutation: bool = False) -> bool:
-    trial_end = datetime.fromisoformat(office["trial_end"])
-    is_expired = datetime.now() > trial_end
-    if is_expired and for_mutation:
-        raise HTTPException(
-            status_code=403,
-            detail="انتهت فترة التجربة المجانية لمكتبك (15 يوماً). جميع بياناتك وقضاياك ومستنداتك محفوظة بأمان تام في خزينة مكتبك. يرجى التواصل مع فريق بيت القانون لتفعيل اشتراكك ومتابعة العمل."
-        )
+def check_trial_permission(office, for_mutation=False):
+    if not office.get('is_active', True):
+        raise HTTPException(403, detail='حساب المكتب موقوف؛ تواصل مع الإدارة.')
+    if for_mutation and office.get('is_demo'):
+        raise HTTPException(403, detail='وضع الضيف للمعاينة فقط. سجّل مكتباً لحفظ بياناتك بشكل خاص.')
+    is_expired=datetime.utcnow()>datetime.fromisoformat(office['trial_end'])
+    if for_mutation and is_expired:
+        raise HTTPException(403, detail='انتهت التجربة المجانية. بيانات مكتبك محفوظة؛ تواصل لتفعيل الاشتراك.')
     return is_expired
 
 # -----------------------------------------------------------------------------
@@ -1383,7 +1231,7 @@ COURTS_DIRECTORY = [
         "name": "دار القضاء العالي (محكمة النقض واستئناف القاهرة)",
         "governorate": "القاهرة",
         "address": "شارع 26 يوليو - وسط البلد - رمسيس",
-        "phone": "0225781190",
+        "phone": "",
         "type": "نقض واستئناف عالي والنيابة العامة",
         "details": "يضم محكمة النقض المصرية، محكمة استئناف القاهرة، مكتب النائب العام، ونيابة النقض الجنائية والمدنية."
     },
@@ -1392,7 +1240,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم التجمع الخامس (القاهرة الجديدة)",
         "governorate": "القاهرة",
         "address": "شارع التسعين الجنوبي - التجمع الخامس - القاهرة الجديدة",
-        "phone": "0228105422",
+        "phone": "",
         "type": "ابتدائية وجنايات واستئناف",
         "details": "يضم محكمة القاهرة الجديدة الابتدائية، دوائر جنايات أمن الدولة وطوارئ، ودوائر أسرة التجمع ومدينة نصر."
     },
@@ -1401,7 +1249,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم الجلاء (جنوب القاهرة)",
         "governorate": "القاهرة",
         "address": "شارع الجلاء - أمام مستشفى الجلاء - رمسيس",
-        "phone": "0225754820",
+        "phone": "",
         "type": "ابتدائية وجزئية",
         "details": "يضم محكمة جنوب القاهرة الابتدائية، محاكم قصر النيل، عابدين، الموسكي، ونيابات وسط القاهرة."
     },
@@ -1410,7 +1258,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم العباسية (شمال القاهرة)",
         "governorate": "القاهرة",
         "address": "ميدان العباسية - بجوار محطة مترو العباسية",
-        "phone": "0226841203",
+        "phone": "",
         "type": "ابتدائية وجنايات ومدني",
         "details": "يضم محكمة شمال القاهرة الابتدائية، دوائر الجنايات، ومحاكم الوايلي، النزهة، مصر الجديدة، والزيتون."
     },
@@ -1419,7 +1267,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم زينهم (السيدة زينب)",
         "governorate": "القاهرة",
         "address": "شارع بيرم التونسي - السيدة زينب - زينهم",
-        "phone": "0223659811",
+        "phone": "",
         "type": "جنح ونيابات وطب شرعي",
         "details": "يضم نيابات كلي جنوب القاهرة، دوائر جنح مستأنف، ومصلحة الطب الشرعي المصرية المجاورة."
     },
@@ -1428,7 +1276,7 @@ COURTS_DIRECTORY = [
         "name": "المحكمة الدستورية العليا المصرية",
         "governorate": "القاهرة",
         "address": "كورنيش النيل - ضاحية المعادي - القاهرة",
-        "phone": "0225257100",
+        "phone": "",
         "type": "قضاء دستوري",
         "details": "أعلى هيئة قضائية للرقابة على دستورية القوانين واللوائح وتفسير النصوص التشريعية الملزمة لكافة سلطات الدولة."
     },
@@ -1437,7 +1285,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم الجيزة الابتدائية (شارع السودان)",
         "governorate": "الجيزة",
         "address": "شارع السودان - تقاطع شارع فيصل وميدان الجيزة",
-        "phone": "0237748520",
+        "phone": "",
         "type": "ابتدائية وجزئية ومدني وأسرة",
         "details": "يضم محكمة الجيزة الابتدائية، دوائر الدقي، العجوزة، الهرم، العمرانية، وبولاق الدكرور."
     },
@@ -1446,7 +1294,7 @@ COURTS_DIRECTORY = [
         "name": "مجمع محاكم المنشية والسيالة (الإسكندرية)",
         "governorate": "الإسكندرية",
         "address": "ميدان المنشية - أمام تمثال محمد علي - الإسكندرية",
-        "phone": "034871230",
+        "phone": "",
         "type": "استئناف عالي وابتدائية",
         "details": "يضم محكمة استئناف الإسكندرية، محكمة الإسكندرية الابتدائية، ونيابات شرق وغرب الإسكندرية الكلية."
     },
@@ -1455,7 +1303,7 @@ COURTS_DIRECTORY = [
         "name": "مكتب توثيق الأهرام النموذجي المميكن",
         "governorate": "الجيزة",
         "address": "شارع الهرم - مجمع المصالح الحكومية - الجيزة",
-        "phone": "0235841029",
+        "phone": "",
         "type": "شهر عقاري وتوثيق",
         "details": "إصدار التوكيلات الرسمية العامة في القضايا، توكيلات البنوك، إثبات التاريخ، والتصديق على التوقيعات فورياً."
     }
@@ -1570,13 +1418,13 @@ class OfficeRegisterRequest(BaseModel):
     lawyer_name: str
     phone: str
     email: str
-    password: Optional[str] = ""
+    password: Optional[str] = Field(default="", max_length=128)
 
 class OfficeLoginRequest(BaseModel):
     identifier: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
-    password: Optional[str] = ""
+    password: Optional[str] = Field(default="", max_length=128)
 
 # -----------------------------------------------------------------------------
 # عقل المساعد القضائي الذكي "زيزو المساعد الشخصي" - خبير القانون المصري والنقض
@@ -1916,50 +1764,38 @@ def analyze_egyptian_legal_query(query: str, court_hint: Optional[str] = None):
 # -----------------------------------------------------------------------------
 @app.post("/api/chat/stream")
 async def chat_stream_endpoint(request: ChatRequest):
-    query = request.message.strip()
-    egyptian_tone, title, defenses, cassation, requests = analyze_egyptian_legal_query(
-        query, request.court_circuit
-    )
-
-    narrative = (
-        f"{egyptian_tone}\n\n"
-        f"🏛️ **الدفوع الجوهرية المقترحة للمرافعة أمام {request.court_circuit}:**\n"
-    )
-    for i, d in enumerate(defenses, 1):
-        narrative += f"{i}. {d}\n"
-    narrative += (
-        f"\n⚖️ **سند محكمة النقض والدستور:**\n{cassation}\n\n"
-        f"📝 **الطلبات الختامية الجازمة:**\n{requests}\n\n"
-        f"✨ *تم إعداد وتحديث مسودة المذكرة القضائية تلقائياً وجاهزة في لوحة الصياغة للنسخ أو التصدير الفوري لمستند وورد.*"
-    )
-
-    draft_memo = {
-        "title": title,
-        "court": request.court_circuit or "محكمة جنح مستأنف",
-        "client": f"السيد / .................... (صفته: {request.client_capacity})",
-        "opposing": "ضـــــد السيد / .................... (الخصم / النيابة العامة)",
-        "defenses": defenses,
-        "cassation": cassation,
-        "requests": requests
-    }
-
+    office=resolve_office()
+    reply=await answer_query(AdvisorRequest(query=request.message),office)
     async def event_generator():
-        words = narrative.split(" ")
-        for i in range(0, len(words), 3):
-            chunk = " ".join(words[i:i+3]) + " "
-            yield f"event: token\ndata: {json.dumps({'token': chunk}, ensure_ascii=False)}\n\n"
-            await asyncio.sleep(0.015)
-        yield f"event: draft\ndata: {json.dumps({'draft_memo': draft_memo}, ensure_ascii=False)}\n\n"
-        yield f"event: done\ndata: {json.dumps({'status': 'done'}, ensure_ascii=False)}\n\n"
+        yield 'event: token\ndata: '+json.dumps({'token':reply['advice']},ensure_ascii=False)+'\n\n'
+        yield 'event: done\ndata: '+json.dumps({'status':'done','sources':reply.get('sources',[])},ensure_ascii=False)+'\n\n'
+    return StreamingResponse(event_generator(),media_type='text/event-stream')
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+# New advisor API: explicit authentication, no mutations or tool side effects.
+def advisor_office(x_office_token, authorization):
+    return resolve_office(x_office_token, authorization)
+
+@app.get('/api/ai/status')
+async def get_assistant_status():
+    return assistant_status()
+
+@app.get('/api/ai/constitution')
+async def get_constitution_articles(q: str = '', article: Optional[int] = None):
+    data = constitution()
+    items = search_constitution('المادة '+str(article)) if article is not None else search_constitution(q, 8)
+    return {'title':data['title'],'edition':data['edition'],'total':len(data['articles']),'source_url':data['source_url'],'articles':items}
+
+@app.post('/api/ai/zizo-advisor')
+async def zizo_advisor_endpoint(request: AdvisorRequest, x_office_token: Optional[str] = Header(None), authorization: Optional[str] = Header(None)):
+    office = advisor_office(x_office_token, authorization)
+    return await answer_query(request, office)
 
 # -----------------------------------------------------------------------------
 # 1.ب. ترحيب ومعلومات المساعد زيزو السياقية حسب كل شاشة (/api/ai/screen-briefing)
 # -----------------------------------------------------------------------------
 @app.get("/api/ai/screen-briefing")
 async def get_screen_briefing(screen: str = "home", office_id: str = "office_demo"):
-    office = OFFICES.get(office_id, OFFICES["office_demo"])
+    office = resolve_office()
     raw_name = office.get("lawyer_name", "معالي المستشار")
     lawyer_name = raw_name if raw_name.startswith("المستشار") else f"معالي المستشار {raw_name}"
     office_name = office.get("office_name", "مكتب المحاماة")
@@ -2033,8 +1869,8 @@ async def get_screen_briefing(screen: str = "home", office_id: str = "office_dem
         greeting = f"منور قصر العدالة يا فندم! أنا زيزو المساعد الشخصي، مستشارك القضائي الذكي ودراعك اليمين لصياغة المذكرات وفحص الثغرات."
         title = "المستشار القضائي الذكي وصياغة مذكرات النقض والدفاع"
         briefing = (
-            "عقلي مدرب بالكامل على دستور مصر 2014 وقوانين العقوبات، الإجراءات، المدني، التجاري، العمل، الإثبات، ومجلس الدولة. "
-            "اكتب لي أي مسألة أو رقم مادة أو موضوع قضية، وهجهزلك على طول مذكرة دفاع كاملة الدفوع ومؤصلة بأحكام محكمة النقض وجاهزة للتصدير كوورد!"
+            "أساعدك في مراجعة الوقائع والبحث في الدستور المصري بمصادره، والتحليل والصياغة عند تفعيل خدمة الذكاء. "
+            "اكتب السؤال أو رقم المادة، وحدد القضية لو محتاج سياق الملف. المسودات تحتاج مراجعتك القانونية والتحقق من المصادر قبل الاستخدام."
         )
         suggested_prompts = [
             "مذكرة بطلان استيقاف وقبض وتفتيش م 54 دستور",
@@ -2074,135 +1910,38 @@ async def get_screen_briefing(screen: str = "home", office_id: str = "office_dem
 # -----------------------------------------------------------------------------
 # أ. إدارة اشتراكات المكاتب والتجربة المجانية (Office Auth & 15-Day Free Trial)
 # -----------------------------------------------------------------------------
-@app.post("/api/auth/register")
-async def register_office(req: OfficeRegisterRequest):
-    if not req.office_name.strip() or not req.lawyer_name.strip():
-        raise HTTPException(status_code=400, detail="يرجى إدخال اسم المكتب واسم المحامي بشكل صحيح.")
-    
-    office_id = f"office_{uuid4().hex[:8]}"
-    token = f"tok_{uuid4().hex}"
-    now = datetime.now()
-    trial_start = now.isoformat()
-    trial_end = (now + timedelta(days=30)).isoformat()
-    
-    customized_data = copy.deepcopy(DEFAULT_SEED_DB)
-    if customized_data.get("clients"):
-        customized_data["clients"][0]["poa_type"] = f"توكيل رسمي عام قضايا وبنوك لصالح {req.lawyer_name.strip()}"
-    
-    OFFICES[office_id] = {
-        "id": office_id,
-        "name": req.office_name.strip(),
-        "lawyer_name": req.lawyer_name.strip(),
-        "email": req.email.strip() or f"{office_id}@baytalqanoon.eg",
-        "phone": req.phone.strip(),
-        "password": req.password or "secret",
-        "token": token,
-        "created_at": trial_start,
-        "trial_start": trial_start,
-        "trial_end": trial_end,
-        "is_active": True,
-        "data": customized_data
-    }
-    OFFICE_TOKENS[token] = office_id
+def empty_office_data():
+    return {'cases':[], 'sessions':[], 'clients':[], 'reception':[], 'finance':{'ledger':[]}, 'templates':[]}
 
-    return {
-        "status": "success",
-        "message": "تم تفعيل تجربة مكتبك المجانية لمدة شهر كامل (30 يوماً) بنجاح!",
-        "token": token,
-        "office": {
-            "id": office_id,
-            "name": req.office_name.strip(),
-            "lawyer_name": req.lawyer_name.strip(),
-            "email": req.email.strip(),
-            "phone": req.phone.strip(),
-            "trial_start": trial_start,
-            "trial_end": trial_end,
-            "days_remaining": 30,
-            "hours_remaining": 720,
-            "is_expired": False
-        }
-    }
+@app.post('/api/auth/register')
+async def register_office(req: OfficeRegisterRequest, response: Response, request: Request):
+    office, token=await asyncio.to_thread(security.register_account,req,empty_office_data())
+    security.set_session_cookie(response,token,secure=bool(os.environ.get('VERCEL')) or request.url.scheme=='https')
+    return security.session_response(office)
 
-@app.post("/api/auth/login")
-async def login_office(req: OfficeLoginRequest):
-    raw_ident = (req.identifier or req.email or req.phone or "").strip().lower()
-    if not raw_ident:
-        raw_ident = "demo@law.eg"
-    ident = raw_ident
-    found_office = None
-    
-    if ident in ["admin", "admin@bayt-alqanoon.eg", "admin@law.eg", "owner", "owner@law.eg", "owner@baytalqanoon.eg", "office_super_admin", "مالك", "المالك"]:
-        found_office = OFFICES["office_super_admin"]
-    elif ident in ["demo", "demo@law.eg", "demo@baytalqanoon.eg", "01001234567", "معالي المستشار", "test", "office_demo"]:
-        found_office = OFFICES["office_demo"]
-    else:
-        for off in OFFICES.values():
-            if ident in [off["email"].lower(), off["phone"], off["id"].lower()]:
-                found_office = off
-                break
+@app.post('/api/auth/login')
+async def login_office(req: OfficeLoginRequest, response: Response, request: Request):
+    identifier=(req.identifier or req.email or req.phone or '').strip()
+    if identifier.lower() in ('demo','demo@law.eg','demo@baytalqanoon.eg'):
+        security.clear_session_cookie(response)
+        return {'status':'success','token':'token_demo','is_admin':False,'office':{k:v for k,v in OFFICES['office_demo'].items() if k!='data'}}
+    if not identifier or not req.password:
+        raise HTTPException(401,detail='البريد أو الهاتف وكلمة المرور مطلوبان.')
+    office,token=await asyncio.to_thread(security.login_account,identifier,req.password)
+    security.set_session_cookie(response,token,secure=bool(os.environ.get('VERCEL')) or request.url.scheme=='https')
+    return security.session_response(office)
 
-    if found_office:
-        expected_pwd = found_office.get("password")
-        # التحقق الأمني الصارم لمالك المنظومة
-        if found_office.get("is_admin") or found_office.get("id") == "office_super_admin":
-            if not secrets.compare_digest(req.password or "", expected_pwd or "admin"):
-                raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة لمالك المنظومة.")
-        elif expected_pwd and req.password:
-            # التحقق لمكاتب المحامين المسجلة
-            if expected_pwd not in ["123456", "demo"] and not secrets.compare_digest(req.password, expected_pwd):
-                raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة.")
+@app.post('/api/auth/logout')
+async def logout_office(request: Request, response: Response):
+    token=request.cookies.get(security.COOKIE) or request.cookies.get(security.LOCAL_COOKIE)
+    await asyncio.to_thread(security.end_session,token)
+    security.clear_session_cookie(response)
+    return {'status':'success'}
 
-    if not found_office:
-        # إنشاء حساب سريع لمدة شهر كامل (30 يوماً) إذا لم يكن مسجلاً
-        office_id = f"office_{uuid4().hex[:8]}"
-        token = f"tok_{uuid4().hex}"
-        now = datetime.now()
-        found_office = {
-            "id": office_id,
-            "name": f"مكتب {req.identifier.strip()}",
-            "lawyer_name": req.identifier.strip(),
-            "email": f"{ident}@baytalqanoon.eg" if "@" not in ident else ident,
-            "phone": ident,
-            "password": req.password or "demo",
-            "token": token,
-            "created_at": now.isoformat(),
-            "trial_start": now.isoformat(),
-            "trial_end": (now + timedelta(days=30)).isoformat(),
-            "is_active": True,
-            "is_admin": False,
-            "plan": "trial_30",
-            "data": copy.deepcopy(DEFAULT_SEED_DB)
-        }
-        OFFICES[office_id] = found_office
-        OFFICE_TOKENS[token] = office_id
-
-    trial_end = datetime.fromisoformat(found_office["trial_end"])
-    now = datetime.now()
-    days_left = max(0, (trial_end - now).days)
-    hours_left = max(0, int((trial_end - now).total_seconds() // 3600))
-    is_expired = now > trial_end
-    is_admin = found_office.get("is_admin", False)
-
-    return {
-        "status": "success",
-        "token": found_office["token"],
-        "is_admin": is_admin,
-        "role": "super_admin" if is_admin else "lawyer",
-        "office": {
-            "id": found_office["id"],
-            "name": found_office["name"],
-            "lawyer_name": found_office["lawyer_name"],
-            "email": found_office["email"],
-            "phone": found_office["phone"],
-            "trial_start": found_office["trial_start"],
-            "trial_end": found_office["trial_end"],
-            "days_remaining": days_left,
-            "hours_remaining": hours_left,
-            "is_expired": is_expired,
-            "is_admin": is_admin,
-            "plan": found_office.get("plan", "trial_15")
-        }
-    }
+@app.get('/api/office/export')
+async def export_current_office():
+    office=resolve_office()
+    return {'office':{k:office[k] for k in ('id','name','lawyer_name','email','phone')},'data':office['data'],'exported_at':datetime.utcnow().isoformat()}
 
 @app.get("/api/auth/me")
 async def get_current_user_profile(
@@ -2228,6 +1967,7 @@ async def get_current_user_profile(
         "days_remaining": days_left,
         "hours_remaining": hours_left,
         "is_expired": is_expired,
+        "is_admin": bool(office.get("is_admin",False)),
         "is_demo": office.get("is_demo", False) or (office["id"] == "office_demo"),
         "cases_count": len(office["data"]["cases"]),
         "sessions_count": len(office["data"]["sessions"])
@@ -2238,34 +1978,10 @@ async def get_current_user_profile(
         **office_dict
     }
 
-@app.post("/api/auth/test-expire")
-async def simulate_trial_expiry(
-    x_office_token: Optional[str] = Header(None),
-    authorization: Optional[str] = Header(None)
-):
-    office = resolve_office(x_office_token, authorization)
-    office["trial_end"] = (datetime.now() - timedelta(hours=1)).isoformat()
-    return {
-        "status": "success",
-        "message": f"تمت محاكاة انتهاء فترة التجربة بنجاح لمكتب {office['name']}",
-        "trial_end": office["trial_end"],
-        "is_expired": True
-    }
-
-@app.post("/api/auth/test-renew")
-async def simulate_trial_renewal(
-    x_office_token: Optional[str] = Header(None),
-    authorization: Optional[str] = Header(None)
-):
-    office = resolve_office(x_office_token, authorization)
-    office["trial_end"] = (datetime.now() + timedelta(days=30)).isoformat()
-    return {
-        "status": "success",
-        "message": f"تم تجديد فترة التجربة بنجاح لمكتب {office['name']}",
-        "trial_end": office["trial_end"],
-        "days_remaining": 30,
-        "is_expired": False
-    }
+@app.post('/api/auth/test-expire')
+@app.post('/api/auth/test-renew')
+async def disabled_trial_test():
+    raise HTTPException(403,detail='أدوات تغيير الاشتراك التجريبية مغلقة. يلزم حساب إدارة مصرح.')
 
 # -----------------------------------------------------------------------------
 # لوحة تحكم مالك المنظومة (Super Admin / Master Control)
@@ -2280,7 +1996,7 @@ async def get_admin_overview(
     authorization: Optional[str] = Header(None)
 ):
     caller = resolve_office(x_office_token, authorization)
-    if not (caller.get("is_admin") or caller.get("role") == "super_admin" or caller.get("id") == "office_super_admin"):
+    if not (caller.get("is_admin") and caller.get("_persistent")):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="صلاحية مرفوضة: هذه اللوحة مخصصة حصرياً لمالك المنظومة (Super Admin)."
@@ -2292,7 +2008,8 @@ async def get_admin_overview(
     expired_count = 0
     total_cases = 0
 
-    for oid, off in OFFICES.items():
+    for off in await asyncio.to_thread(security.list_offices):
+        oid=off["id"]
         if oid == "office_super_admin":
             continue
         tend = datetime.fromisoformat(off["trial_end"])
@@ -2325,8 +2042,8 @@ async def get_admin_overview(
             "active_subscriptions": active_count,
             "expired_subscriptions": expired_count,
             "total_platform_cases": total_cases,
-            "platform_revenue": "148,000 ج.م",
-            "server_status": "سحابي مستقر 100% • خوادم القاهرة"
+            "platform_revenue": "غير مربوط بنظام دفع",
+            "server_status": "Vercel + Neon"
         },
         "offices": offices_list
     }
@@ -2339,15 +2056,13 @@ async def admin_manage_subscription(
     authorization: Optional[str] = Header(None)
 ):
     caller = resolve_office(x_office_token, authorization)
-    if not (caller.get("is_admin") or caller.get("role") == "super_admin" or caller.get("id") == "office_super_admin"):
+    if not (caller.get("is_admin") and caller.get("_persistent")):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="صلاحية مرفوضة: لا تملك صلاحية تعديل اشتراكات مكاتب المحاماة."
         )
 
-    if office_id not in OFFICES:
-        raise HTTPException(status_code=404, detail="المكتب غير موجود")
-    target = OFFICES[office_id]
+    target=await asyncio.to_thread(security.get_office,office_id)
     now = datetime.now()
     cur_end = datetime.fromisoformat(target["trial_end"])
     base_time = max(now, cur_end)
@@ -2371,6 +2086,7 @@ async def admin_manage_subscription(
         target["is_active"] = False
         target["plan"] = "expired"
 
+    await asyncio.to_thread(security.update_subscription,target)
     tend = datetime.fromisoformat(target["trial_end"])
     return {
         "status": "success",
@@ -2421,35 +2137,7 @@ async def get_executive_reports(
     reception_waiting = sum(1 for r in db["reception"] if r.get("status") == "بالانتظار")
     reception_active = sum(1 for r in db["reception"] if r.get("status") == "قيد المقابلة")
 
-    urgent_deadlines = [
-        {
-            "title": "استئناف جنحة خيانة أمانة (1425 لسنة 2026 قصر النيل)",
-            "client": "مروان عصام عبد الرحمن",
-            "statutory_days": 10,
-            "days_left": 3,
-            "status": "حرج للغاية",
-            "rule": "المادة 406 إجراءات جنائية - تفادي سقوط الحق في الاستئناف",
-            "color": "red"
-        },
-        {
-            "title": "إيداع مذكرات وعرض مقدم الصداق (319 لسنة 2026 أسرة)",
-            "client": "سارة إبراهيم الدسوقي",
-            "statutory_days": 7,
-            "days_left": 2,
-            "status": "عاجل",
-            "rule": "المادة 20 قانون 1 لسنة 2000 - شرط قبول دعوى الخلع",
-            "color": "amber"
-        },
-        {
-            "title": "سداد أمانة الخبير الهندسي بمحكمة شمال القاهرة (5521 لسنة 2025)",
-            "client": "مؤسسة النيل للتجارة والمقاولات",
-            "statutory_days": 15,
-            "days_left": 6,
-            "status": "متابعة",
-            "rule": "المادة 137 إثبات - تفادي سقوط الدليل ورفض الإحالة",
-            "color": "blue"
-        }
-    ]
+    urgent_deadlines = []  # No fabricated deadlines in real office reports.
 
     trial_end = datetime.fromisoformat(office["trial_end"])
     days_left = max(0, (trial_end - datetime.now()).days)
@@ -2772,14 +2460,15 @@ async def create_transaction(
 # -----------------------------------------------------------------------------
 @app.get("/api/templates")
 async def get_templates(category: Optional[str] = None):
+    catalogue=LEGAL_TEMPLATES+resolve_office()["data"].get("templates",[])
     if not category or category == "الكل":
-        return {"status": "success", "templates": LEGAL_TEMPLATES}
-    filtered = [t for t in LEGAL_TEMPLATES if category in t["category"]]
+        return {"status": "success", "templates": catalogue}
+    filtered = [t for t in catalogue if category in t["category"]]
     return {"status": "success", "templates": filtered}
 
 @app.get("/api/templates/{template_id}")
 async def get_template(template_id: str):
-    for t in LEGAL_TEMPLATES:
+    for t in LEGAL_TEMPLATES+resolve_office()["data"].get("templates",[]):
         if t["id"] == template_id:
             return {"status": "success", "template": t}
     raise HTTPException(status_code=404, detail="الصيغة غير موجودة")
@@ -2790,6 +2479,9 @@ async def add_template(
     x_office_token: Optional[str] = Header(None),
     authorization: Optional[str] = Header(None)
 ):
+    office=resolve_office(x_office_token,authorization)
+    check_trial_permission(office,for_mutation=True)
+
     title = (req.title or "").strip()
     if not title:
         raise HTTPException(status_code=400, detail="يرجى كتابة عنوان الصيغة أو العقد")
@@ -2849,7 +2541,7 @@ async def add_template(
         "created_at": datetime.now().isoformat()
     }
     
-    LEGAL_TEMPLATES.insert(0, new_tmpl)
+    office['data'].setdefault('templates',[]).insert(0,new_tmpl)
     
     return {
         "status": "success",
@@ -2859,74 +2551,12 @@ async def add_template(
 
 @app.post("/api/templates/generate-ai")
 async def generate_ai_template(req: TemplateAiGenerateRequest):
-    title = req.title.strip() or "عقد اتفاق وتراضٍ وفق القانون المصري"
-    parties = req.parties.strip() or "الطرف الأول: السيد / .................... بصفتـه (....................)\nالطرف الثاني: السيد / .................... بصفتـه (....................)"
-    details = req.details.strip() or "الاتفاق على التزامات وحقوق متبادلة طبقا للقانون المدني والتجاري المصري."
-    
-    first_party = parties.splitlines()[0] if parties.splitlines() else 'الطرف الأول: السيد / .................... (الرقم القومي: ....................) المقيم في ....................'
-    second_party = parties.splitlines()[1] if len(parties.splitlines()) > 1 else 'الطرف الثاني: السيد / .................... (الرقم القومي: ....................) المقيم في ....................'
-
-    generated_content = f"""{title}
-خاضع لأحكام القانون المدني المصري رقم 131 لسنة 1948 والقوانين المكملة
-
-إنه في يوم ............ الموافق    /    / 2026 م، وبمدينة ............ بجمهورية مصر العربية، تم الاتفاق والتراضي بين كل من:
-
-أولاً: {first_party}
-ثانياً: {second_party}
-
-*** تمهيد ***
-حيث تلاقت إرادة الطرفين بكامل الأهلية المعتبرة شرعاً وقانوناً للتعاقد والاتفاق على: ({details})، وحيث يرغب الطرفان في توثيق وتنظيم العلاقة القانونية والالتزامات المتبادلة بينهما بما يحفظ حقوقهما ويمنع أي نزاع مستقبلي.
-لذا فقد اتفق الطرفان بعد تلاوة هذا العقد وفهم بنوده على ما يلي:
-
-البند الأول (التمهيد):
-يعتبر التمهيد السابق جزءاً لا يتجزأ من هذا العقد وبنداً جوهرياً ومفسراً لكافة أحكامه وشروطه.
-
-البند الثاني (محل العقد والالتزام الرئيسي):
-اتفق الطرفان صراحة على موضوع هذا العقد وتفاصيله المتمثلة في:
-- {details}
-ويلتزم كل طرف بتنفيذ ما يخصه بحسن نية وفقاً لما تقضي به المادة 148 من القانون المدني المصري.
-
-البند الثالث (المقابل المالي وطريقة السداد):
-اتفق الطرفان على أن المقابل المالي الإجمالي المتفق عليه هو مبلغ وقدره (.................... ج.م) فقط وقدره .................... جنيهاً مصرياً لا غير، يسدد كالتالي:
-1. دفعة أولى بمجلس العقد وقدرها (.................... ج.م) بموجب إيصال استلام موقع.
-2. المتبقي يسدد وفقاً للجدول الزمني المرفق أو عند تحقق شروط التسليم والإنجاز.
-
-البند الرابع (الضمانات وحظر التنازل):
-يضمن الطرف الأول خلو محل التعاقد من أي نزاع أو حقوق للغير أو ديون أو رهون، كما يحظر على أي من الطرفين التنازل عن هذا العقد أو أي من حقوقه أو التزاماته للغير دون موافقة كتابية صريحة ومسبقة من الطرف الآخر.
-
-البند الخامس (الشرط الجزائي والتعويض الاتفاقي):
-عملاً بالمادة 223 من القانون المدني، إذا أخل أي من الطرفين بأي التزام من الالتزامات الجوهرية المترتبة على هذا العقد أو تأخر في التنفيذ، يلتزم بأن يؤدي للطرف الآخر تعويضاً اتفاقياً جازماً غير خاضع لرقابة القضاء قدره (.......... ج.م) عن كل يوم تأخير، دون الإخلال بحق الطرف المضرور في طلب التنفيذ العيني أو الفسخ.
-
-البند السادس (الفسخ التلقائي والانفساخ):
-في حال إخلال أي من طرفي هذا العقد بأي بند من بنوده، يعتبر هذا العقد مفسوخاً من تلقاء نفسه فوراً دون حاجة إلى تنبيه أو إنذار رسمي أو حكم قضائي، عملاً بنص المادة 158 من القانون المدني المصري.
-
-البند السابع (القوة القاهرة والظروف الطارئة):
-تخضع التزامات الطرفين لأحكام نظرية الحوادث الطارئة والقوة القاهرة المنصوص عليها بالمادة 165 و215 من القانون المدني المصري.
-
-البند الثامن (الموطن المختار):
-يقر كل طرف بأنه اتخذ من العنوان المبين بصدر هذا العقد موطناً مختاراً له، وتصح عليه كافة الإعلانات والإخطارات والمراسلات القانونية والقضائية.
-
-البند التاسع (الاختصاص القضائي):
-تختص محاكم ............ الابتدائية وجزئياتها بجمهورية مصر العربية بنظر أي نزاع قد ينشأ لا قدر الله بخصوص تفسير أو تنفيذ هذا العقد.
-
-البند العاشر (نسخ العقد):
-تحرر هذا العقد من نسختين أصليتين بيد كل طرف نسخة للعمل بمقتضاها والتصديق عليها بالشهر العقاري عند اللزوم.
-
-توقيع الطرف الأول: ....................                توقيع الطرف الثاني: ....................
-شاهد أول: ....................                         شاهد ثانٍ: ...................."""
-
-    return {
-        "status": "success",
-        "template": {
-            "id": f"ai-tmpl-{uuid4().hex[:6]}",
-            "title": title,
-            "category": "صياغة ذكية بالذكاء الاصطناعي",
-            "court": "المحاكم المصرية المختصة",
-            "law_ref": "القانون المدني المصري 131 لسنة 1948 وقضاء محكمة النقض",
-            "description": f"صيغة عقد مخصصة ومطابقة للقانون المصري تم توليدها فوراً بناءً على طلبك: {details[:80]}...",
-            "content": generated_content
-        }
-    }
+    office=resolve_office()
+    check_trial_permission(office,for_mutation=True)
+    reply=await answer_query(AdvisorRequest(query='صياغة مسودة عقد للمراجعة، مع تحديد المعلومات الناقصة دون افتراضها. العنوان: '+req.title+'\nالأطراف: '+req.parties+'\nالوقائع: '+req.details,mode='draft'),office)
+    if reply['engine']!='openai':
+        raise HTTPException(503,detail=reply['advice'])
+    return {'status':'success','template':{'id':'ai-tmpl-'+uuid4().hex[:12],'title':req.title or 'مسودة عقد','category':'مسودة للمراجعة','court':'','law_ref':'راجع المصادر المرفقة','description':'مسودة مولدة تحتاج مراجعة المحامي','content':reply['advice']},'sources':reply.get('sources',[])}
 
 # -----------------------------------------------------------------------------
 # 7. دليل المحاكم والنيابات والشهر العقاري (Courts Directory)
@@ -3204,45 +2834,8 @@ async def get_office_staff(
     authorization: Optional[str] = Header(None)
 ):
     office = resolve_office(x_office_token, authorization)
-    staff = [
-        {
-            "id": "st-1",
-            "name": office.get("lawyer_name", "المستشار العام"),
-            "role": "مدير المكتب • محامٍ بالنقض والدستورية العليا",
-            "phone": office.get("phone", "01001234567"),
-            "bar_card": "مصر - استئناف ونقض 2011",
-            "cases_count": len(office.get("data", {}).get("cases", [])),
-            "status": "نشط"
-        },
-        {
-            "id": "st-2",
-            "name": "أ. إبراهيم فؤاد عبد الرحيم",
-            "role": "محامٍ بالاستئناف العالي ومجلس الدولة",
-            "phone": "01145678901",
-            "bar_card": "قيد استئناف 2018",
-            "cases_count": 6,
-            "status": "نشط"
-        },
-        {
-            "id": "st-3",
-            "name": "أ. سارة مصطفى حسن",
-            "role": "محامية بالجدول العام والابتدائي (متابعة جلسات ورول)",
-            "phone": "01234567892",
-            "bar_card": "قيد ابتدائي 2023",
-            "cases_count": 4,
-            "status": "نشط"
-        },
-        {
-            "id": "st-4",
-            "name": "أ. مروان سمير",
-            "role": "سكرتير قانوني ومسؤول قلم الإعلانات والمحضرين",
-            "phone": "01556677889",
-            "bar_card": "إداري",
-            "cases_count": 12,
-            "status": "نشط"
-        }
-    ]
-    return {"status": "success", "staff": staff}
+    staff=[{'id':'owner','name':office['lawyer_name'],'role':'مدير المكتب','phone':office['phone'],'bar_card':'','cases_count':len(office['data'].get('cases',[])),'status':'نشط'}]
+    return {'status':'success','staff':staff}
 
 @app.get("/api/office/settings")
 async def get_office_settings(
@@ -3256,7 +2849,7 @@ async def get_office_settings(
             "office_name": office.get("name", "مكتب المحاماة"),
             "lawyer_name": office.get("lawyer_name", "معالي المستشار"),
             "email": office.get("email", "contact@baytalqanoon.eg"),
-            "phone": office.get("phone", "01001234567"),
+            "phone": office.get("phone", ""),
             "bar_number": "قيد نقابة المحامين 48291",
             "governorate": "القاهرة",
             "notary_office": "مكتب توثيق مصر الجديدة",
@@ -3270,136 +2863,9 @@ async def get_office_settings(
 # -----------------------------------------------------------------------------
 @app.post("/api/vision/ocr-scan")
 async def vision_ocr_scan_endpoint(file: UploadFile = File(...)):
-    safe_filename = os.path.basename(file.filename or "uploaded_document")
-    ext = os.path.splitext(safe_filename)[1].lower()
-    allowed_exts = [".png", ".jpg", ".jpeg", ".webp", ".pdf", ".docx", ".doc", ""]
-    if ext and ext not in allowed_exts:
-        raise HTTPException(
-            status_code=400,
-            detail=f"نوع الملف غير مدعوم ({ext}). يُسمح فقط بالصور والمستندات (PNG, JPG, PDF, DOCX)."
-        )
-    filename = safe_filename
-    lower_name = filename.lower()
-
-    if any(k in lower_name for k in ["محضر", "police", "قسم", "جنح", "ضبط"]):
-        doc_type = "محضر جمع استدلالات - قسم شرطة"
-        extracted = {
-            "entity_type": "police_report",
-            "station": "قسم شرطة قصر النيل / مديرية أمن القاهرة",
-            "report_num": "1425 لسنة 2026 جنح قصر النيل",
-            "case_number": "1425 لسنة 2026 جنح قصر النيل",
-            "court": "محكمة جنح مستأنف قصر النيل",
-            "client": "مروان عصام عبد الرحمن",
-            "opponent": "أحمد حسني محمود",
-            "subject": "جنحة خيانة أمانة وإيصال أمانة (م 341 عقوبات)",
-            "date": "2026-03-14",
-            "parties": "الشاكي: أحمد حسني محمود ضد المشكو في حقه: مروان عصام عبد الرحمن",
-            "charge": "خيانة أمانة وتبديد مبالغ نقدية (م 341 عقوبات)",
-            "summary": "حضر الشاكي وقرر بتضرره من المشكو في حقه لتبديده المبلغ المسلم إليه على سبيل الأمانة بموجب إيصال أمانة.",
-            "defenses": [
-                "بطلان التحريات لكونها مكتبية وترديداً لأقوال الشاكي دون إجراء معاينة واقعية.",
-                "انتفاء ركن التسليم الحقيقي ومدنية النزاع لكون الإيصال أداة ضمان استناداً للمادة 341 عقوبات.",
-                "الطعن بالجهالة والتزوير صلباً وتاريخاً وطلب إحالة الورقة لأبحاث التزييف والتزوير بمصلحة الطب الشرعي."
-            ],
-            "memo_text": """باسم الشعب
-محكمة جنح مستأنف قصر النيل
-دائرة الجنح المستأنفة
-
-مذكرة بدفاع السيد / مروان عصام عبد الرحمن (المتهم - المستأنف)
-ضـــد
-النيابة العامة (سلطة الاتهام) والسيد / أحمد حسني محمود (المدعي بالحق المدني)
-في القضية رقم 1425 لسنة 2026 جنح مستأنف قصر النيل
-والمحدد لنظرها جلسة الأحد الموافق 26/04/2026
-
-أولاً: الوقائع
-تخلص واقعات الدعوى في أن الشاكي حرر محضر ضبط زاعماً تسليم موكلي مبلغاً نقدياً على سبيل الأمانة بموجب إيصال أمانة سند الجنحة، وحيث أن الحقيقة والواقع تكشفان بجلاء عن مدنية النزاع وانتفاء واقعة التسليم الفعلي للمال.
-
-ثانياً: الدفوع القانونية الجوهرية
-1. انتفاء ركن التسليم الحقيقي لجريمة خيانة الأمانة المنصوص عليها بالمادة 341 من قانون العقوبات المصري:
-المستقر عليه في قضاء محكمة النقض أن: "جريمة خيانة الأمانة لا تقوم إلا إذا كان تسليم المال قد تم تسليماً فعلياً وحقيقياً ليد المؤتمن على سبيل الأمانة بأحد عقود الأمانة الواردة حصراً في المادة 341 عقوبات، فإذا كان الإيصال قد تحرر كأداة ضمان لمعاملة مدنية أو تجارية سقط الركن المادي للجريمة".
-(نقض جنائي جلسة 15/4/1982 - مجموعة القواعد القانونية)
-
-2. بطلان تحريات المباحث لكونها مكتبية وترديداً لأقوال الشاكي دون معاينة أو فحص فني مستقل استناداً للمادة 54 و96 من دستور جمهورية مصر العربية 2014.
-
-3. الطعن بالتزوير صلبًا وتاريخًا على إيصال الأمانة سند الدعوى عملاً بنص المادة 295 وما بعدها من قانون الإجراءات الجنائية والمادة 49 من قانون الإثبات رقم 25 لسنة 1968.
-
-ثالثاً: الطلبات الختامية
-يلتمس دفاع المستأنف من عدالة المحكمة الموقرة القضاء بـ:
-أصلياً: إلغاء الحكم المستأنف والقضاء مجدداً ببراءة المتهم من التهمة المنسوبة إليه ورفض الدعوى المدنية.
-احتياطياً: إحالة إيصال الأمانة لمصلحة الطب الشرعي (قسم أبحاث التزييف والتزوير) لبيان أسبقية التوقيع على الصلب.
-
-وكيل المتهم المستأنف
-المحامي بالنقض والاستئناف"""
-        }
-    elif any(k in lower_name for k in ["توكيل", "power", "توثيق", "شهر"]):
-        doc_type = "توكيل رسمي عام في القضايا"
-        extracted = {
-            "entity_type": "poa",
-            "station": "مكتب توثيق الأهرام النموذجي - الجيزة",
-            "report_num": "3824 / ب لسنة 2026 توثيق الأهرام",
-            "case_number": "3824 / ب توثيق الأهرام",
-            "court": "مكتب توثيق الأهرام النموذجي",
-            "client": "سارة إبراهيم الدسوقي",
-            "opponent": "مصلحة الشهر العقاري والتوثيق",
-            "subject": "توكيل رسمي عام في القضايا والبنوك والصلح",
-            "date": "2026-01-18",
-            "parties": "الموكل: سارة إبراهيم الدسوقي | الوكيل: الأستاذ محمد جندي المحامي بالنقض",
-            "charge": "توكيل رسمي عام في القضايا والبنوك وإبرام الصلح والتصالح",
-            "summary": "توكيل سارٍ ومستوفٍ للأختام الرسمية ورسوم نقابة المحامين وشعار الجمهورية.",
-            "defenses": [
-                "التوكيل يبيح المرافعة أمام جميع المحاكم درجاتها بما فيها محكمة النقض والإدارية العليا ومجلس الدولة."
-            ],
-            "memo_text": """توثيق رسمي معتمد
-مصلحة الشهر العقاري والتوثيق - وزارة العدل المصرية
-مكتب توثيق الأهرام النموذجي
-
-محضر إيداع وسريان التوكيل رقم 3824 / ب لسنة 2026
-أقر الموكل بصحة التوكيل الممنوح للأستاذ الوكيل للمرافعة والمدافعة وتقديم المذكرات وسداد الرسوم وإبرام الصلح والتصالح والإقرار أمام كافة المحاكم والجهات القضائية وهيئات التحكيم بجمهورية مصر العربية."""
-        }
-    else:
-        doc_type = "عقد ومعاملة قانونية محررة"
-        extracted = {
-            "entity_type": "contract",
-            "station": "محرر عرفي معتمد ومؤرخ",
-            "report_num": "عقد اتفاق تجاري مؤرخ 2025/11/10",
-            "case_number": "5521 لسنة 2025 مدني شمال القاهرة",
-            "court": "محكمة شمال القاهرة الابتدائية",
-            "client": "مؤسسة النيل للتجارة والمقاولات",
-            "opponent": "شركة الفنار للتوريدات العمومية",
-            "subject": "دعوى مطالبة مدنية بالتعويض عن الإخلال العقدي وفسخ العقد",
-            "date": "2025-11-10",
-            "parties": "شركة الفنار للتوريدات ومؤسسة النيل للتجارة",
-            "charge": "التزام تعاقدي وتوريد دفعات مالية مع شرط جزائي",
-            "summary": "المطالبة بسداد متبقي المستحقات والتعويض الاتفاقي.",
-            "defenses": [
-                "الدفع بعدم التنفيذ عملاً بالمادة 161 من القانون المدني نظراً لإخلال الطرف الآخر بالتزاماته.",
-                "الدفع بالقوة القاهرة وسقوط الشرط الجزائي لانتفاء الخطأ والضرر وعلاقة السببية عملاً بالمادة 215 مدني."
-            ],
-            "memo_text": """باسم الشعب
-محكمة شمال القاهرة الابتدائية
-الدائرة (12) مدني كلي
-
-مذكرة بدفاع السيد / الممثل القانوني لمؤسسة النيل للتجارة (المدعى عليه)
-ضـــد
-شركة الفنار للتوريدات العمومية (المدعية)
-في الدعوى رقم 5521 لسنة 2025 مدني كلي شمال القاهرة
-المحدد لنظرها جلسة الأحد 10/05/2026
-
-أولاً: الدفوع
-1. الدفع بعدم قبول الدعوى لرفعها قبل الأوان لعدم الإعذار الرسمي عملاً بنص المادة 219 من القانون المدني المصري.
-2. الدفع بسقوط الشرط الجزائي لانتفاء ركن الخطأ العقدي وثبوت إخلال المدعية أولاً بالتزامات التوريد (المادة 161 مدني).
-
-ثانياً: الطلبات
-رفض الدعوى وإلزام المدعية بالمصروفات ومقابل أتعاب المحاماة."""
-        }
-
-    return {
-        "status": "success",
-        "file_name": filename,
-        "doc_type": doc_type,
-        "extracted": extracted,
-        "message": "تم استخراج البيانات وتحليل الثغرات القانونية وإعداد مسودة المذكرة بنجاح."
-    }
+    office=resolve_office()
+    check_trial_permission(office,for_mutation=True)
+    raise HTTPException(501,detail='استخراج المستندات غير مفعّل بعد؛ لم يتم تحليل هذا الملف أو حفظه. أدخل البيانات يدوياً لحين ربط خدمة OCR فعلية.')
 
 # -----------------------------------------------------------------------------
 # تقديم صفحة النظام وفحص الصحة
@@ -3421,7 +2887,7 @@ async def health_check():
     return {
         "status": "healthy",
         "system": "بيت القانون | المنظومة الرقمية المتكاملة للمحامي المصري",
-        "offices_count": len(OFFICES),
+        "database_configured": security.configured(),
         "demo_trial_days_remaining": max(0, (datetime.fromisoformat(OFFICES["office_demo"]["trial_end"]) - datetime.now()).days),
         "cases_count": len(OFFICES["office_demo"]["data"]["cases"]),
         "clients_count": len(OFFICES["office_demo"]["data"]["clients"]),

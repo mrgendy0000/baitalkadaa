@@ -2844,14 +2844,14 @@
                                         <td><strong>1422 / 2026</strong></td>
                                         <td>استئناف القاهرة · د/5 تجاري</td>
                                         <td>شركة النيل للتجارة</td>
-                                        <td>أ. أحمد الشريف (نقض)</td>
+                                        <td>أ. اسم تجريبي (نقض)</td>
                                         <td><span class="hx-chip ok">منطوق صادر</span></td>
                                         <td>حجزت للحكم لجلسة 28 أكتوبر</td>
                                     </tr>
                                     <tr>
                                         <td><strong>891 / 2026</strong></td>
                                         <td>جنح قصر النيل · د/2</td>
-                                        <td>م/ محمود عبد الرحمن</td>
+                                        <td>م/ اسم تجريبي</td>
                                         <td>أ. محمد جمال (استئناف)</td>
                                         <td><span class="hx-chip warn">تأجيل للمستندات</span></td>
                                         <td>إعلان المتهم بورقة المضاهاة</td>
@@ -2859,7 +2859,7 @@
                                     <tr>
                                         <td><strong>405 / 2026</strong></td>
                                         <td>شمال القاهرة · د/3 إيجارات</td>
-                                        <td>الحاج / فوزي الديب</td>
+                                        <td>الحاج / اسم تجريبي</td>
                                         <td>أ. حسام الدين (ابتدائي)</td>
                                         <td><span class="hx-chip ok">حجزت للحكم</span></td>
                                         <td>إيداع تقرير الخبير الحسابي</td>
@@ -2867,7 +2867,7 @@
                                     <tr>
                                         <td><strong>2910 / 2026</strong></td>
                                         <td>مجلس الدولة · القضاء الإداري</td>
-                                        <td>د/ ياسمين فؤاد</td>
+                                        <td>د/ اسم تجريبي</td>
                                         <td>المستشار رئيس المكتب</td>
                                         <td><span class="hx-chip ok">شق عاجل</span></td>
                                         <td>حكم بوقف تنفيذ القرار المطعون فيه</td>
@@ -3493,11 +3493,11 @@
             <form onsubmit="handleRegisterSubmit(event)">
                 <div class="form-group">
                     <label>اسم المكتب أو الشركة القانونية *</label>
-                    <input type="text" id="reg-office" required placeholder="مثال: مكتب المستشار أحمد الشريف">
+                    <input type="text" id="reg-office" required placeholder="مثال: مكتب المستشار اسم تجريبي">
                 </div>
                 <div class="form-group">
                     <label>اسم المحامي المسؤول *</label>
-                    <input type="text" id="reg-lawyer" required placeholder="مثال: أ. أحمد الشريف (المحامي بالنقض)">
+                    <input type="text" id="reg-lawyer" required placeholder="مثال: أ. اسم تجريبي (المحامي بالنقض)">
                 </div>
                 <div class="form-group">
                     <label>رقم الهاتف / الواتساب *</label>
@@ -3505,11 +3505,11 @@
                 </div>
                 <div class="form-group">
                     <label>البريد الإلكتروني (اختياري)</label>
-                    <input type="email" id="reg-email" placeholder="lawyer@example.com">
+                    <input type="email" id="reg-email" required placeholder="lawyer@example.com">
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور *</label>
-                    <input type="password" id="reg-pwd" required placeholder="اختر كلمة مرور">
+                    <input type="password" id="reg-pwd" required minlength="10" maxlength="128" placeholder="اختر كلمة مرور">
                 </div>
                 <button type="submit" class="btn-submit-modal" id="btn-reg">تفعيل التجربة المجانية والدخول للنظام 🚀</button>
             </form>
@@ -3530,7 +3530,7 @@
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="login-pwd" required value="demo123" placeholder="demo123">
+                    <input type="password" id="login-pwd" required placeholder="كلمة مرور مكتبك">
                 </div>
                 <button type="submit" class="btn-submit-modal" id="btn-login">دخول إلى المنظومة 🔐</button>
             </form>
@@ -3671,10 +3671,10 @@
                 url: 'https://app.baytalqanoon.com/workspace/sessions',
                 headers: ['رقم القضية', 'المحكمة والدائرة', 'الموكل', 'المحامي الحاضر', 'الحالة / القرار', 'آخر إجراء'],
                 rows: [
-                    ['1422 / 2026', 'استئناف القاهرة · د/5 تجاري', 'شركة النيل للتجارة', 'أ. أحمد الشريف (نقض)', '<span class="hx-chip ok">منطوق صادر</span>', 'حجزت للحكم لجلسة 28 أكتوبر'],
-                    ['891 / 2026', 'جنح قصر النيل · د/2', 'م/ محمود عبد الرحمن', 'أ. محمد جمال (استئناف)', '<span class="hx-chip warn">تأجيل للمستندات</span>', 'إعلان المتهم بورقة المضاهاة'],
-                    ['405 / 2026', 'شمال القاهرة · د/3 إيجارات', 'الحاج / فوزي الديب', 'أ. حسام الدين (ابتدائي)', '<span class="hx-chip ok">حجزت للحكم</span>', 'إيداع تقرير الخبير الحسابي'],
-                    ['2910 / 2026', 'مجلس الدولة · القضاء الإداري', 'د/ ياسمين فؤاد', 'المستشار رئيس المكتب', '<span class="hx-chip ok">شق عاجل</span>', 'حكم بوقف تنفيذ القرار المطعون فيه']
+                    ['1422 / 2026', 'استئناف القاهرة · د/5 تجاري', 'شركة النيل للتجارة', 'أ. اسم تجريبي (نقض)', '<span class="hx-chip ok">منطوق صادر</span>', 'حجزت للحكم لجلسة 28 أكتوبر'],
+                    ['891 / 2026', 'جنح قصر النيل · د/2', 'م/ اسم تجريبي', 'أ. محمد جمال (استئناف)', '<span class="hx-chip warn">تأجيل للمستندات</span>', 'إعلان المتهم بورقة المضاهاة'],
+                    ['405 / 2026', 'شمال القاهرة · د/3 إيجارات', 'الحاج / اسم تجريبي', 'أ. حسام الدين (ابتدائي)', '<span class="hx-chip ok">حجزت للحكم</span>', 'إيداع تقرير الخبير الحسابي'],
+                    ['2910 / 2026', 'مجلس الدولة · القضاء الإداري', 'د/ اسم تجريبي', 'المستشار رئيس المكتب', '<span class="hx-chip ok">شق عاجل</span>', 'حكم بوقف تنفيذ القرار المطعون فيه']
                 ]
             },
             cases: {
@@ -3699,8 +3699,8 @@
                 rows: [
                     ['REC-901', 'شركة النيل للتجارة', 'دفعة ثانية أتعاب استئناف', '<strong style="color:#15803D;">+25,000 ج.م</strong>', 'إنستاباي / بنكي', 'اليوم 11:30 ص'],
                     ['EXP-402', 'محكمة شمال القاهرة', 'رسوم قضائية وتوريد أمانة خبير', '<strong style="color:#B91C1C;">-3,200 ج.م</strong>', 'فيزا ميزة حكومية', 'أمس 02:15 م'],
-                    ['REC-902', 'م/ محمود عبد الرحمن', 'مقدم أتعاب جنحة شيك', '<strong style="color:#15803D;">+10,000 ج.م</strong>', 'نقداً بالخزينة', 'أمس 12:00 م'],
-                    ['REC-903', 'د/ ياسمين فؤاد', 'أتعاب حكم الشق العاجل', '<strong style="color:#15803D;">+15,000 ج.م</strong>', 'تحويل فودافون كاش', '19 أكتوبر 2026']
+                    ['REC-902', 'م/ اسم تجريبي', 'مقدم أتعاب جنحة شيك', '<strong style="color:#15803D;">+10,000 ج.م</strong>', 'نقداً بالخزينة', 'أمس 12:00 م'],
+                    ['REC-903', 'د/ اسم تجريبي', 'أتعاب حكم الشق العاجل', '<strong style="color:#15803D;">+15,000 ج.م</strong>', 'تحويل فودافون كاش', '19 أكتوبر 2026']
                 ]
             },
             zizo: {
@@ -3723,10 +3723,10 @@
                 url: 'https://app.baytalqanoon.com/workspace/clients',
                 headers: ['الموكل', 'رقم الهاتف', 'التوكيل وسريانه', 'القضايا الموكلة', 'حالة رسائل الواتساب', 'آخر تواصل'],
                 rows: [
-                    ['شركة النيل للتجارة', '01011223344', 'رسمي عام 1402 قضايا (سارٍ)', '3 قضايا تجارية', '<span class="hx-chip ok">تم إرسال قرار الجلسة</span>', 'منذ 20 دقيقة'],
-                    ['م/ محمود عبد الرحمن', '01233445566', 'خاص بالقضية 891 (سارٍ)', 'جنحة شيك', '<span class="hx-chip ok">تم إرسال ميعاد الجلسة</span>', 'اليوم 09:15 ص'],
-                    ['الحاج / فوزي الديب', '01144556677', 'عام بنوك وقضايا (سارٍ)', 'دعوى إيجارات', '<span class="hx-chip ok">تم إرسال كشف الحساب</span>', 'أمس 04:30 م'],
-                    ['د/ ياسمين فؤاد', '01099887766', 'رسمي قضايا 812 (سارٍ)', 'مجلس دولة إلغاء', '<span class="hx-chip ok">تم إرسال منطوق الحكم</span>', '19 أكتوبر 2026']
+                    ['شركة النيل للتجارة', 'بيانات عرض', 'رسمي عام 1402 قضايا (سارٍ)', '3 قضايا تجارية', '<span class="hx-chip ok">تم إرسال قرار الجلسة</span>', 'منذ 20 دقيقة'],
+                    ['م/ اسم تجريبي', 'بيانات عرض', 'خاص بالقضية 891 (سارٍ)', 'جنحة شيك', '<span class="hx-chip ok">تم إرسال ميعاد الجلسة</span>', 'اليوم 09:15 ص'],
+                    ['الحاج / اسم تجريبي', 'بيانات عرض', 'عام بنوك وقضايا (سارٍ)', 'دعوى إيجارات', '<span class="hx-chip ok">تم إرسال كشف الحساب</span>', 'أمس 04:30 م'],
+                    ['د/ اسم تجريبي', 'بيانات عرض', 'رسمي قضايا 812 (سارٍ)', 'مجلس دولة إلغاء', '<span class="hx-chip ok">تم إرسال منطوق الحكم</span>', '19 أكتوبر 2026']
                 ]
             }
         };
@@ -3855,7 +3855,7 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    localStorage.setItem('office_token', data.token);
+                    localStorage.setItem('legal_session_mode', data.token);
                     alert(`🎉 مبارك معالي المستشار ${payload.lawyer_name}!\n\nتم تفعيل شهر كامل (30 يوماً / 720 ساعة) تجربة مجانية لمكتبك.`);
                     window.location.href = '/app';
                 } else {
@@ -3889,12 +3889,12 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    localStorage.setItem('office_token', data.token);
+                    localStorage.setItem('legal_session_mode', data.token);
                     if (data.is_admin) {
-                        localStorage.setItem('is_admin', 'true');
+                        // Admin authorization is checked on the server.
                         window.location.href = '/app?view=admin';
                     } else {
-                        localStorage.removeItem('is_admin');
+                        // No admin credential is stored in the browser.
                         window.location.href = '/app';
                     }
                 } else {

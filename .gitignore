@@ -6,3 +6,7 @@ cloudflared
 *.log
 .local-backups/
 .playwright-mcp/
+.env
+.env.*
+!.env.example
+/static/knowledge/*.pdf

@@ -384,6 +384,8 @@
             animation: tab-fade 0.25s ease-out forwards;
         }
     </style>
+    <link rel="stylesheet" href="/static/assistant.css?v=secure-ai-2">
+    <script src="/static/assistant.js?v=secure-ai-2" defer></script>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 antialiased selection:bg-gold-500 selection:text-white">
 
@@ -1100,7 +1102,7 @@
             </div>
 
             <!-- Grid: Chat Column + Memo Canvas Column -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[calc(100dvh-13.5rem)] min-h-[500px]">
+            <div id="zizo-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[calc(100dvh-13.5rem)] min-h-[500px]">
                 
                 <!-- Chat Panel (Zizo AI) -->
                 <div id="zizo-panel-chat" class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
@@ -1114,9 +1116,9 @@
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-black text-sm text-gold-300">زيزو المساعد الشخصي</span>
-                                    <span class="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-bold border border-emerald-500/30">متصل • خبير القانون المصري</span>
+                                    <span id="zizo-connection-status" class="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-bold border border-emerald-500/30" role="status">جاري فحص الاتصال</span>
                                 </div>
-                                <div class="text-[10px] text-slate-300">أدلة ومذكرات ونصوص دستورية وقانونية باللهجة المصرية واللغة القضائية</div>
+                                <div class="text-[10px] text-slate-300">حوار في الوقائع · صياغة للمراجعة · مصادر واضحة</div>
                             </div>
                         </div>
 
@@ -1127,45 +1129,27 @@
                         </button>
                     </div>
 
-                    <!-- Chat Messages Stream -->
-                    <div id="zizo-chat-stream" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
-                        <!-- Welcome message from Zizo -->
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-navy-900 flex-shrink-0 flex items-center justify-center border border-gold-500/30">
-                                <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-5 h-5 object-contain">
-                            </div>
-                            <div class="bg-white p-3.5 rounded-2xl rounded-tr-none border border-slate-200 shadow-sm text-slate-800 leading-relaxed max-w-[88%]">
-                                <p class="font-black text-navy-950 mb-1 text-[13px]">يا مراحب يا أستاذنا! 🦅⚖️</p>
-                                <p>أنا «زيزو» مساعدك القانوني الشخصي. جاهز معاك لأي مسألة قانونية وفق أحدث أحكام محكمة النقض والدستور المصري:</p>
-                                <ul class="list-disc list-inside mt-2 space-y-1 text-slate-600 text-[11px]">
-                                    <li>صياغة مذكرات دفاع ودفوع شكلية وموضوعية.</li>
-                                    <li>البحث في نصوص القانون المدني، الجنائي، والمرافعات.</li>
-                                    <li>تكييف وقائع الدعوى وتحديد السند القانوني السليم.</li>
-                                </ul>
-                                <div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap gap-1.5">
-                                    <button onclick="sendQuickPrompt('صغ مذكرة بدفاع المستأجر في دعوى طرد للهدم')" class="px-2 py-1 rounded bg-slate-100 hover:bg-gold-50 text-[10px] text-navy-900 border border-slate-200 transition">
-                                        طرد للهدم
-                                    </button>
-                                    <button onclick="sendQuickPrompt('دفوع في جنحة شيك بدون رصيد وتقادم الدعوى')" class="px-2 py-1 rounded bg-slate-100 hover:bg-gold-50 text-[10px] text-navy-900 border border-slate-200 transition">
-                                        دفوع جنحة شيك
-                                    </button>
-                                    <button onclick="sendQuickPrompt('صيغة دعوى صحة ونفاذ عقد بيع ابتدائي')" class="px-2 py-1 rounded bg-slate-100 hover:bg-gold-50 text-[10px] text-navy-900 border border-slate-200 transition">
-                                        صحة ونفاذ
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="zizo-tools">
+                        <label for="zizo-case-context">سياق القضية</label>
+                        <select id="zizo-case-context"><option value="">محادثة عامة — بدون ملف قضية</option></select>
+                        <div class="zizo-tools-row">
+                            <select id="zizo-mode" aria-label="نوع المساعدة"><option value="chat">مناقشة وتحليل</option><option value="draft">صياغة مسودة</option></select>
+                            <label class="zizo-research"><input type="checkbox" id="zizo-research" checked> بحث بالمصادر</label>
+                            <a href="/static/constitution.html" target="_blank" rel="noopener">الدستور كاملاً ↗</a>
                         </div>
                     </div>
+                    <div id="zizo-chat-stream" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs" role="log" aria-label="محادثة زيزو" aria-live="polite"></div>
 
                     <!-- Chat Input Elevated and Protected from Floating Elements -->
                     <form onsubmit="handleZizoSubmit(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2 relative z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-                        <textarea id="zizo-input-text" rows="2" placeholder="اكتب استشارتك أو وقائع الدعوى هنا... (مثال: صغ لي دفعاً بعدم جواز نظر الدعوى لسابقة الفصل فيها)" class="flex-1 text-xs sm:text-sm p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-navy-900 resize-none text-slate-900 placeholder:text-slate-400"></textarea>
-                        <button type="submit" id="btn-zizo-send" class="w-12 h-12 rounded-xl bg-gradient-to-r from-navy-950 to-navy-900 hover:from-navy-900 hover:to-navy-850 text-gold-400 hover:text-gold-300 flex items-center justify-center shadow-md transition flex-shrink-0" title="إرسال إلى زيزو">
+                        <textarea id="zizo-input-text" rows="2" placeholder="اكتب سؤالك أو وقائع القضية…" aria-label="رسالتك إلى زيزو" maxlength="12000" class="flex-1 text-xs sm:text-sm p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-navy-900 resize-none text-slate-900 placeholder:text-slate-400"></textarea>
+                        <button type="submit" id="btn-zizo-send" class="w-12 h-12 rounded-xl bg-gradient-to-r from-navy-950 to-navy-900 hover:from-navy-900 hover:to-navy-850 text-gold-400 hover:text-gold-300 flex items-center justify-center shadow-md transition flex-shrink-0" title="إرسال إلى زيزو" aria-label="إرسال الرسالة">
                             <svg class="w-5 h-5 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
                         </button>
                     </form>
+                    <p class="zizo-privacy">المسودة للمراجعة المهنية. يُرسل السؤال وسياق القضية المختارة لخدمة الذكاء؛ لا تُرسل ملفات المكتب كلها.</p>
 
                 </div>
 
@@ -1591,11 +1575,11 @@
                                 </div>
                                 <div class="bg-white p-2 rounded-xl border border-slate-200">
                                     <div class="text-[9px] text-slate-400 font-bold">الموكل:</div>
-                                    <div class="font-black text-emerald-700 truncate" id="scan-res-client">مروان عصام عبد الرحمن</div>
+                                    <div class="font-black text-emerald-700 truncate" id="scan-res-client">اسم تجريبي</div>
                                 </div>
                                 <div class="bg-white p-2 rounded-xl border border-slate-200">
                                     <div class="text-[9px] text-slate-400 font-bold">الخصم:</div>
-                                    <div class="font-black text-rose-700 truncate" id="scan-res-opponent">أحمد حسني محمود</div>
+                                    <div class="font-black text-rose-700 truncate" id="scan-res-opponent">اسم تجريبي</div>
                                 </div>
                             </div>
 
@@ -1840,7 +1824,7 @@
 
             <div class="mt-6 space-y-2.5">
                 <!-- WhatsApp Direct Contact -->
-                <a href="https://wa.me/201000000000?text=السلام%20عليكم،%20أرغب%20في%20تفعيل%20اشتراك%20مكتب%20المحاماة%20في%20بيت%20القانون" target="_blank" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                <a href="#" onclick="showToast('بيانات الدعم لم تضاف بعد');return false" target="_blank" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
                     </svg>
@@ -1848,7 +1832,7 @@
                 </a>
 
                 <!-- Phone Call Contact -->
-                <a href="tel:+201000000000" class="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-950 font-bold text-xs border border-slate-200 transition flex items-center justify-center gap-2">
+                <a href="#" onclick="showToast('بيانات الدعم لم تضاف بعد');return false" class="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-950 font-bold text-xs border border-slate-200 transition flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -1899,28 +1883,28 @@
             <form id="form-office-register" onsubmit="handleOfficeRegisterSubmit(event)" class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-bold text-navy-950 mb-1">اسم المكتب أو المؤسسة القانونية <span class="text-rose-500">*</span></label>
-                    <input type="text" id="reg-office-name" required placeholder="مثال: مكتب المستشار أحمد ممدوح للمحاماة" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
+                    <input type="text" id="reg-office-name" required placeholder="مثال: مكتب المستشار اسم تجريبي للمحاماة" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold text-navy-950 mb-1">اسم المحامي المسؤول <span class="text-rose-500">*</span></label>
-                        <input type="text" id="reg-lawyer-name" required placeholder="أ. أحمد ممدوح" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
+                        <input type="text" id="reg-lawyer-name" required placeholder="أ. اسم تجريبي" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-navy-950 mb-1">رقم الهاتف / الواتساب <span class="text-rose-500">*</span></label>
-                        <input type="tel" id="reg-phone" required placeholder="01012345678" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
+                        <input type="tel" id="reg-phone" required placeholder="رقم الهاتف" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold text-navy-950 mb-1">البريد الإلكتروني (اختياري)</label>
-                        <input type="email" id="reg-email" placeholder="lawyer@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
+                        <input type="email" id="reg-email" required placeholder="lawyer@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-navy-950 mb-1">كلمة المرور <span class="text-rose-500">*</span></label>
-                        <input type="password" id="reg-password" required placeholder="اختر كلمة مرور لمكتبك" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
+                        <input type="password" id="reg-password" required minlength="10" maxlength="128" placeholder="اختر كلمة مرور لمكتبك" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-navy-700">
                     </div>
                 </div>
 
@@ -2165,17 +2149,17 @@
             <form onsubmit="handleCreateClientSubmit(event)" class="mt-4 space-y-3">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">اسم الموكل بالكامل *</label>
-                    <input type="text" id="client-new-name" required placeholder="مثال: المستشار محمد أحمد الهواري" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
+                    <input type="text" id="client-new-name" required placeholder="مثال: المستشار اسم تجريبي" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">رقم الهاتف *</label>
-                        <input type="tel" id="client-new-phone" required placeholder="مثال: 01012345678" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
+                        <input type="tel" id="client-new-phone" required placeholder="مثال: رقم الهاتف" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">الرقم القومي (14 رقماً)</label>
-                        <input type="text" id="client-new-national-id" maxlength="14" placeholder="مثال: 29501011234567" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
+                        <input type="text" id="client-new-national-id" maxlength="14" placeholder="مثال: الرقم القومي" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-purple-600">
                     </div>
                 </div>
 
@@ -2300,7 +2284,7 @@
 
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">أطراف التعاقد (الطرف الأول والثاني) *</label>
-                        <input type="text" id="ai-contract-parties" required placeholder="مثال: السيد / أحمد مصطفى النجار (بائع) ضد السيد / محمود كامل سليم (مشتري)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-navy-700">
+                        <input type="text" id="ai-contract-parties" required placeholder="مثال: السيد / اسم تجريبي (بائع) ضد السيد / اسم تجريبي (مشتري)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-navy-700">
                     </div>
 
                     <div>
@@ -2352,6 +2336,10 @@
     <!-- CLIENT APPLICATION JAVASCRIPT LOGIC -->
     <!-- ========================================================================= -->
     <script>
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+        }
+        function jsArg(value) { return escapeHtml(JSON.stringify(String(value ?? ''))); }
         // State variables
         let currentOffice = null;
         let casesData = [];
@@ -2360,12 +2348,12 @@
         let currentMoreSubTab = 'clients';
         let currentCaseStageFilter = 'all';
 
-        // Retrieve auth token from localStorage (default to 'token_demo' if not set)
+        // Non-secret UI mode only. Authentication uses a server-issued HttpOnly cookie.
         function getOfficeToken() {
-            let token = localStorage.getItem('office_token');
+            let token = localStorage.getItem('legal_session_mode');
             if (!token) {
                 token = 'token_demo';
-                localStorage.setItem('office_token', token);
+                localStorage.setItem('legal_session_mode', token);
             }
             return token;
         }
@@ -2594,9 +2582,11 @@
             openModal('modal-subscription-contact');
         }
 
-        function handleLogout() {
+        async function handleLogout() {
             if (confirm('هل ترغب في تسجيل الخروج من هذا الحساب؟')) {
-                localStorage.removeItem('office_token');
+                try { const response=await apiFetch('/api/auth/logout',{method:'POST',body:{}}); if (!response.ok) throw Error(); } catch { showToast('تعذر تأكيد تسجيل الخروج؛ أعد المحاولة.'); return; }
+                sessionStorage.clear();
+                localStorage.removeItem('legal_session_mode');
                 window.location.href = '/';
             }
         }
@@ -2654,6 +2644,7 @@
             const floatingZizoEl = document.getElementById('floating-zizo-widget');
             const universalFabEl = document.getElementById('universal-fab-container');
             if (viewName === 'zizo') {
+                window.ZizoAssistant?.refresh();
                 if (floatingZizoEl) floatingZizoEl.classList.add('hidden');
                 if (universalFabEl) universalFabEl.classList.add('hidden');
             } else {
@@ -2777,11 +2768,8 @@
 
         function askZizoQuick(promptText) {
             switchView('zizo');
-            const input = document.getElementById('zizo-query-input');
-            if (input) {
-                input.value = promptText;
-                setTimeout(() => sendZizoMessage(), 150);
-            }
+            switchZizoTab('chat');
+            sendQuickPrompt(promptText);
         }
 
         // ---------------------------------------------------------------------
@@ -2792,7 +2780,7 @@
                 const res = await apiFetch('/api/auth/me');
                 if (!res.ok) {
                     // Invalid token, fallback to demo or landing
-                    localStorage.setItem('office_token', 'token_demo');
+                    localStorage.setItem('legal_session_mode', 'token_demo');
                     return checkOfficeAuth();
                 }
                 const resData = await res.json();
@@ -2804,7 +2792,7 @@
                 const text = document.getElementById('trial-status-text');
                 const expiredBanner = document.getElementById('trial-expired-banner');
 
-                const isDemo = office.is_demo || (office.id === 'office_demo') || (localStorage.getItem('office_token') === 'token_demo');
+                const isDemo = office.is_demo || (office.id === 'office_demo') || (localStorage.getItem('legal_session_mode') === 'token_demo');
 
                 if (isDemo) {
                     document.getElementById('header-office-name').textContent = 'منظومة بيت القانون';
@@ -2835,7 +2823,7 @@
                     document.getElementById('dashboard-greeting').textContent = `أهلاً بك، معالي المستشار ${lawyerName} ⚖️`;
 
                     chip.className = 'px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 bg-gold-500/20 text-gold-300 border border-gold-500/40 whitespace-nowrap flex-shrink-0';
-                    text.innerHTML = `<span class="hidden sm:inline">متبقي ${office.days_remaining} يومًا بالتجربة المجانية</span><span class="sm:hidden">متبقي ${office.days_remaining} يوم</span>`;
+                    text.innerHTML = `<span class="hidden sm:inline">متبقي ${escapeHtml(office.days_remaining)} يومًا بالتجربة المجانية</span><span class="sm:hidden">متبقي ${escapeHtml(office.days_remaining)} يوم</span>`;
                     chip.onclick = null;
                     if (expiredBanner) expiredBanner.classList.add('hidden');
 
@@ -2858,7 +2846,7 @@
                 }
 
                 // Check Admin role & Show Admin badges
-                const isAdmin = office.is_admin || (office.plan === 'super_admin') || (localStorage.getItem('is_admin') === 'true');
+                const isAdmin = office.is_admin === true;
                 const adminIndicator = document.getElementById('admin-badge-indicator');
                 const adminBtn = document.getElementById('btn-open-admin-control');
 
@@ -2949,7 +2937,7 @@
                 lawyer_name: (document.getElementById('reg-lawyer-name').value || '').trim(),
                 phone: (document.getElementById('reg-phone').value || '').trim(),
                 email: (document.getElementById('reg-email').value || '').trim(),
-                password: (document.getElementById('reg-password').value || '').trim() || 'secret'
+                password: document.getElementById('reg-password').value
             };
 
             if (!payload.office_name || !payload.lawyer_name || !payload.phone) {
@@ -2976,7 +2964,7 @@
                 }
 
                 // Save token to localStorage
-                localStorage.setItem('office_token', data.token);
+                localStorage.setItem('legal_session_mode', data.token);
                 closeModal('modal-office-register');
                 showToast(`🎉 مبارك معالي المستشار ${payload.lawyer_name}! تم تفعيل شهر كامل (30 يوماً) تجربة مجانية لمكتبك.`);
 
@@ -2998,7 +2986,7 @@
 
             const payload = {
                 identifier: (document.getElementById('login-identifier').value || '').trim(),
-                password: (document.getElementById('login-password').value || '').trim()
+                password: document.getElementById('login-password').value
             };
 
             if (!payload.identifier) {
@@ -3024,7 +3012,7 @@
                     return;
                 }
 
-                localStorage.setItem('office_token', data.token);
+                localStorage.setItem('legal_session_mode', data.token);
                 closeModal('modal-office-register');
                 showToast(`مرحباً بك مجدداً في مكتبك!`);
 
@@ -3039,7 +3027,7 @@
         }
 
         function continueAsDemo() {
-            localStorage.setItem('office_token', 'token_demo');
+            localStorage.setItem('legal_session_mode', 'token_demo');
             closeModal('modal-office-register');
             showToast('أنت الآن تتصفح النظام كـ زائر استكشافي');
             checkOfficeAuth();
@@ -3179,7 +3167,7 @@
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-xl icon-3d icon-3d-blue flex items-center justify-center text-xs flex-shrink-0 group-hover:scale-105 transition shadow-sm">📁</div>
                             <div>
-                                <span class="font-black text-xs text-navy-950 block">${c.number}</span>
+                                <span class="font-black text-xs text-navy-950 block">${escapeHtml(c.number)}</span>
                                 <span class="text-[10px] text-slate-400">${c.court || 'المحكمة'}</span>
                             </div>
                         </div>
@@ -3257,10 +3245,10 @@
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="font-black text-xs text-navy-950">${c.number}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">${c.stage}</span>
+                            <span class="font-black text-xs text-navy-950">${escapeHtml(c.number)}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">${escapeHtml(c.stage)}</span>
                         </div>
-                        <h4 class="font-bold text-xs text-slate-800 mb-2 leading-snug">${c.subject}</h4>
+                        <h4 class="font-bold text-xs text-slate-800 mb-2 leading-snug">${escapeHtml(c.subject)}</h4>
                         
                         <div class="space-y-1 text-[11px] text-slate-600 mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                             <div class="flex justify-between">
@@ -3279,13 +3267,13 @@
                     </div>
 
                     <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <button onclick="prepareMemoForCase('${c.number}', '${c.subject}', '${c.client}', '${c.court}')" class="text-gold-600 hover:text-gold-700 font-black flex items-center gap-1">
+                        <button onclick="prepareMemoForCase(${jsArg(c.number)}, ${jsArg(c.subject)}, ${jsArg(c.client)}, ${jsArg(c.court)})" class="text-gold-600 hover:text-gold-700 font-black flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                             <span>صياغة مذكرة</span>
                         </button>
-                        <select onchange="updateCaseStage('${c.id}', this.value)" class="text-[10px] bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-bold text-slate-700">
+                        <select onchange="updateCaseStage('${escapeHtml(c.id)}', this.value)" class="text-[10px] bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-bold text-slate-700">
                             <option value="تجهيز وقيد" ${c.stage === 'تجهيز وقيد' ? 'selected' : ''}>تجهيز وقيد</option>
                             <option value="متداولة بالجلسات" ${c.stage === 'متداولة بالجلسات' ? 'selected' : ''}>متداولة</option>
                             <option value="حجز للحكم" ${c.stage === 'حجز للحكم' ? 'selected' : ''}>حجز للحكم</option>
@@ -3360,58 +3348,7 @@
 
         // Demo simulation if camera is unavailable or on quick-test button
         function simulateSmartScanDemo() {
-            const laser = document.getElementById('case-scan-laser');
-            if (laser) laser.classList.remove('hidden');
-            showToast('📷 جاري فحص المستند وتحليل دفوع محكمة النقض...');
-
-            setTimeout(() => {
-                if (laser) laser.classList.add('hidden');
-                const mock = {
-                    doc_type: "محضر جمع استدلالات - قسم قصر النيل",
-                    extracted: {
-                        case_number: "1425 لسنة 2026 جنح قصر النيل",
-                        court: "محكمة جنح مستأنف قصر النيل",
-                        client: "مروان عصام عبد الرحمن",
-                        opponent: "أحمد حسني محمود",
-                        subject: "خيانة أمانة وإيصال أمانة (م 341 عقوبات)",
-                        defenses: [
-                            "انتفاء ركن التسليم الحقيقي ومدنية النزاع لكون الإيصال أداة ضمان (م 341 عقوبات).",
-                            "بطلان التحريات لكونها مكتبية وترديداً لأقوال الشاكي استناداً للمادة 54 دستور 2014.",
-                            "الطعن بالجهالة والتزوير صلباً وتاريخاً وإحالة الورقة للطب الشرعي."
-                        ],
-                        memo_text: `باسم الشعب
-محكمة جنح مستأنف قصر النيل
-دائرة الجنح المستأنفة
-
-مذكرة بدفاع السيد / مروان عصام عبد الرحمن (المتهم - المستأنف)
-ضـــد
-النيابة العامة (سلطة الاتهام) والسيد / أحمد حسني محمود (المدعي بالحق المدني)
-في القضية رقم 1425 لسنة 2026 جنح مستأنف قصر النيل
-والمحدد لنظرها جلسة الأحد الموافق 26/04/2026
-
-أولاً: الوقائع
-تخلص واقعات الدعوى في أن الشاكي حرر محضر ضبط زاعماً تسليم موكلي مبلغاً نقدياً على سبيل الأمانة بموجب إيصال أمانة سند الجنحة، وحيث أن الحقيقة والواقع تكشفان بجلاء عن مدنية النزاع وانتفاء واقعة التسليم الفعلي للمال.
-
-ثانياً: الدفوع القانونية الجوهرية
-1. انتفاء ركن التسليم الحقيقي لجريمة خيانة الأمانة المنصوص عليها بالمادة 341 من قانون العقوبات المصري:
-المستقر عليه في قضاء محكمة النقض أن: "جريمة خيانة الأمانة لا تقوم إلا إذا كان تسليم المال قد تم تسليماً فعلياً وحقيقياً ليد المؤتمن على سبيل الأمانة بأحد عقود الأمانة الواردة حصراً في المادة 341 عقوبات، فإذا كان الإيصال قد تحرر كأداة ضمان لمعاملة مدنية أو تجارية سقط الركن المادي للجريمة".
-(نقض جنائي جلسة 15/4/1982 - مجموعة القواعد القانونية)
-
-2. بطلان تحريات المباحث لكونها مكتبية وترديداً لأقوال الشاكي دون معاينة أو فحص فني مستقل استناداً للمادة 54 و96 من دستور جمهورية مصر العربية 2014.
-
-3. الطعن بالتزوير صلبًا وتاريخًا على إيصال الأمانة سند الدعوى عملاً بنص المادة 295 وما بعدها من قانون الإجراءات الجنائية والمادة 49 من قانون الإثبات رقم 25 لسنة 1968.
-
-ثالثاً: الطلبات الختامية
-يلتمس دفاع المستأنف من عدالة المحكمة الموقرة القضاء بـ:
-أصلياً: إلغاء الحكم المستأنف والقضاء مجدداً ببراءة المتهم من التهمة المنسوبة إليه ورفض الدعوى المدنية.
-احتياطياً: إحالة إيصال الأمانة لمصلحة الطب الشرعي (قسم أبحاث التزييف والتزوير) لبيان أسبقية التوقيع على الصلب.
-
-وكيل المتهم المستأنف
-المحامي بالنقض والاستئناف`
-                    }
-                };
-                applyScanResultsToCase(mock);
-            }, 750);
+            showToast('خدمة استخراج المستندات غير مفعّلة بعد. لم يتم تحليل المستند؛ أدخل البيانات يدوياً.');
         }
 
         function applyScanResultsToCase(data) {
@@ -3425,12 +3362,12 @@
             document.getElementById('case-scanned-doctype').textContent = data.doc_type || 'مستند قضائي معتمد';
             document.getElementById('scan-res-number').textContent = ext.case_number || '1425 لسنة 2026';
             document.getElementById('scan-res-court').textContent = ext.court || 'جنح قصر النيل';
-            document.getElementById('scan-res-client').textContent = ext.client || 'مروان عصام';
-            document.getElementById('scan-res-opponent').textContent = ext.opponent || 'أحمد حسني';
+            document.getElementById('scan-res-client').textContent = ext.client || 'اسم تجريبي';
+            document.getElementById('scan-res-opponent').textContent = ext.opponent || 'اسم تجريبي';
 
             if (ext.defenses && ext.defenses.length) {
                 const list = document.getElementById('scan-res-defenses');
-                list.innerHTML = ext.defenses.map(d => `<li>${d}</li>`).join('');
+                list.innerHTML = ext.defenses.map(d => `<li>${escapeHtml(d)}</li>`).join('');
             }
 
             // Fill form fields
@@ -3713,7 +3650,7 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h4 class="font-black text-sm text-navy-950">${off.name}</h4>
+                                        <h4 class="font-black text-sm text-navy-950">${escapeHtml(off.name)}</h4>
                                         <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${off.is_expired ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
                                             ${off.is_expired ? '⛔ منتهي الصلاحية' : `سارٍ (${days} يوم متبقية)`}
                                         </span>
@@ -3723,7 +3660,7 @@
                                         ${!off.is_active ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">معطل مؤقتاً</span>` : ''}
                                     </div>
                                     <div class="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                                        <span>المحامي المسؤول: <b class="text-navy-900">${off.lawyer_name}</b></span>
+                                        <span>المحامي المسؤول: <b class="text-navy-900">${escapeHtml(off.lawyer_name)}</b></span>
                                         <span>الهاتف: <b class="text-navy-900">${off.phone || '—'}</b></span>
                                         <span>القضايا المسجلة: <b class="text-purple-700">${off.cases_count || 0}</b></span>
                                     </div>
@@ -3745,21 +3682,21 @@
                         <!-- 1-Click Action Controls -->
                         <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <button onclick="adminActionSubscription('${off.id}', 'extend_15')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1">
+                                <button onclick="adminActionSubscription('${escapeHtml(off.id)}', 'extend_15')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1">
                                     <span>+15 يوماً تجديد</span>
                                 </button>
-                                <button onclick="adminActionSubscription('${off.id}', 'extend_30')" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1">
+                                <button onclick="adminActionSubscription('${escapeHtml(off.id)}', 'extend_30')" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1">
                                     <span>+30 يوماً تمديد</span>
                                 </button>
-                                <button onclick="adminActionSubscription('${off.id}', 'upgrade_pro')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-gold-300 font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1 border border-purple-400/40">
+                                <button onclick="adminActionSubscription('${escapeHtml(off.id)}', 'upgrade_pro')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-gold-300 font-black text-[11px] shadow-xs hover:scale-105 active:scale-95 transition flex items-center gap-1 border border-purple-400/40">
                                     <span>🌟 ترقية سنوية Pro</span>
                                 </button>
-                                <button onclick="adminActionSubscription('${off.id}', 'toggle_status')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition">
+                                <button onclick="adminActionSubscription('${escapeHtml(off.id)}', 'toggle_status')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition">
                                     ${off.is_active ? 'إيقاف مؤقت' : 'تنشيط الحساب'}
                                 </button>
                             </div>
                             <div class="text-[10px] text-slate-400 font-medium">
-                                كود المكتب: <code class="bg-slate-100 px-1 py-0.5 rounded text-navy-950 font-mono">${off.id}</code>
+                                كود المكتب: <code class="bg-slate-100 px-1 py-0.5 rounded text-navy-950 font-mono">${escapeHtml(off.id)}</code>
                             </div>
                         </div>
                     </div>
@@ -3836,13 +3773,13 @@
             }
             tbody.innerHTML = list.map(s => `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="p-3.5 font-bold text-navy-950">${s.date}</td>
-                    <td class="p-3.5 font-black text-navy-900">${s.case_number}</td>
+                    <td class="p-3.5 font-bold text-navy-950">${escapeHtml(s.date)}</td>
+                    <td class="p-3.5 font-black text-navy-900">${escapeHtml(s.case_number)}</td>
                     <td class="p-3.5">${s.court || '—'} <span class="text-slate-400 block text-[10px]">${s.circuit || ''}</span></td>
                     <td class="p-3.5 font-black text-gold-600">${s.roll_number || '—'}</td>
                     <td class="p-3.5 text-slate-700 max-w-xs truncate">${s.previous_decision || 'حضور ومرافعة'}</td>
                     <td class="p-3.5 text-center">
-                        <button onclick="prepareMemoForCase('${s.case_number}', 'جلسة ${s.date}', '', '${s.court}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-navy-950 hover:text-gold-400 text-slate-700 font-bold text-[10px] transition">
+                        <button onclick="prepareMemoForCase(${jsArg(s.case_number)}, ${jsArg("جلسة "+s.date)}, ${jsArg('')}, ${jsArg(s.court)})" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-navy-950 hover:text-gold-400 text-slate-700 font-bold text-[10px] transition">
                             مذكرة
                         </button>
                     </td>
@@ -3903,20 +3840,7 @@
             }
         }
 
-        function clearChatMessages() {
-            if (confirm('هل ترغب في بدء محادثة جديدة مع زيزو؟')) {
-                const stream = document.getElementById('zizo-chat-stream');
-                stream.innerHTML = `
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-navy-900 flex-shrink-0 flex items-center justify-center border border-gold-500/30">
-                            <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-5 h-5 object-contain">
-                        </div>
-                        <div class="bg-white p-3 rounded-2xl rounded-tr-none border border-slate-200 shadow-sm text-slate-800 text-xs leading-relaxed">
-                            <p class="font-bold text-navy-950">أهلاً بك مجدداً يا أستاذنا! في خدمتك لأي دفع أو مذكرة جديدة.</p>
-                        </div>
-                    </div>`;
-            }
-        }
+        function clearChatMessages() { window.ZizoAssistant?.clear(); }
 
         function sendQuickPrompt(promptText) {
             document.getElementById('zizo-input-text').value = promptText;
@@ -3959,106 +3883,15 @@
             showToast(`تم تجهيز مسودة المذكرة للقضية ${caseNumber}`);
         }
 
-        async function handleZizoSubmit(e) {
-            if (e) e.preventDefault();
-            const inputEl = document.getElementById('zizo-input-text');
-            const query = inputEl.value.trim();
-            if (!query) return;
-
-            const stream = document.getElementById('zizo-chat-stream');
-
-            // Append User Message
-            stream.innerHTML += `
-                <div class="flex items-start justify-end gap-2">
-                    <div class="bg-navy-950 text-white p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed max-w-[85%] shadow-sm">
-                        ${query.replace(/\n/g, '<br>')}
-                    </div>
-                </div>`;
-            inputEl.value = '';
-            stream.scrollTop = stream.scrollHeight;
-
-            // Loading indicator
-            const loadingId = 'loading-' + Date.now();
-            stream.innerHTML += `
-                <div id="${loadingId}" class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-navy-900 flex-shrink-0 flex items-center justify-center border border-gold-500/30">
-                        <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-5 h-5 object-contain animate-bounce">
-                    </div>
-                    <div class="bg-white p-3 rounded-2xl rounded-tr-none border border-slate-200 shadow-sm text-slate-500 text-xs">
-                        <span>زيزو بيبحث في مواد القانون وأحكام محكمة النقض...</span>
-                    </div>
-                </div>`;
-            stream.scrollTop = stream.scrollHeight;
-
-            try {
-                const res = await apiFetch('/api/ai/zizo-advisor', {
-                    method: 'POST',
-                    body: { query: query }
-                });
-
-                document.getElementById(loadingId)?.remove();
-
-                if (res.ok) {
-                    const data = await res.json();
-                    
-                    // Render Assistant Message
-                    stream.innerHTML += `
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-navy-900 flex-shrink-0 flex items-center justify-center border border-gold-500/30">
-                                <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-5 h-5 object-contain">
-                            </div>
-                            <div class="bg-white p-3.5 rounded-2xl rounded-tr-none border border-slate-200 shadow-sm text-slate-800 text-xs leading-relaxed max-w-[88%]">
-                                <div class="font-black text-navy-950 mb-1 text-[13px] flex items-center gap-1.5">
-                                    <span>زيزو المساعد الشخصي</span>
-                                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold">تأصيل قانوني</span>
-                                </div>
-                                <div class="whitespace-pre-wrap">${data.advice || 'تم الرد وفق أحكام القانون المصري.'}</div>
-                                
-                                ${data.draft_memo ? `
-                                    <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-                                        <span class="text-[10px] text-slate-500 font-bold">تم إعداد مسودة مذكرة دفاع</span>
-                                        <button onclick="applyMemoFromResponse(${JSON.stringify(data.draft_memo).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-lg bg-gold-500 hover:bg-gold-600 text-navy-950 font-black text-[10px] transition flex items-center gap-1 shadow-sm">
-                                            <span>نقل للمسودة</span>
-                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>`;
-
-                    if (data.draft_memo) {
-                        applyMemoFromResponse(data.draft_memo);
-                    }
-
-                } else {
-                    stream.innerHTML += `
-                        <div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-xs">
-                            عذراً يا أستاذنا، حدث خطأ في معالجة الاستشارة.
-                        </div>`;
-                }
-
-                stream.scrollTop = stream.scrollHeight;
-
-            } catch (err) {
-                document.getElementById(loadingId)?.remove();
-                stream.innerHTML += `
-                    <div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-xs">
-                        تعذر الاتصال بالخادم.
-                    </div>`;
-            }
-        }
-
+        function handleZizoSubmit(e) { return window.ZizoAssistant?.submit(e); }
         function applyMemoFromResponse(memoText) {
             const editor = document.getElementById('memo-canvas-editor');
-            editor.innerHTML = `<div class="whitespace-pre-wrap text-justify">${memoText}</div>`;
-            showToast('تم نقل المذكرة إلى محرر المسودة بنجاح');
-            
-            // On mobile, switch to draft tab to view it
-            if (window.innerWidth < 1024) {
-                switchZizoTab('draft');
-            }
+            const block = document.createElement('div');
+            block.className = 'whitespace-pre-wrap text-justify';
+            block.textContent = memoText;
+            editor.replaceChildren(block);
+            showToast('تم نقل المسودة للمراجعة — لم يتم حفظها في ملف قضية');
+            if (window.innerWidth < 1024) switchZizoTab('draft');
         }
 
         function copyDraftMemo() {
@@ -4166,8 +3999,8 @@
                             ${(fin.transactions || []).map(t => `
                                 <div class="p-3 text-xs flex items-center justify-between bg-white hover:bg-slate-50 transition">
                                     <div>
-                                        <div class="font-bold text-navy-950">${t.description}</div>
-                                        <div class="text-[10px] text-slate-500">${t.date} • ${t.case_number || 'عام'}</div>
+                                        <div class="font-bold text-navy-950">${escapeHtml(t.description)}</div>
+                                        <div class="text-[10px] text-slate-500">${escapeHtml(t.date)} • ${t.case_number || 'عام'}</div>
                                     </div>
                                     <div class="font-black ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}">
                                         ${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} ج.م
@@ -4384,16 +4217,16 @@
                                                     ${st.name.slice(0, 2)}
                                                 </div>
                                                 <div>
-                                                    <div class="font-black text-xs text-navy-950">${st.name}</div>
-                                                    <div class="text-[10px] text-slate-500 font-bold">${st.role}</div>
+                                                    <div class="font-black text-xs text-navy-950">${escapeHtml(st.name)}</div>
+                                                    <div class="text-[10px] text-slate-500 font-bold">${escapeHtml(st.role)}</div>
                                                 </div>
                                             </div>
-                                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">${st.status}</span>
+                                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">${escapeHtml(st.status)}</span>
                                         </div>
                                         <div class="text-[11px] text-slate-600 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100 space-y-1">
-                                            <div><span class="text-slate-400">القيد:</span> <span class="font-bold text-navy-900">${st.bar_card}</span></div>
-                                            <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${st.phone}" class="text-blue-600 font-bold hover:underline">${st.phone}</a></div>
-                                            <div><span class="text-slate-400">الملفات المسندة:</span> <span class="font-bold text-navy-900">${st.cases_count} قضايا متداولة</span></div>
+                                            <div><span class="text-slate-400">القيد:</span> <span class="font-bold text-navy-900">${escapeHtml(st.bar_card)}</span></div>
+                                            <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${escapeHtml(st.phone)}" class="text-blue-600 font-bold hover:underline">${escapeHtml(st.phone)}</a></div>
+                                            <div><span class="text-slate-400">الملفات المسندة:</span> <span class="font-bold text-navy-900">${escapeHtml(st.cases_count)} قضايا متداولة</span></div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -4523,20 +4356,20 @@
                     <div class="flex items-center justify-between">
                         <div class="font-black text-xs text-navy-950 flex items-center gap-1.5">
                             <span class="w-7 h-7 rounded-lg icon-3d icon-3d-purple flex items-center justify-center text-xs">👤</span>
-                            <span>${cl.name}</span>
+                            <span>${escapeHtml(cl.name)}</span>
                         </div>
                         <span class="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">موكل رسمي</span>
                     </div>
                     <div class="text-[11px] text-slate-600 space-y-1 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
                         <div><span class="text-slate-400">رقم التوكيل:</span> <span class="font-bold text-navy-900">${cl.power_of_attorney || '1540 لسنة 2026 توثيق مصر الجديدة'}</span></div>
                         <div><span class="text-slate-400">الشهر العقاري:</span> <span>${cl.notary_office || 'مكتب توثيق النزهة'}</span></div>
-                        <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${cl.phone}" class="text-blue-600 font-bold hover:underline">${cl.phone || '—'}</a></div>
+                        <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${escapeHtml(cl.phone)}" class="text-blue-600 font-bold hover:underline">${cl.phone || '—'}</a></div>
                     </div>
                     <div class="flex items-center justify-between pt-1 text-[10px]">
-                        <button onclick="openNewCaseModal(); prefillClientInCase('${cl.name.replace(/'/g, "\\'")}');" class="text-gold-600 hover:text-gold-700 font-black">
+                        <button onclick="openNewCaseModal(); prefillClientInCase(${jsArg(cl.name)});" class="text-gold-600 hover:text-gold-700 font-black">
                             + فتح قضية للموكل
                         </button>
-                        <a href="tel:${cl.phone}" class="text-slate-500 hover:text-navy-900 font-bold">
+                        <a href="tel:${escapeHtml(cl.phone)}" class="text-slate-500 hover:text-navy-900 font-bold">
                             📞 اتصال سريع
                         </a>
                     </div>
@@ -4591,15 +4424,15 @@
                     <div class="flex items-center justify-between">
                         <div class="font-black text-xs text-navy-950 flex items-center gap-2">
                             <span class="w-8 h-8 rounded-xl icon-3d icon-3d-blue flex items-center justify-center text-xs">🏛️</span>
-                            <span>${c.name}</span>
+                            <span>${escapeHtml(c.name)}</span>
                         </div>
                         <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold">${c.governorate || 'القاهرة'}</span>
                     </div>
                     <div class="text-[11px] text-slate-600 mt-1 space-y-1 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
                         <div><span class="text-slate-400">العنوان:</span> <span class="font-bold text-navy-950">${c.address || '—'}</span></div>
                         <div><span class="text-slate-400">النوع:</span> <span>${c.type || '—'}</span></div>
-                        <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${c.phone}" class="text-blue-600 font-bold hover:underline">${c.phone || '—'}</a></div>
-                        ${c.details ? `<div class="text-[10px] text-slate-500 pt-1 border-t border-slate-100">${c.details}</div>` : ''}
+                        <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${escapeHtml(c.phone)}" class="text-blue-600 font-bold hover:underline">${c.phone || '—'}</a></div>
+                        ${c.details ? `<div class="text-[10px] text-slate-500 pt-1 border-t border-slate-100">${escapeHtml(c.details)}</div>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -4852,21 +4685,21 @@
                     <div>
                         <div class="flex items-start justify-between gap-1.5 mb-2">
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${getCategoryBadgeClass(t.category)}">
-                                ${t.category}
+                                ${escapeHtml(t.category)}
                             </span>
                             <span class="text-[10px] text-slate-400 font-bold truncate max-w-[130px]" title="${t.law_reference || ''}">
                                 ${t.law_reference || ''}
                             </span>
                         </div>
-                        <h4 class="font-black text-xs text-navy-950 mb-1.5 leading-snug">${t.title}</h4>
+                        <h4 class="font-black text-xs text-navy-950 mb-1.5 leading-snug">${escapeHtml(t.title)}</h4>
                         <p class="text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">${t.description || ''}</p>
                     </div>
                     
                     <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
-                        <button onclick="openTemplateModal('${t.id}')" class="flex-1 py-1.5 px-2 rounded-xl bg-navy-950 hover:bg-navy-900 text-gold-400 font-black text-xs transition flex items-center justify-center gap-1 shadow-sm">
+                        <button onclick="openTemplateModal('${escapeHtml(t.id)}')" class="flex-1 py-1.5 px-2 rounded-xl bg-navy-950 hover:bg-navy-900 text-gold-400 font-black text-xs transition flex items-center justify-center gap-1 shadow-sm">
                             <span>⚡ تعديل وتخصيص</span>
                         </button>
-                        <button onclick="applyTemplateContent('${t.id}')" class="py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition" title="فتح مباشرة في محرر المسودة">
+                        <button onclick="applyTemplateContent('${escapeHtml(t.id)}')" class="py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition" title="فتح مباشرة في محرر المسودة">
                             مسودة
                         </button>
                     </div>
@@ -5205,7 +5038,7 @@
                                 ${(data.shares || []).map(s => `
                                     <div class="py-1.5 flex justify-between items-center">
                                         <div>
-                                            <span class="font-bold text-navy-950">${s.heir}</span>
+                                            <span class="font-bold text-navy-950">${escapeHtml(s.heir)}</span>
                                             <span class="text-slate-400 text-[10px] block">${s.reason || s.fraction}</span>
                                         </div>
                                         <div class="text-left font-black text-purple-900">

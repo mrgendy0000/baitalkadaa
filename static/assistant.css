@@ -1,0 +1,51 @@
+#zizo-workspace { min-height: 540px; }
+#zizo-panel-chat { min-height: 0; }
+#zizo-panel-chat > div:first-child > div { min-width: 0; }
+#zizo-panel-chat > div:first-child > div > div:last-child > div:first-child { flex-wrap: wrap; }
+#zizo-connection-status { line-height: 1.9; }
+.zizo-tools { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: 11px; }
+.zizo-tools > label { display: block; margin-bottom: 4px; font-weight: 700; }
+.zizo-tools select { max-width: 100%; color: #062a3f; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 8px; min-height: 34px; }
+#zizo-case-context { width: 100%; }
+.zizo-tools-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.zizo-tools-row a { color: #0f6b80; margin-inline-start: auto; font-weight: 700; }
+.zizo-research { display: flex; align-items: center; gap: 5px; }
+.zizo-research input { accent-color: #0f6b80; }
+#zizo-chat-stream { overflow-x: hidden; overflow-anchor: auto; }
+.zizo-message { display: flex; margin: 0 0 14px; }
+.zizo-message.user { justify-content: flex-end; }
+.zizo-bubble { max-width: 94%; padding: 12px 14px; border-radius: 14px 4px 14px 14px; background: #fff; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13px; line-height: 1.95; overflow-wrap: anywhere; }
+.user .zizo-bubble { white-space: pre-wrap; background: #062a3f; color: #fff; border: 0; border-radius: 14px 14px 4px 14px; max-width: 87%; }
+.zizo-bubble p { margin: 0 0 7px; }
+.zizo-bubble p:last-child { margin-bottom: 0; }
+.zizo-bubble h4 { color: #062a3f; font-weight: 800; margin: 12px 0 5px; font-size: 14px; }
+.zizo-message-label { font-size: 10px; color: #0f6b80; margin-bottom: 6px; font-weight: 700; }
+.zizo-bubble a { color: #096078; text-decoration: underline; text-underline-offset: 3px; }
+.zizo-message-actions { display: flex; flex-wrap: wrap; gap: 7px; border-top: 1px solid #edf2f7; margin-top: 10px; padding-top: 9px; }
+.zizo-action { min-height: 34px; padding: 5px 9px; font-size: 11px; background: #f1f5f9; color: #062a3f; border: 1px solid #dce6ee; border-radius: 7px; }
+.zizo-action:hover { background: #e2edf3; }
+.zizo-sources { margin: 10px 0 0; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+.zizo-sources summary { cursor: pointer; font-size: 11px; font-weight: 700; }
+.zizo-sources a { display: block; padding: 4px 0; font-size: 11px; }
+.zizo-error { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+.zizo-thinking { color: #64748b; font-size: 12px; }
+.zizo-thinking::after { content: '…'; animation: zizo-pulse 1s ease infinite alternate; }
+@keyframes zizo-pulse { to { opacity: .25; } }
+.zizo-privacy { color: #64748b; font-size: 9px; line-height: 1.7; padding: 0 12px 8px; margin: 0; background: #fff; }
+#zizo-input-text { font-size: 16px; line-height: 1.7; min-height: 48px; max-height: 140px; }
+#btn-zizo-send { min-width: 44px; min-height: 44px; }
+#btn-zizo-send:disabled { cursor: wait; opacity: .5; }
+@media (max-width: 767px) {
+ #zizo-workspace { height: calc(100dvh - 215px); min-height: 460px; gap: 10px; }
+ #zizo-panel-chat > div:first-child { padding: 10px; }
+ #zizo-panel-chat > div:first-child .text-sm { font-size: 12px; }
+ #zizo-chat-stream { padding: 12px; }
+ .zizo-bubble { font-size: 13px; padding: 10px 12px; max-width: 96%; }
+ .zizo-tools { padding: 8px 10px; }
+ .zizo-tools-row { gap: 8px; }
+ .zizo-tools select { font-size: 16px; width: 100%; }
+ .zizo-tools-row select { width: auto; font-size: 16px; max-width: 49%; }
+ .zizo-tools-row a,.zizo-research { min-height: 32px; display: flex; align-items: center; }
+ .zizo-action { min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .zizo-thinking::after { animation: none; } }
