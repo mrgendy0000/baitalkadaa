@@ -76,7 +76,9 @@ def generate(model,payload):
     try:return call(model,payload)
     except HTTPError as exc:
         if exc.code!=404:raise
-        names=available_models()
+        try: names=available_models()
+        except HTTPError as catalog_error:
+            raise HTTPException(503,detail={'code':'gemini_catalog_error','message':'Google رفض عرض النماذج المتاحة. تحقق من مفتاح Gemini ومشروعه وتفعيل Gemini API.','http_status':catalog_error.code}) from None
         preferred=['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.8-flash','gemini-3.5-flash-lite']
         chosen=next((name for name in preferred if name in names and name!=model),None)
         if not chosen:
@@ -84,7 +86,9 @@ def generate(model,payload):
         body=copy.deepcopy(payload)
         body['generationConfig'].pop('thinkingConfig',None)
         search_disabled=chosen not in {'gemini-2.5-flash','gemini-2.5-flash-lite'} and bool(body.pop('tools',None))
-        result=call(chosen,body)
+        try: result=call(chosen,body)
+        except HTTPError as model_error:
+            raise HTTPException(503,detail={'code':'gemini_generation_error','message':'Google يعرض النموذج في قائمة الحساب لكنه رفض التوليد؛ راجع صلاحية المفتاح وقيود المشروع.','http_status':model_error.code,'model':chosen,'available_free_models':[name for name in names if name in FREE_MODELS]}) from None
         result['_research_unavailable']=search_disabled
         return result
 
