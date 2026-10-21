@@ -36,6 +36,7 @@ class ConstitutionTests(unittest.TestCase):
 
 class AdvisorTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        env=patch.dict(os.environ,{'ZIZO_PROVIDER':'openai'});env.start();self.addCleanup(env.stop)
         self.office = {'id':'unit-test-office','data':{'cases':[{'id':'own-case','number':'123','subject':'نزاع عقد','notes':'test notes'}]}}
         service.CALLS.clear()
     async def test_greeting_and_delete_request_never_mutate(self):
