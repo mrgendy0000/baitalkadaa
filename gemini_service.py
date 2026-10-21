@@ -1,5 +1,8 @@
 """Free-tier Gemini adapter. Never falls back to a paid provider automatically."""
 import json
+import copy
+from functools import lru_cache
+from urllib.error import HTTPError
 import os
 import re
 from urllib.request import Request, urlopen
@@ -57,9 +60,33 @@ def build_payload(request,office,instructions,extracts):
     return model,payload
 
 
+@lru_cache(maxsize=1)
+def available_models():
+    request=Request('https://generativelanguage.googleapis.com/v1beta/models',headers={'x-goog-api-key':os.environ['GEMINI_API_KEY'].strip()})
+    with urlopen(request,timeout=12) as response:data=json.load(response)
+    return [m['name'].removeprefix('models/') for m in data.get('models',[]) if 'generateContent' in m.get('supportedGenerationMethods',[]) and m.get('name','').startswith('models/')]
+
+
 def generate(model,payload):
-    request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',data=json.dumps(payload,ensure_ascii=False).encode(),headers={'x-goog-api-key':os.environ['GEMINI_API_KEY'].strip(),'Content-Type':'application/json'},method='POST')
-    with urlopen(request,timeout=48) as response:return json.load(response)
+    def call(chosen,body):
+        request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+chosen+':generateContent',data=json.dumps(body,ensure_ascii=False).encode(),headers={'x-goog-api-key':os.environ['GEMINI_API_KEY'].strip(),'Content-Type':'application/json'},method='POST')
+        with urlopen(request,timeout=40) as response:result=json.load(response)
+        result['_used_model']=chosen
+        return result
+    try:return call(model,payload)
+    except HTTPError as exc:
+        if exc.code!=404:raise
+        names=available_models()
+        preferred=['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.8-flash','gemini-3.5-flash-lite']
+        chosen=next((name for name in preferred if name in names and name!=model),None)
+        if not chosen:
+            raise HTTPException(503,detail={'code':'free_model_unavailable','message':'المشروع لا يتيح حالياً أحد النماذج المجانية المعتمدة. الأدوات المحلية متاحة بدون API.','available_models':names[:12]}) from None
+        body=copy.deepcopy(payload)
+        body['generationConfig'].pop('thinkingConfig',None)
+        search_disabled=chosen not in {'gemini-2.5-flash','gemini-2.5-flash-lite'} and bool(body.pop('tools',None))
+        result=call(chosen,body)
+        result['_research_unavailable']=search_disabled
+        return result
 
 
 def parse_response(response,safe_url):
@@ -77,6 +104,7 @@ def parse_response(response,safe_url):
         if safe_url(web.get('uri')) and web['uri'] not in [s['url'] for s in sources]:
             sources.append({'title':str(web.get('title') or 'مصدر Google Search')[:250],'url':web['uri']})
     advice='\n\n'.join(parts).strip()
+    if response.get('_research_unavailable'): advice='البحث الخارجي غير متاح مجاناً للنموذج الذي أتاحه هذا المشروع؛ الرد التالي لم يُتحقق منه ببحث خارجي.\n\n'+advice
     # Link grounded passages to supporting sources without injecting provider HTML.
     evidence=[]
     for support in metadata.get('groundingSupports',[])[:12]:

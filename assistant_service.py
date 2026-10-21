@@ -215,5 +215,5 @@ async def answer_query(request, office):
             sources.append({'title':a['label']+' — نص الدستور الرسمي','url':a['source_url']})
     reply = result(advice, engine=provider, sources=sources, draft=advice if request.mode == 'draft' else None)
     if widget: reply['search_widget']=widget
-    reply.update({'model':gemini_model if provider=='gemini' else payload['model'],'web_searched':searched})
+    reply.update({'model':response.get('_used_model',gemini_model) if provider=='gemini' else payload['model'],'web_searched':searched})
     return reply
