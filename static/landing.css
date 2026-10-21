@@ -246,3 +246,135 @@ html[data-motion='paused'] .hero-phrase { transition: none; }
  .hero-motion-toggle { display: none; }
  .odoo-app-card:is(:hover,:focus-visible) .odoo-3d-icon-tile { transform: rotateX(10deg) rotateY(-12deg); }
 }
+
+.mobile-offer, .mobile-hero-lead { display: none; }
+/* Phone layout uses compact app-launcher dimensions rather than desktop cards. */
+@media (max-width: 600px) {
+ body { font-size: 14px; }
+ .announcement-bar { min-height: 32px; padding: 4px 12px; gap: 8px; font-size: 11px; }
+ .desktop-offer { display: none; }
+ .mobile-offer { display: inline; }
+ .announcement-bar button { padding: 0 4px; font-size: 11px; min-height: 28px; }
+ .odoo-nav-container { min-height: 60px; padding: 6px 12px; gap: 6px; }
+ .site-brand-name strong { font-size: 17px; }
+ .site-brand-name small { font-size: 7px; }
+ .site-brand-emblem svg { width: 32px; height: 32px; }
+ .odoo-nav-brand { gap: 5px; }
+ .odoo-nav-login { font-size: 11px; min-height: 44px; padding: 6px; }
+ .nav-menu-toggle { min-width: 44px; min-height: 44px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; }
+ .nav-theme-toggle-btn { width: 36px; height: 36px; font-size: 13px; padding: 5px; }
+ .odoo-nav-link { min-height: 44px; display: grid; place-items: center; padding: 6px; font-size: 12px; }
+ section[id] { scroll-margin-top: 72px; }
+ .hx-hero { padding: 20px 16px 28px; }
+ .hx-hero-grid { gap: 22px; }
+ .hx-hero-kicker { font-size: 10px; padding: 4px 7px; margin-bottom: 8px; line-height: 1.8; }
+ .hero-motion-toggle { min-height: 32px; font-size: 10px; margin-block: 0 4px; padding-inline: 10px; }
+ .hx-hero-title { font-size: 28px; line-height: 1.5 !important; margin-bottom: 12px !important; }
+ .hero-phrases { font-size: 28px; padding-bottom: 8px; }
+ .hero-phrase { text-decoration-thickness: 3px; text-underline-offset: 8px; }
+ .desktop-hero-lead { display: none; }
+ .mobile-hero-lead { display: block; font-size: 13.5px; line-height: 1.9; color: var(--muted); max-width: 340px; margin: 0 auto 16px; }
+ .hx-hero-ctas { flex-direction: row; display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-bottom: 12px; }
+ .hx-hero-ctas > * { min-height: 44px; padding: 9px 8px; font-size: 12px; border-radius: 9px; gap: 4px; }
+ .hx-hero-points { margin-top: 12px; gap: 7px; }
+ .hx-hero-points li { font-size: 10.5px; line-height: 1.8; gap: 7px; }
+ .hx-hero-points li > span { flex-basis: 16px; width: 16px; height: 16px; font-size: 9px; }
+ .hx-hero-visual { padding: 0; }
+ .hx-window { border-radius: 12px; }
+ .hx-window-bar { min-height: 32px; padding: 7px 10px; font-size: 10px; }
+ .hx-window-bar i { width: 7px; height: 7px; }
+ .hx-window-body { padding: 10px; }
+ .hx-stats { margin-bottom: 10px; gap: 6px; }
+ .hx-stats div { padding: 7px; border-radius: 8px; }
+ .hx-stats small { font-size: 9px; margin-bottom: 0; }
+ .hx-stats strong { font-size: 17px; }
+ .hx-rows { gap: 6px; }
+ .hx-row { grid-template-columns: 24px minmax(0,1fr) auto; padding: 8px; gap: 6px; }
+ .hx-av { width: 24px; height: 24px; font-size: 10px; }
+ .hx-name { gap: 1px; }
+ .hx-name b { font-size: 10px; line-height: 1.7; }
+ .hx-name small { font-size: 9px; }
+ .hx-row .hx-chip { grid-column: auto; padding: 3px 5px; font-size: 8px; }
+ .hx-row:last-child { display: none; }
+ .hx-phone { width: calc(100% - 16px); padding: 9px 12px; border-radius: 9px; margin-top: -5px; }
+ .hx-msg-head { font-size: 10px; padding-bottom: 5px; margin-bottom: 5px; }
+ .hx-msg-ok { font-size: 9px; padding: 3px 6px; }
+ .preview-disclaimer { font-size: 9px; margin-top: 8px; }
+ :is(.odoo-sectors-section,.odoo-preview-section,.odoo-pricing-section,.odoo-testimonials-section,.odoo-faq-section,.odoo-apps-section,.odoo-comparison-section,.odoo-roi-calculator-section) { padding: 30px 16px; }
+ .odoo-section-header { margin-bottom: 20px; }
+ .odoo-section-tag { font-size: 11px; margin-bottom: 5px; }
+ .odoo-section-title { font-size: 21px; line-height: 1.65; margin-bottom: 8px; }
+ .odoo-section-sub { font-size: 12px; line-height: 1.85; }
+ .odoo-apps-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+ .odoo-app-card { padding: 14px 5px 10px; border-radius: 12px; min-height: 116px; }
+ .odoo-3d-icon-tile { width: 42px; height: 42px; flex-basis: 42px; border-radius: 12px; margin-bottom: 12px; }
+ .odoo-3d-icon-tile::before { border-radius: 9px; }
+ .odoo-3d-icon-tile svg { width: 26px; height: 26px; flex-basis: 26px; }
+ .odoo-app-name { font-size: 11.5px; line-height: 1.65; min-height: 38px; margin: 0; }
+ .odoo-app-cat { display: none; }
+ .odoo-sectors-tabs { gap: 8px; margin-bottom: 16px; }
+ .sector-tab-btn { flex-direction: row; align-items: center; padding: 11px 8px; gap: 8px; border-radius: 10px; }
+ .sector-icon { width: 30px; height: 30px; flex-basis: 30px; border-radius: 8px; }
+ .sector-icon svg { width: 21px; height: 21px; }
+ .sector-text strong { font-size: 11px; line-height: 1.7; margin-bottom: 1px; }
+ .sector-text small { font-size: 9px; line-height: 1.7; }
+ .sector-feature-card { padding: 16px; border-radius: 12px; }
+ .sector-card-inner { gap: 18px; }
+ .sector-pill-tag { font-size: 10px; }
+ .sector-info-side h3 { font-size: 17px; line-height: 1.8; }
+ .sector-info-side p { font-size: 12px; margin-bottom: 12px; }
+ .sector-perks { font-size: 11px; gap: 7px; margin-bottom: 14px; }
+ .sector-stat-row { padding-top: 12px; }
+ .sector-stat-row strong { font-size: 14px; }
+ .sector-stat-row small { font-size: 10px; }
+ .sector-preview-mockup { padding: 12px; border-radius: 10px; }
+ .mockup-header .badge,.mockup-header .time { font-size: 9px; }
+ .mock-item { flex-direction: row; gap: 8px; font-size: 10px; padding: 8px; }
+ .mock-status-pill { font-size: 10px; padding: 6px; }
+ .odoo-preview-tabs { gap: 6px; margin-bottom: 16px; }
+ .odoo-tab-btn { font-size: 11px; min-height: 44px; padding: 8px 10px; }
+ .mockup-title { font-size: 14px; line-height: 1.8; }
+ .mockup-subtitle { font-size: 11px; }
+ .mockup-kpi-badge { font-size: 10px; padding: 4px 8px; }
+ .mockup-table { font-size: 11px; }
+ .comparison-box { padding: 16px; border-radius: 12px; }
+ .comparison-badge { font-size: 11px; }
+ .comparison-list { font-size: 11px; gap: 8px; }
+ .odoo-stats-counter-section { padding: 24px 16px; }
+ .odoo-stats-container { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 12px; }
+ .counter-number { font-size: 23px; }
+ .counter-label { font-size: 10px; }
+ .roi2 { gap: 16px; }
+ .roi2-presets button { min-height: 44px; font-size: 11px; padding: 8px; }
+ .roi2-field { margin-bottom: 16px; }
+ .roi2-field-head { font-size: 12px; }
+ .roi2-mini { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+ .roi2-mini div { padding: 7px 4px; }
+ .roi2-mini strong { font-size: 12px; }
+ .roi2-mini span { font-size: 9px; }
+ .roi2-hero strong { font-size: 23px; }
+ .testimonial-card { padding: 16px; border-radius: 12px; }
+ .testimonial-quote { font-size: 12px; margin-bottom: 12px; }
+ .pricing-card { padding: 22px 18px 18px; border-radius: 12px; }
+ .pricing-card-header h3 { font-size: 17px; }
+ .pricing-cost strong { font-size: 30px; }
+ .pricing-features { padding-top: 14px; gap: 8px; margin-bottom: 18px; font-size: 11.5px; }
+ .pricing-card-header small { margin-bottom: 16px; }
+ .pricing-btn { min-height: 44px; font-size: 12px; padding: 10px; }
+ .faq-item { padding: 12px 14px; border-radius: 10px; }
+ .faq-item summary { font-size: 12px; min-height: 32px; }
+ .faq-item p { font-size: 12px; }
+ .cta-banner-container { padding: 24px 16px; }
+ .cta-banner-container h2 { font-size: 21px; }
+ .cta-banner-container p { font-size: 12px; }
+ .cta-banner-buttons { gap: 8px; }
+ .cta-banner-buttons > * { min-height: 44px; font-size: 12px; padding: 10px; }
+ .odoo-mega-footer { padding: 28px 16px 20px; }
+ .odoo-footer-container { gap: 20px; }
+ .modal-backdrop { padding: 12px; }
+ .modal { max-height: calc(100dvh - 24px); padding: 20px 16px; border-radius: 14px; }
+ .modal-title h2 { font-size: 19px; }
+ .form-group { margin-bottom: 12px; }
+ .form-group input { font-size: 16px; min-height: 44px; padding: 9px 11px; }
+ .form-group label { font-size: 12px; }
+}
