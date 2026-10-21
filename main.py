@@ -95,8 +95,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-os.makedirs("static", exist_ok=True)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.join(BASE_DIR, "static")
+os.makedirs(static_dir, exist_ok=True)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # -----------------------------------------------------------------------------
 # قاعدة بيانات المنظومة الشاملة المستوحاة من كبرى تطبيقات المحامين في مصر
@@ -3404,12 +3406,13 @@ async def vision_ocr_scan_endpoint(file: UploadFile = File(...)):
 # -----------------------------------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
 async def serve_landing():
-    with open("index.html", "r", encoding="utf-8") as f:
+    idx_path = os.path.join(BASE_DIR, "index.html")
+    with open(idx_path, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read(), status_code=200)
 
 @app.get("/app", response_class=HTMLResponse)
 async def serve_app():
-    target = "app.html" if os.path.exists("app.html") else "index.html"
+    target = os.path.join(BASE_DIR, "app.html") if os.path.exists(os.path.join(BASE_DIR, "app.html")) else os.path.join(BASE_DIR, "index.html")
     with open(target, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read(), status_code=200)
 
