@@ -1,0 +1,203 @@
+/* Marketing site layout. Brand: navy, teal, warm gold. */
+body { font-family: 'Tajawal', sans-serif; font-size: 16px; background: var(--bg); }
+:is(h1,h2,h3,h4,p,span,button,a) { overflow-wrap: break-word; }
+:is(button,a,input,summary):focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+section[id] { scroll-margin-top: 110px; }
+.odoo-nav-container { max-width: 1360px; min-height: 88px; height: auto; gap: 24px; padding: 16px 32px; }
+.odoo-nav-brand { flex-shrink: 0; gap: 10px; }
+.site-brand-emblem { animation: none; }
+.site-brand-name strong { font-size: 24px; line-height: 1.4; background: none; -webkit-text-fill-color: var(--ink-heading); color: var(--ink-heading); }
+.site-brand-name small { font-size: 9px; line-height: 1.6; }
+.odoo-nav-links { gap: 4px; margin-inline: auto; }
+.odoo-nav-link { white-space: nowrap; padding: 9px 10px; font-size: 14px; color: var(--muted); }
+.odoo-nav-link.active, .odoo-nav-link:hover { color: var(--primary); background: var(--surface-hover); }
+.odoo-nav-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.odoo-nav-actions button { white-space: nowrap; line-height: 1.6; }
+.odoo-nav-login { border: 0; background: transparent; padding: 10px; }
+.odoo-btn-burgundy { background: #063B53; border: 1px solid #063B53; color: #fff; border-radius: 9px; padding: 11px 18px; font-weight: 800; font-size: 14px; box-shadow: none; }
+.odoo-btn-burgundy:hover { background: #0e4e75; }
+.nav-menu-toggle { display: none; width: 42px; height: 42px; padding: 9px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: var(--surface); }
+.nav-menu-toggle svg { display: block; width: 22px; height: 22px; }
+.announcement-bar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 16px; padding: 10px 24px; background: #062A3F; color: #fff; font-size: 13px; line-height: 1.8; border-bottom: 1px solid #dcae43; }
+.announcement-pill { background: #f5ce6b; color: #062a3f; }
+.hx-hero { max-width: 1360px; padding: 78px 40px 86px; }
+.hx-hero-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; }
+.hx-hero-grid > *, .sector-card-inner > *, .roi2 > *, .odoo-footer-container > * { min-width: 0; }
+.hx-hero-kicker { font-size: 12px; border: 0; background: var(--surface-hover); box-shadow: none; border-radius: 6px; padding: 7px 12px; max-width: 100%; line-height: 1.8; }
+.hx-hero-title { font-size: clamp(34px,3.8vw,52px); line-height: 1.5 !important; margin-bottom: 18px !important; text-wrap: balance; }
+.hero-accent { color: var(--primary); position: relative; text-decoration: underline; text-decoration-color: #e4b54e; text-decoration-thickness: 5px; text-underline-offset: 12px; }
+.hx-hero-lead { font-size: 17px; max-width: 530px; line-height: 1.95 !important; margin-bottom: 26px !important; }
+.hx-hero-ctas { gap: 12px; margin-bottom: 20px; }
+.hx-hero-ctas > * { display: inline-flex; justify-content: center; align-items: center; gap: 12px; padding: 13px 20px; min-height: 52px; font-size: 15px; line-height: 1.7; border-radius: 9px; box-shadow: none; }
+.hx-hero-points { gap: 10px; margin-top: 22px; }
+.hx-hero-points li { font-size: 13px; color: var(--muted); align-items: flex-start; line-height: 1.9; }
+.hx-hero-points li > span { flex: 0 0 21px; margin-top: 2px; }
+.hx-hero-visual { padding: 20px 0 0; }
+.hx-hero-visual::before { content: ''; position: absolute; inset: -24px -24px 60px; background: radial-gradient(ellipse,rgba(23,109,131,.13),transparent 70%); z-index: -1; }
+.hx-window { border-radius: 14px; box-shadow: 0 18px 60px #062a3f12 !important; }
+.hx-window-bar { min-height: 44px; height: auto; padding: 12px 16px; }
+.hx-window-body { padding: 20px; }
+.hx-stats { gap: 10px; }
+.hx-stats div { padding: 13px 10px; background: var(--surface-alt); }
+.hx-stats strong { font-size: 23px; direction: ltr; display: block; text-align: right; }
+.hx-stats small { line-height: 1.8; }
+.hx-row { display: grid; grid-template-columns: 32px minmax(0,1fr) auto; padding: 13px 10px; background: var(--surface); gap: 10px; }
+.hx-name { min-width: 0; gap: 4px; }
+.hx-name b { line-height: 1.75; font-size: 12px; }
+.hx-name small { line-height: 1.8; }
+.hx-chip { font-size: 10px; align-self: center; }
+.hx-phone { position: relative; bottom: auto; left: auto; width: calc(100% - 48px); margin: -12px auto 0; padding: 14px 18px; border-radius: 12px; border-top-width: 3px; box-shadow: 0 10px 30px #062a3f10; }
+.hx-msg { display: none; }
+.hx-msg-head { line-height: 1.8; }
+.hx-msg-ok { margin: 0; }
+.preview-disclaimer { margin: 14px 0 0; font-size: 11px; text-align: center; color: var(--muted-light); }
+.legal-marquee-container { display: none; }
+.odoo-section-header { max-width: 740px; margin-bottom: 36px; }
+.odoo-section-title { font-size: clamp(26px,3vw,36px); line-height: 1.6; text-wrap: balance; color: var(--ink-heading); }
+.odoo-section-sub { font-size: 16px; line-height: 1.95; color: var(--muted); }
+.odoo-section-tag { background: transparent; border: 0; color: var(--teal); padding: 0; font-size: 13px; margin-bottom: 10px; }
+:is(.odoo-sectors-section,.odoo-preview-section,.odoo-pricing-section,.odoo-testimonials-section,.odoo-faq-section) { padding: 72px 32px; background: var(--surface); }
+:is(.odoo-apps-section,.odoo-comparison-section,.odoo-roi-calculator-section) { max-width: 1280px; padding: 72px 32px; }
+.odoo-apps-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; }
+.odoo-app-card { min-width: 0; padding: 26px 16px; gap: 0; text-align: center; align-items: center; border-radius: 12px; border-width: 1px; box-shadow: none !important; }
+.odoo-app-card.active { border-color: var(--teal) !important; background: var(--surface-alt) !important; }
+.odoo-app-card:hover { transform: translateY(-3px); border-color: var(--teal) !important; }
+.odoo-3d-icon-tile { width: 60px; height: 60px; flex: 0 0 60px; margin: 0 0 18px; border-radius: 16px; background: linear-gradient(145deg,#176d83,#062a3f) !important; box-shadow: 0 5px 12px #062a3f15; }
+.odoo-app-card:nth-child(3n+2) .odoo-3d-icon-tile { background: linear-gradient(145deg,#258b86,#14665f) !important; }
+.odoo-app-card:nth-child(4n) .odoo-3d-icon-tile { background: linear-gradient(145deg,#c99b3e,#906720) !important; }
+.odoo-3d-icon-tile svg { display: block; flex: 0 0 32px; width: 32px; height: 32px; overflow: hidden; }
+.odoo-app-name { display: block; width: 100%; font-size: 16px; line-height: 1.85; min-height: 30px; margin: 0 0 5px; color: var(--ink-heading); }
+.odoo-app-cat { display: block; width: 100%; font-size: 12px; line-height: 1.8; color: var(--muted-light); }
+.odoo-sectors-tabs { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
+.sector-tab-btn { min-width: 0; padding: 18px 16px; gap: 12px; border-width: 1px; box-shadow: none; }
+.sector-icon { flex: 0 0 36px; width: 36px; height: 36px; display: grid; place-items: center; }
+.sector-icon svg { width: 28px; height: 28px; }
+.sector-text { min-width: 0; }
+.sector-text strong { font-size: 14px; line-height: 1.8; color: var(--ink); }
+.sector-text small { line-height: 1.8; color: var(--muted); }
+.sector-feature-card { padding: 32px; border-radius: 14px; }
+.sector-card-inner { grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 36px; }
+.sector-info-side h3 { line-height: 1.8; color: var(--ink-heading); }
+.sector-info-side p, .sector-perks { color: var(--muted); line-height: 1.95; }
+.mockup-header,.mockup-header-row { gap: 16px; flex-wrap: wrap; }
+.mock-item { gap: 16px; align-items: flex-start; }
+.mock-item > span { flex-shrink: 0; }
+.mock-item strong { text-align: left; min-width: 0; }
+.odoo-preview-tabs { flex-wrap: wrap; gap: 10px; }
+.mockup-table { min-width: 760px; }
+.window-topbar { gap: 10px; }
+.window-address-bar { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.roi2 { grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: 32px; }
+.roi2-presets { flex-wrap: wrap; }
+.roi2-field-head { gap: 12px; flex-wrap: wrap; }
+.roi2-number { white-space: nowrap; }
+.roi2-range { margin-inline: 0; max-width: 100%; }
+.odoo-pricing-grid,.odoo-testimonials-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
+.pricing-card { min-width: 0; border-radius: 14px; display: flex; flex-direction: column; }
+.pricing-features { flex: 1; }
+.pricing-cost { flex-wrap: wrap; gap: 6px; line-height: 1.8; }
+.odoo-footer-container { grid-template-columns: minmax(0,1.6fr) repeat(3,minmax(0,1fr)); gap: 36px; }
+.footer-phone,.cta-banner-buttons,.odoo-footer-bottom { flex-wrap: wrap; gap: 16px; }
+.modal-backdrop { padding: 20px; overflow-y: auto; z-index: 1000; }
+.modal { max-width: 480px; width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; background: var(--surface); color: var(--ink); }
+.floating-theme-widget { display: none; }
+[data-theme='dark'] :is(.hx-window-bar,.hx-stats div,.hx-row,.hx-phone,.sector-preview-mockup,.mock-item,.window-topbar,.window-body,.roi2-results,.roi2-hero,.roi2-mini div,.pricing-card,.testimonial-card,.faq-item) { background: var(--surface); border-color: var(--line); color: var(--ink); }
+[data-theme='dark'] :is(.hx-name b,.mock-item strong,.mockup-title,.pricing-card h3,.testimonial-quote,.faq-item summary) { color: var(--ink-heading); }
+[data-theme='dark'] :is(.comparison-box,.odoo-stats-counter-section) { background: var(--surface-alt); }
+@media (max-width: 1190px) {
+ .odoo-nav-container { flex-wrap: wrap; gap: 12px; padding-inline: 24px; }
+ .odoo-nav-brand { margin-inline-end: auto; }
+ .nav-menu-toggle { display: block; }
+ .odoo-nav-links { display: none; order: 4; width: 100%; margin: 0; grid-template-columns: repeat(3,minmax(0,1fr)); border-top: 1px solid var(--line); padding-top: 12px; }
+ .odoo-main-nav.menu-open .odoo-nav-links { display: grid; }
+ .odoo-nav-link { text-align: center; }
+ .hx-hero { padding: 56px 32px 64px; }
+ .hx-hero-grid { gap: 32px; }
+ .odoo-sectors-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 900px) {
+ .hx-hero-grid { grid-template-columns: minmax(0,1fr); gap: 38px; }
+ .hx-hero-copy { text-align: center; }
+ .hx-hero-title { font-size: 42px; }
+ .hx-hero-lead { margin-inline: auto !important; }
+ .hx-hero-ctas { justify-content: center; }
+ .hx-hero-points { width: fit-content; margin-inline: auto; text-align: right; }
+ .hx-hero-visual { width: min(100%,580px); margin: 0 auto; }
+ .hx-phone { display: block; }
+ .sector-card-inner,.roi2 { grid-template-columns: minmax(0,1fr); }
+ .odoo-apps-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+ .odoo-pricing-grid,.odoo-testimonials-grid { grid-template-columns: minmax(0,1fr); max-width: 580px; margin-inline: auto; gap: 30px; }
+ .odoo-footer-container { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+ section[id] { scroll-margin-top: 90px; }
+ .announcement-bar { font-size: 11px; padding: 9px 16px; gap: 4px 10px; text-align: center; }
+ .announcement-pill { display: none; }
+ .odoo-nav-container { padding: 12px 16px; gap: 8px; min-height: 76px; }
+ .site-brand-name strong { font-size: 20px; }
+ .site-brand-emblem svg { width: 38px; height: 38px; }
+ .site-brand-name small { font-size: 8px; }
+ .odoo-nav-brand { gap: 6px; }
+ .odoo-nav-actions { gap: 4px; }
+ .odoo-nav-actions .odoo-btn-burgundy { display: none; }
+ .odoo-nav-login { font-size: 12px; padding: 8px; }
+ .nav-theme-toggle-btn { padding: 8px; font-size: 14px; }
+ .nav-menu-toggle { width: 36px; height: 36px; padding: 6px; }
+ .odoo-nav-links { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .odoo-nav-link { font-size: 13px; white-space: normal; }
+ .hx-hero { padding: 38px 20px 44px; }
+ .hx-hero-kicker { font-size: 11px; padding: 6px 8px; }
+ .hx-hero-title { font-size: 34px; line-height: 1.6 !important; }
+ .hx-hero-lead { font-size: 16px; }
+ .hx-hero-ctas { flex-direction: column; align-items: stretch; }
+ .hx-hero-points li { font-size: 12px; gap: 8px; }
+ .hx-window-body { padding: 12px; }
+ .hx-stats { gap: 6px; }
+ .hx-stats div { padding: 10px 6px; }
+ .hx-stats small { font-size: 10px; }
+ .hx-stats strong { font-size: 20px; }
+ .hx-row { grid-template-columns: 28px minmax(0,1fr); gap: 8px; }
+ .hx-av { width: 28px; height: 28px; }
+ .hx-row .hx-chip { grid-column: 2; justify-self: start; }
+ .hx-phone { width: calc(100% - 20px); padding: 12px; }
+ :is(.odoo-sectors-section,.odoo-preview-section,.odoo-pricing-section,.odoo-testimonials-section,.odoo-faq-section,.odoo-apps-section,.odoo-comparison-section,.odoo-roi-calculator-section) { padding: 48px 20px; }
+ .odoo-section-title { font-size: 27px; }
+ .odoo-section-sub { font-size: 14px; }
+ .odoo-apps-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+ .odoo-app-card { padding: 22px 10px 18px; }
+ .odoo-app-name { font-size: 14px; min-height: 52px; display: grid; place-items: center; }
+ .odoo-app-cat { font-size: 11px; }
+ .odoo-sectors-tabs { gap: 8px; }
+ .sector-tab-btn { padding: 12px 10px; flex-direction: column; align-items: flex-start; gap: 8px; }
+ .sector-text strong { font-size: 13px; }
+ .sector-feature-card { padding: 20px; }
+ .sector-info-side h3 { font-size: 20px; }
+ .sector-perks { grid-template-columns: minmax(0,1fr); }
+ .sector-preview-mockup,.window-body,.roi2-results { padding: 14px; }
+ .mock-item { flex-direction: column; gap: 4px; }
+ .mock-item strong { text-align: right; }
+ .sector-stat-row { gap: 10px; }
+ .sector-stat-row strong { font-size: 16px; }
+ .odoo-comparison-grid,.odoo-stats-container { grid-template-columns: minmax(0,1fr); }
+ .window-address-bar { font-size: 9px; padding-inline: 6px; }
+ .window-badge { display: none; }
+ .roi2-mini { grid-template-columns: minmax(0,1fr); }
+ .roi2-hero strong { font-size: 26px; }
+ .odoo-footer-container { grid-template-columns: minmax(0,1fr); gap: 28px; }
+ .odoo-mega-footer { padding-inline: 20px; margin-top: 0; }
+ .cta-banner-container { padding: 32px 20px; }
+ .cta-banner-container h2 { font-size: 27px; line-height: 1.7; }
+ .cta-banner-buttons { flex-direction: column; align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior: auto; }
+ *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+/* Keep decorative surfaces and featured pricing within their grid tracks. */
+.hx-hero-visual::before { inset: 0 0 60px; }
+.pricing-card.highlighted { transform: none; border-color: var(--teal); box-shadow: 0 12px 36px #062a3f0c; }
+.odoo-bottom-cta-banner h2, .odoo-bottom-cta-banner p { color: #fff; }
+.odoo-bottom-cta-banner { background: linear-gradient(115deg,#062a3f,#176d83); }
+.odoo-mega-footer :is(h3,h4) { color: #f8fafc; }
+.odoo-mega-footer .site-brand-name strong { -webkit-text-fill-color: #f8fafc; color: #f8fafc; }
+.odoo-mega-footer .footer-desc { color: #cbd5e1; }

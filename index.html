@@ -2137,6 +2137,8 @@
             border: 1.5px solid var(--line) !important;
         }
 </style>
+    <link rel="stylesheet" href="/static/landing.css"/>
+    <script src="/static/landing.js" defer></script>
 </head>
 <body>
 
@@ -2310,15 +2312,16 @@
                 </span>
             </a>
 
-            <nav class="odoo-nav-links" aria-label="روابط الموقع الرئيسي">
+            <nav id="marketing-navigation" class="odoo-nav-links" aria-label="روابط الموقع الرئيسي">
                 <a href="#apps" class="odoo-nav-link active">التطبيقات (16)</a>
                 <a href="#sectors" class="odoo-nav-link">قطاعات المحاماة</a>
-                <a href="#preview" class="odoo-nav-link">جولة في المنظومة</a>
-                <a href="#pricing" class="odoo-nav-link">الأسعار وشهر مجاني</a>
-                <a href="#testimonials" class="odoo-nav-link">تجارب المحامين</a>
-                <a href="#faq" class="odoo-nav-link">المساعدة والأسئلة</a>
+                <a href="#preview" class="odoo-nav-link">جولة بالمنظومة</a>
+                <a href="#pricing" class="odoo-nav-link">الأسعار</a>
+                <a href="#testimonials" class="odoo-nav-link">لفريق مكتبك</a>
+                <a href="#faq" class="odoo-nav-link">الأسئلة الشائعة</a>
             </nav>
 
+            <button type="button" class="nav-menu-toggle" aria-label="قائمة الموقع" aria-controls="marketing-navigation" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
             <div class="odoo-nav-actions">
                 <button class="nav-theme-toggle-btn" onclick="toggleTheme()" aria-label="تغيير المظهر" title="تغيير المظهر بين الأبيض والكحلي">
                     <span class="nav-theme-icon-sun">☀️</span>
@@ -2326,7 +2329,7 @@
                 </button>
 
                 <button onclick="openLoginModal()" class="odoo-nav-login">تسجيل الدخول</button>
-                <button onclick="openRegisterModal()" class="odoo-btn-burgundy">جرب مجاناً شهر كامل ⚡</button>
+                <button onclick="openRegisterModal()" class="odoo-btn-burgundy">ابدأ مجاناً ←</button>
             </div>
         </div>
     </header>
@@ -2338,20 +2341,17 @@
             <div class="hx-hero-copy">
                 <span class="hx-hero-kicker">🇪🇬 نظام سحابي لإدارة مكاتب وشركات المحاماة في مصر</span>
                 <h1 class="odoo-hero-headline hx-hero-title">
-                    كل تطبيقات مكتبك القانوني.. في<br/>
-                    <span class="animated-slogan-wrapper">
-                        <span id="rotatingHeroSlogan" class="animated-slogan-text">شاشة واحدة بالغة البساطة والذكاء ⚖️</span>
-                    </span>
+                    مكتبك كله..<br/><span class="hero-accent">في شاشة واحدة.</span>
                 </h1>
                 <p class="hx-hero-lead">
-                    سجّل القضايا، نسّق رول الجلسات، صِيغ مذكراتك بالذكاء الاصطناعي، واطبع فواتير الأتعاب وحسابات الموكلين بالجنيه. من غير ورق ولا دفاتر مبعثرة.
+                    سجّل القضايا، نسّق رول الجلسات، صُغ مذكراتك بالذكاء الاصطناعي، واطبع فواتير الأتعاب وحسابات الموكلين بالجنيه. من غير ورق ولا دفاتر مبعثرة.
                 </p>
                 <div class="odoo-hero-ctas hx-hero-ctas">
                     <button onclick="openRegisterModal()" class="odoo-hero-btn-primary">
-                        ابدأ تجربة مجانية شهر كامل (30 يوماً) 🚀
+                        ابدأ تجربتك المجانية ←
                     </button>
                     <a href="/app" class="odoo-hero-btn-secondary">
-                        جرّب النسخة التجريبية كـ ضيف ←
+                        استكشف المنظومة
                     </a>
                 </div>
                 <ul class="hx-hero-points">
@@ -2420,6 +2420,7 @@
                     <div class="hx-msg">👤 الموكل: م/ شريف عبد الرحمن</div>
                     <div class="hx-msg-ok">✓ تم إخطار الموكل رسمياً بالواتساب</div>
                 </div>
+                <p class="preview-disclaimer">معاينة توضيحية لشكل لوحة المكتب · بيانات تجريبية</p>
             </div>
 
         </div>
@@ -2475,34 +2476,34 @@
     <section id="sectors" class="odoo-sectors-section">
         <div class="odoo-section-header">
             <span class="odoo-section-tag">حلول متخصصة لقطاعك القانوني</span>
-            <h2 class="odoo-section-title">مصمم خصيصاً ليناسب كافة أنماط العمل القانوني في مصر</h2>
+            <h2 class="odoo-section-title">مهما كان حجم مكتبك، ليك مساحة هنا.</h2>
             <p class="odoo-section-sub">سواء كنت تدير مكتباً مستقلاً، شركة محاماة مشتركة، أو إدارة قانونية لشركة كبرى</p>
         </div>
 
         <div class="odoo-sectors-tabs">
             <button type="button" class="sector-tab-btn active" onclick="switchSector('solo', this)">
-                <span class="sector-icon">⚖️</span>
+                <span class="sector-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 21h14M4 7h16M6 7l-4 8h8L6 7zm12 0-4 8h8l-4-8z"/></svg></span>
                 <div class="sector-text">
                     <strong>المحامون الأفراد والمكاتب المستقلة</strong>
                     <small>أجندة شخصية، رول اليوم، وحساب مواعيد</small>
                 </div>
             </button>
             <button type="button" class="sector-tab-btn" onclick="switchSector('firm', this)">
-                <span class="sector-icon">🏢</span>
+                <span class="sector-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5h10v16M14 11h6v10M2 21h20M8 9h2M8 13h2M8 17h2M17 15h1M17 18h1"/></svg></span>
                 <div class="sector-text">
                     <strong>مكاتب الشركاء وشركات المحاماة</strong>
                     <small>إدارة مركزية، توزيع قضايا، وتوزيع أرباح</small>
                 </div>
             </button>
             <button type="button" class="sector-tab-btn" onclick="switchSector('corp', this)">
-                <span class="sector-icon">💼</span>
+                <span class="sector-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 13h18M10 13v3h4v-3"/></svg></span>
                 <div class="sector-text">
                     <strong>الإدارات القانونية بالشركات</strong>
                     <small>عقود، مطالبات تجارية، وتحكيم</small>
                 </div>
             </button>
             <button type="button" class="sector-tab-btn" onclick="switchSector('appellate', this)">
-                <span class="sector-icon">🏛️</span>
+                <span class="sector-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 8 10-5 10 5H2zm2 13h16M6 10v8M12 10v8M18 10v8"/></svg></span>
                 <div class="sector-text">
                     <strong>محامو الجنايات والنقض والإدارية</strong>
                     <small>طعون، شق عاجل، وإلغاء وتعويض</small>
@@ -2563,7 +2564,7 @@
     <section id="apps" class="odoo-apps-section">
         <div class="odoo-section-header">
             <span class="odoo-section-tag">تطبيقات مترابطة بلا حدود</span>
-            <h2 class="odoo-section-title">كل تطبيق متكامل بذاته، ويعمل بتناغم مذهل مع بقية المنظومة</h2>
+            <h2 class="odoo-section-title">كل أدوات مكتبك. متصلة ببعض.</h2>
             <p class="odoo-section-sub">اضغط على أي تطبيق لتجربة طريقة عمله ومعاينة شاشته في الجولة الحية أدناه</p>
         </div>
 
@@ -3454,7 +3455,7 @@
                     <li><a href="#pricing">الأسعار والباقات</a></li>
                     <li><a href="#preview">طلب عرض توضيحي حي</a></li>
                     <li><a href="#testimonials">شركاء النجاح</a></li>
-                    <li><a href="#faq">مركز المساعدة والأسئلة</a></li>
+                    <li><a href="#faq">مركز الأسئلة الشائعة</a></li>
                     <li><a href="https://wa.me/201010200391" target="_blank">الدعم الفني المباشر</a></li>
                 </ul>
             </div>
@@ -3926,35 +3927,6 @@
             applyTheme(saved);
         })();
 
-        // ============================================================
-        // DYNAMIC ROTATING LEGAL SLOGANS (كلام متحرك وسلوجنات تلفت الانتباه)
-        // ============================================================
-        const catchyLegalSlogans = [
-            "شاشة واحدة بالغة البساطة والذكاء ⚖️",
-            "حساب مواعيد الطعن بنسبة خطأ 0% ⚡",
-            "صياغة مذكرات النقض بالذكاء الاصطناعي 🤖",
-            "إدارة رول الجلسات ورسائل الواتساب التلقائية 📱",
-            "تحصيل أتعاب القضايا بفواتير إلكترونية فورية 💰",
-            "أجندة المحضرين والإعلانات القضائية بدقة 🏛️",
-            "حفظ ملفات القضايا بتشفير بنكي 256-bit 🔒"
-        ];
-        let legalSloganIndex = 0;
-
-        function cycleLegalSlogans() {
-            const target = document.getElementById('rotatingHeroSlogan');
-            if (!target) return;
-            
-            target.classList.add('slogan-flip-out');
-            setTimeout(() => {
-                legalSloganIndex = (legalSloganIndex + 1) % catchyLegalSlogans.length;
-                target.textContent = catchyLegalSlogans[legalSloganIndex];
-                target.classList.remove('slogan-flip-out');
-                target.classList.add('slogan-flip-in');
-                setTimeout(() => target.classList.remove('slogan-flip-in'), 350);
-            }, 350);
-        }
-
-        setInterval(cycleLegalSlogans, 3400);
 </script>
 
     <!-- زر تغيير المظهر المتطور على اليسار (Floating Advanced Theme Switcher) -->

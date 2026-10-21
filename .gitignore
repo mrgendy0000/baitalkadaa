@@ -4,3 +4,5 @@ __pycache__/
 .DS_Store
 cloudflared
 *.log
+.local-backups/
+.playwright-mcp/
