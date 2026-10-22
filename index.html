@@ -22,77 +22,106 @@
         
         :root, [data-theme="light"] {
             --theme-name: "light";
-            --bg: #F8FAFC;
-            --bg-alt: #F1F5F9;
-            --surface: #FFFFFF;
-            --surface-alt: #F8FAFC;
-            --surface-card: #FFFFFF;
-            --surface-hover: #F1F5F9;
-            --primary: #062A3F;
-            --primary-dark: #031724;
-            --primary-light: #0E4E75;
-            --primary-gradient: linear-gradient(135deg, #062A3F 0%, #0E4E75 100%);
+            /* Signature Odoo Color System */
+            --odoo-purple: #714B67;
+            --odoo-purple-dark: #53364C;
+            --odoo-purple-light: #8A5C7E;
+            --odoo-purple-tint: #F3EEF2;
+            --odoo-teal: #00A09D;
+            --odoo-teal-dark: #017E84;
+            --odoo-teal-tint: #E6F6F6;
+            
+            --primary: #714B67;
+            --primary-dark: #53364C;
+            --primary-light: #8A5C7E;
+            --primary-gradient: linear-gradient(135deg, #714B67 0%, #8A5C7E 100%);
+            --primary-tint: #F3EEF2;
+            
+            --teal: #00A09D;
+            --teal-dark: #017E84;
+            --teal-light: #E6F6F6;
+            
             --gold: #F59E0B;
             --gold-dark: #D97706;
             --gold-light: #FEF3C7;
-            --gold-border: rgba(245, 158, 11, 0.35);
-            --teal: #0D9488;
-            --teal-light: #CCFBF1;
-            --burgundy: #7C2D37;
-            --burgundy-dark: #581C24;
-            --green: #059669;
-            --green-light: #D1FAE5;
-            --ink: #0F172A;
-            --ink-heading: #062A3F;
-            --muted: #475569;
-            --muted-light: #64748B;
-            --line: #E2E8F0;
-            --line-focus: #CBD5E1;
-            --nav-bg: rgba(255, 255, 255, 0.94);
-            --nav-border: #E2E8F0;
-            --card-shadow: 0 4px 20px -2px rgba(6, 42, 63, 0.06), 0 2px 6px -1px rgba(6, 42, 63, 0.04);
-            --card-shadow-hover: 0 14px 34px -4px rgba(6, 42, 63, 0.12), 0 4px 12px -2px rgba(6, 42, 63, 0.06);
-            --badge-bg: #E2E8F0;
-            --ticker-bg: #062A3F;
-            --ticker-text: #F8FAFC;
-            --modal-backdrop: rgba(6, 42, 63, 0.65);
+            --gold-border: rgba(245, 158, 11, 0.4);
+            
+            --burgundy: #714B67;
+            --burgundy-dark: #53364C;
+            
+            --green: #28A745;
+            --green-light: #E8F5E9;
+            
+            --bg: #FFFFFF;
+            --bg-alt: #F8F9FA;
+            --surface: #FFFFFF;
+            --surface-alt: #F8F9FA;
+            --surface-card: #FFFFFF;
+            --surface-hover: #F3EEF2;
+            
+            --ink: #212529;
+            --ink-heading: #714B67;
+            --muted: #6C757D;
+            --muted-light: #ADB5BD;
+            --line: #E9ECEF;
+            --line-focus: #714B67;
+            
+            --nav-bg: rgba(255, 255, 255, 0.96);
+            --nav-border: #E9ECEF;
+            
+            --card-shadow: 0 4px 16px -2px rgba(113, 75, 103, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+            --card-shadow-hover: 0 12px 28px -4px rgba(113, 75, 103, 0.16), 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+            --badge-bg: #F3EEF2;
+            --ticker-bg: #714B67;
+            --ticker-text: #FFFFFF;
+            --modal-backdrop: rgba(83, 54, 76, 0.6);
         }
 
         [data-theme="dark"] {
             --theme-name: "dark";
-            --bg: #071524;
-            --bg-alt: #0B1E32;
-            --surface: #0E243A;
-            --surface-alt: #132E4A;
-            --surface-card: #0E243A;
-            --surface-hover: #183756;
-            --primary: #38BDF8;
-            --primary-dark: #0284C7;
-            --primary-light: #7DD3FC;
-            --primary-gradient: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+            --odoo-purple: #B88FA0;
+            --odoo-purple-dark: #714B67;
+            --odoo-teal: #2DD4BF;
+            
+            --primary: #B88FA0;
+            --primary-dark: #714B67;
+            --primary-light: #D4B2C0;
+            --primary-gradient: linear-gradient(135deg, #714B67 0%, #B88FA0 100%);
+            --primary-tint: rgba(184, 143, 160, 0.15);
+            
+            --teal: #2DD4BF;
+            --teal-dark: #00A09D;
+            --teal-light: rgba(45, 212, 191, 0.15);
+            
             --gold: #FBBF24;
             --gold-dark: #F59E0B;
             --gold-light: rgba(251, 191, 36, 0.15);
             --gold-border: rgba(251, 191, 36, 0.45);
-            --teal: #2DD4BF;
-            --teal-light: rgba(45, 212, 191, 0.15);
-            --burgundy: #C084FC;
-            --burgundy-dark: #A855F7;
-            --green: #34D399;
-            --green-light: rgba(52, 211, 153, 0.15);
-            --ink: #F8FAFC;
+            
+            --burgundy: #B88FA0;
+            --burgundy-dark: #714B67;
+            
+            --bg: #1B121A;
+            --bg-alt: #231722;
+            --surface: #2A1E29;
+            --surface-alt: #342633;
+            --surface-card: #2A1E29;
+            --surface-hover: #3E2F3D;
+            
+            --ink: #F8F9FA;
             --ink-heading: #FFFFFF;
-            --muted: #94A3B8;
-            --muted-light: #CBD5E1;
-            --line: #1D3D5E;
-            --line-focus: #38BDF8;
-            --nav-bg: rgba(7, 21, 36, 0.94);
-            --nav-border: #1D3D5E;
-            --card-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.05);
-            --card-shadow-hover: 0 16px 40px -4px rgba(56, 189, 248, 0.18), 0 0 25px rgba(56, 189, 248, 0.1);
-            --badge-bg: #1A3B5C;
-            --ticker-bg: #0B1E32;
-            --ticker-text: #F8FAFC;
+            --muted: #A0919E;
+            --muted-light: #7E6F7C;
+            --line: #3D2C3B;
+            --line-focus: #B88FA0;
+            
+            --nav-bg: rgba(27, 18, 26, 0.95);
+            --nav-border: #3D2C3B;
+            --card-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5);
+            --card-shadow-hover: 0 16px 40px -4px rgba(184, 143, 160, 0.2);
+            --badge-bg: #342633;
+            --ticker-bg: #2A1E29;
+            --ticker-text: #FFFFFF;
             --modal-backdrop: rgba(0, 0, 0, 0.85);
         }
 
@@ -2171,10 +2200,10 @@
 
         <!-- Deep Royal Navy & Cyan 3D Squircle Gradients -->
         <linearGradient id="h3d-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0E5A7A"></stop>
-            <stop offset="28%" stop-color="#063B53"></stop>
-            <stop offset="70%" stop-color="#062537"></stop>
-            <stop offset="100%" stop-color="#02131D"></stop>
+            <stop offset="0%" stop-color="#8A5C7E"></stop>
+            <stop offset="35%" stop-color="#714B67"></stop>
+            <stop offset="75%" stop-color="#53364C"></stop>
+            <stop offset="100%" stop-color="#351E30"></stop>
         </linearGradient>
 
         <!-- Glass Specular Highlight (Upper Curve) -->
@@ -2208,16 +2237,16 @@
         <!-- 3D Metallic Border Rim Gradient -->
         <linearGradient id="h3d-border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"></stop>
-            <stop offset="30%" stop-color="#38BDF8" stop-opacity="0.6"></stop>
+            <stop offset="30%" stop-color="#00A09D" stop-opacity="0.7"></stop>
             <stop offset="70%" stop-color="#F59E0B" stop-opacity="0.85"></stop>
             <stop offset="100%" stop-color="#FFD322" stop-opacity="0.95"></stop>
         </linearGradient>
 
         <!-- Ribbon Badge Gradient inside Icon -->
         <linearGradient id="h3d-badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0F425C"></stop>
-            <stop offset="50%" stop-color="#06283D"></stop>
-            <stop offset="100%" stop-color="#031622"></stop>
+            <stop offset="0%" stop-color="#53364C"></stop>
+            <stop offset="50%" stop-color="#3D2437"></stop>
+            <stop offset="100%" stop-color="#261422"></stop>
         </linearGradient>
     </defs>
 
@@ -2308,8 +2337,8 @@
 </svg>
                 </span>
                 <span class="site-brand-name">
-                    <strong>بيت القانون</strong>
-                    <small>SMART LEGAL ERP · 2026</small>
+                    <strong style="color: #714B67; font-size: 22px; font-weight: 900; line-height: 1.2;">بيت القانون</strong>
+                    <small style="color: #00A09D; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; display: block; margin-top: 2px;">منظومة المحاماة المتكاملة • على طريقة Odoo</small>
                 </span>
             </a>
 
@@ -2340,26 +2369,20 @@
         <div class="hx-hero-grid">
             
             <div class="hx-hero-copy">
-                <span class="hx-hero-kicker">🇪🇬 نظام سحابي لإدارة مكاتب وشركات المحاماة في مصر</span>
-                <button type="button" class="hero-motion-toggle" aria-pressed="false" aria-label="إيقاف حركة الواجهة">Ⅱ <span>إيقاف الحركة</span></button>
+                <span class="hx-hero-kicker">🇪🇬 المنظومة السحابية الأولى لإدارة مكاتب المحاماة في مصر</span>
                 <h1 class="odoo-hero-headline hx-hero-title">
-                    <span class="hero-opening">مكتبك كله..</span>
-                    <span class="hero-phrases" aria-label="في شاشة واحدة، بتنظيم أبسط، بخطوة أذكى">
-                        <span class="hero-phrase is-current" aria-hidden="true">في شاشة واحدة.</span>
-                        <span class="hero-phrase" aria-hidden="true">بتنظيم أبسط.</span>
-                        <span class="hero-phrase" aria-hidden="true">بخطوة أذكى.</span>
-                    </span>
+                    كل ما يحتاجه مكتبك القانوني.. في<br/>
+                    <span class="odoo-marker-highlight">منظومة واحدة متكاملة</span>
                 </h1>
-                <p class="hx-hero-lead desktop-hero-lead">
-                    سجّل القضايا، نسّق رول الجلسات، صُغ مذكراتك بالذكاء الاصطناعي، واطبع فواتير الأتعاب وحسابات الموكلين بالجنيه. من غير ورق ولا دفاتر مبعثرة.
+                <p class="hx-hero-lead">
+                    ودّع فوضى الدفاتر الورقية وجداول الإكسيل المبعثرة. سجّل رول الجلسات، صُغ عرائضك ومذكراتك بالذكاء الاصطناعي بنقض 2026، وأدِر خزينتك وفواتير الأتعاب بالجنيه المصري من شاشة واحدة بالغة البساطة.
                 </p>
-                <p class="mobile-hero-lead">قضاياك، جلساتك وأتعابك في مكان واحد. نظّم مكتبك من موبايلك، بسهولة.</p>
                 <div class="odoo-hero-ctas hx-hero-ctas">
-                    <button onclick="openRegisterModal()" class="odoo-hero-btn-primary">
-                        ابدأ تجربتك المجانية ←
+                    <button onclick="openRegisterModal()" class="odoo-btn-primary">
+                        ابدأ مجاناً - شهر كامل (30 يوماً) 🚀
                     </button>
-                    <a href="/app" class="odoo-hero-btn-secondary">
-                        استكشف المنظومة
+                    <a href="/app" class="odoo-btn-secondary">
+                        جرّب النسخة التجريبية كـ ضيف ←
                     </a>
                 </div>
                 <ul class="hx-hero-points">
@@ -3273,10 +3296,10 @@
 
         <!-- Deep Royal Navy & Cyan 3D Squircle Gradients -->
         <linearGradient id="h3d-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0E5A7A"></stop>
-            <stop offset="28%" stop-color="#063B53"></stop>
-            <stop offset="70%" stop-color="#062537"></stop>
-            <stop offset="100%" stop-color="#02131D"></stop>
+            <stop offset="0%" stop-color="#8A5C7E"></stop>
+            <stop offset="35%" stop-color="#714B67"></stop>
+            <stop offset="75%" stop-color="#53364C"></stop>
+            <stop offset="100%" stop-color="#351E30"></stop>
         </linearGradient>
 
         <!-- Glass Specular Highlight (Upper Curve) -->
@@ -3310,16 +3333,16 @@
         <!-- 3D Metallic Border Rim Gradient -->
         <linearGradient id="h3d-border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"></stop>
-            <stop offset="30%" stop-color="#38BDF8" stop-opacity="0.6"></stop>
+            <stop offset="30%" stop-color="#00A09D" stop-opacity="0.7"></stop>
             <stop offset="70%" stop-color="#F59E0B" stop-opacity="0.85"></stop>
             <stop offset="100%" stop-color="#FFD322" stop-opacity="0.95"></stop>
         </linearGradient>
 
         <!-- Ribbon Badge Gradient inside Icon -->
         <linearGradient id="h3d-badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0F425C"></stop>
-            <stop offset="50%" stop-color="#06283D"></stop>
-            <stop offset="100%" stop-color="#031622"></stop>
+            <stop offset="0%" stop-color="#53364C"></stop>
+            <stop offset="50%" stop-color="#3D2437"></stop>
+            <stop offset="100%" stop-color="#261422"></stop>
         </linearGradient>
     </defs>
 
