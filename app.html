@@ -199,10 +199,7 @@
             background-color: #017E84 !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 160, 157, 0.25);
-        }
-
-        /* Odoo Card styling */
-        .odoo-card {
+              .odoo-card {
             background: #FFFFFF;
             border: 1px solid #E9ECEF;
             border-radius: 16px;
@@ -212,22 +209,108 @@
         .odoo-card:hover {
             box-shadow: 0 8px 24px rgba(113, 75, 103, 0.1);
         }
+
+        /* Animated 3D Brand Emblem Keyframes */
+        @keyframes scaleBeamTilt {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(3.5deg); }
+            75% { transform: rotate(-3.5deg); }
+        }
+        @keyframes emblemFloatingSoft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes emblemAuraPulse {
+            0%, 100% { filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.25)); }
+            50% { filter: drop-shadow(0 8px 24px rgba(245, 158, 11, 0.45)); }
+        }
+        .site-brand-emblem {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            animation: emblemFloatingSoft 4s ease-in-out infinite, emblemAuraPulse 3s ease-in-out infinite;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .animated-scale-beam {
+            transform-origin: 60px 42px;
+            animation: scaleBeamTilt 4.2s ease-in-out infinite;
+        }
+
+        /* Odoo Navigation Tabs - Calm & Simple */
+        .odoo-app-tab {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .odoo-app-tab:hover {
+            color: #714B67;
+            background-color: #F8FAFC;
+            border-color: #E2E8F0;
+        }
+        .odoo-app-tab.active {
+            color: #714B67 !important;
+            background-color: #F3EEF2 !important;
+            border-color: rgba(113, 75, 103, 0.25) !important;
+            font-weight: 800;
+            box-shadow: 0 1px 3px rgba(113, 75, 103, 0.08);
+        }
+
+        /* Universal Back Button Styling */
+        .app-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #FFFFFF;
+            color: #334155;
+            border: 1px solid #CBD5E1;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .app-back-btn:hover {
+            background: #F1F5F9;
+            color: #714B67;
+            border-color: #714B67;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(113, 75, 103, 0.12);
+        }
+        .app-back-btn .back-arrow {
+            font-size: 15px;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+        .app-back-btn:hover .back-arrow {
+            transform: translateX(3px);
+        }
     </style>
     <link rel="stylesheet" href="/static/assistant.css?v=secure-ai-2">
     <script src="/static/assistant.js?v=secure-ai-2" defer></script>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 antialiased selection:bg-gold-500 selection:text-white">
+<body class="min-h-screen flex flex-col bg-[#F8FAFC] antialiased selection:bg-gold-500 selection:text-white">
 
     <!-- ========================================================================= -->
     <!-- TOP BAR: Brand, Trial Countdown, Office Profile (Responsive Mobile Dimensions) -->
     <!-- ========================================================================= -->
-    <header class="sticky top-0 z-40 bg-white text-slate-800 border-b border-slate-200 shadow-sm safe-top-padding">
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md text-slate-800 border-b border-slate-200/90 shadow-2xs safe-top-padding">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
             
-            <!-- Right: Odoo App Launcher Icon + Brand Logo + Title -->
+            <!-- Right: Odoo App Launcher Icon + Advanced 3D Brand Emblem + Title -->
             <div class="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
                 <!-- Odoo 3x3 Waffle Grid Launcher Button -->
-                <button onclick="switchView('home')" class="w-10 h-10 rounded-xl bg-[#F3EEF2] hover:bg-[#EAE2E8] text-[#714B67] flex items-center justify-center transition border border-[#714B67]/20" title="لوحة تطبيقات المنظومة">
+                <button onclick="toggleOdooAppsMenu()" class="w-10 h-10 rounded-xl bg-[#F3EEF2] hover:bg-[#EAE2E8] text-[#714B67] flex items-center justify-center transition border border-[#714B67]/20 active:scale-95 shadow-2xs" title="لوحة تطبيقات المنظومة (16 تطبيقاً)">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <circle cx="5" cy="5" r="2"></circle>
                         <circle cx="12" cy="5" r="2"></circle>
@@ -241,14 +324,120 @@
                     </svg>
                 </button>
 
-                <!-- 3D Brand Logo -->
-                <a href="/app" class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8A5C7E] to-[#53364C] p-0.5 flex items-center justify-center shadow-md border border-[#F59E0B]/50 flex-shrink-0 text-white">
-                        <span class="text-lg">⚖️</span>
-                    </div>
+                <!-- Advanced 3D Animated Brand Logo (الايقون المتطور مع حركة ميزان العدالة) -->
+                <a href="/app" class="flex items-center gap-2.5 group" title="الانتقال للرئيسية">
+                    <span class="site-brand-emblem">
+                        <svg width="44" height="44" viewBox="0 0 120 120" fill="none" class="brand-3d-svg" style="flex-shrink:0;border-radius:14px;display:inline-block;vertical-align:middle">
+                            <defs>
+                                <filter id="app3d-outer-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#714B67" flood-opacity="0.3"></feDropShadow>
+                                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.15"></feDropShadow>
+                                </filter>
+                                <filter id="app3d-inner-glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#F59E0B" flood-opacity="0.45"></feDropShadow>
+                                </filter>
+                                <filter id="app3d-text-glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.6"></feDropShadow>
+                                </filter>
+                                <linearGradient id="app3d-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#8A5C7E"></stop>
+                                    <stop offset="35%" stop-color="#714B67"></stop>
+                                    <stop offset="75%" stop-color="#53364C"></stop>
+                                    <stop offset="100%" stop-color="#351E30"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-glass-specular" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.65"></stop>
+                                    <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.12"></stop>
+                                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-gold-3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFFDF0"></stop>
+                                    <stop offset="20%" stop-color="#FDE68A"></stop>
+                                    <stop offset="50%" stop-color="#F59E0B"></stop>
+                                    <stop offset="85%" stop-color="#D97706"></stop>
+                                    <stop offset="100%" stop-color="#92400E"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-gold-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#F59E0B"></stop>
+                                    <stop offset="60%" stop-color="#B45309"></stop>
+                                    <stop offset="100%" stop-color="#78350F"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-gold-light" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFFFFF"></stop>
+                                    <stop offset="50%" stop-color="#FFF9D2"></stop>
+                                    <stop offset="100%" stop-color="#FDE68A"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"></stop>
+                                    <stop offset="30%" stop-color="#00A09D" stop-opacity="0.7"></stop>
+                                    <stop offset="70%" stop-color="#F59E0B" stop-opacity="0.85"></stop>
+                                    <stop offset="100%" stop-color="#FFD322" stop-opacity="0.95"></stop>
+                                </linearGradient>
+                                <linearGradient id="app3d-badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#53364C"></stop>
+                                    <stop offset="50%" stop-color="#3D2437"></stop>
+                                    <stop offset="100%" stop-color="#261422"></stop>
+                                </linearGradient>
+                            </defs>
+                            <g filter="url(#app3d-outer-shadow)">
+                                <rect x="7" y="7" width="106" height="106" rx="28" fill="url(#app3d-bg-grad)"></rect>
+                                <rect x="7" y="7" width="106" height="53" rx="28" fill="url(#app3d-glass-specular)"></rect>
+                                <rect x="7.75" y="7.75" width="104.5" height="104.5" rx="27.25" stroke="url(#app3d-border-grad)" stroke-width="1.8"></rect>
+                                <rect x="9.5" y="9.5" width="101" height="101" rx="25.5" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="1"></rect>
+                            </g>
+                            <g opacity="0.9">
+                                <path d="M26 22 L27.5 25.5 L31 27 L27.5 28.5 L26 32 L24.5 28.5 L21 27 L24.5 25.5 Z" fill="url(#app3d-gold-3d)"></path>
+                                <circle cx="26" cy="27" r="1" fill="#FFFFFF"></circle>
+                                <path d="M96 24 L97 26.5 L99.5 27.5 L97 28.5 L96 31 L95 28.5 L92.5 27.5 L95 26.5 Z" fill="url(#app3d-gold-3d)"></path>
+                                <circle cx="96" cy="27.5" r="0.8" fill="#FFFFFF"></circle>
+                            </g>
+                            <g filter="url(#app3d-inner-glow)">
+                                <path d="M46 76 C46 72, 74 72, 74 76 L76 79 C76 81, 70 82, 60 82 C50 82, 44 81, 44 79 Z" fill="url(#app3d-gold-dark)"></path>
+                                <ellipse cx="60" cy="76" rx="14" ry="3.5" fill="url(#app3d-gold-3d)"></ellipse>
+                                <ellipse cx="60" cy="75" rx="12" ry="2.5" fill="url(#app3d-gold-light)"></ellipse>
+                                <rect x="58" y="24" width="4" height="52" rx="2" fill="url(#app3d-gold-dark)"></rect>
+                                <rect x="58.5" y="24" width="2" height="52" rx="1" fill="url(#app3d-gold-light)"></rect>
+                                <circle cx="60" cy="21" r="5" fill="url(#app3d-gold-dark)"></circle>
+                                <circle cx="60" cy="20.5" r="4.2" fill="url(#app3d-gold-3d)"></circle>
+                                <circle cx="58.8" cy="19.2" r="1.5" fill="#FFFFFF" opacity="0.8"></circle>
+                                <g class="animated-scale-beam">
+                                    <path d="M26 33 Q60 27 94 33 Q60 31 26 33 Z" fill="url(#app3d-gold-dark)"></path>
+                                    <path d="M26 32 C42 27, 78 27, 94 32 L94 33.5 C78 28.5, 42 28.5, 26 33.5 Z" fill="url(#app3d-gold-3d)"></path>
+                                    <line x1="26" y1="32" x2="94" y2="32" stroke="#FFFDF0" stroke-width="1.2" stroke-linecap="round"></line>
+                                    <circle cx="60" cy="30" r="3.2" fill="url(#app3d-gold-3d)"></circle>
+                                    <circle cx="60" cy="30" r="1.2" fill="#062A3F"></circle>
+                                    <g class="left-scale-group">
+                                        <line x1="27" y1="33" x2="19" y2="52" stroke="url(#app3d-gold-dark)" stroke-width="1.2"></line>
+                                        <line x1="27" y1="33" x2="35" y2="52" stroke="url(#app3d-gold-dark)" stroke-width="1.2"></line>
+                                        <line x1="27" y1="33" x2="27" y2="52" stroke="url(#app3d-gold-light)" stroke-width="0.9"></line>
+                                        <path d="M16 52 C16 63, 38 63, 38 52 Z" fill="url(#app3d-gold-dark)"></path>
+                                        <path d="M17 52.5 C17 61.5, 37 61.5, 37 52.5 Z" fill="url(#app3d-gold-3d)"></path>
+                                        <ellipse cx="27" cy="52" rx="11" ry="2.5" fill="url(#app3d-gold-light)"></ellipse>
+                                        <ellipse cx="27" cy="52.3" rx="9" ry="1.6" fill="#92400E" opacity="0.6"></ellipse>
+                                    </g>
+                                    <g class="right-scale-group">
+                                        <line x1="93" y1="33" x2="85" y2="52" stroke="url(#app3d-gold-dark)" stroke-width="1.2"></line>
+                                        <line x1="93" y1="33" x2="101" y2="52" stroke="url(#app3d-gold-dark)" stroke-width="1.2"></line>
+                                        <line x1="93" y1="33" x2="93" y2="52" stroke="url(#app3d-gold-light)" stroke-width="0.9"></line>
+                                        <path d="M82 52 C82 63, 104 63, 104 52 Z" fill="url(#app3d-gold-dark)"></path>
+                                        <path d="M83 52.5 C83 61.5, 103 61.5, 103 52.5 Z" fill="url(#app3d-gold-3d)"></path>
+                                        <ellipse cx="93" cy="52" rx="11" ry="2.5" fill="url(#app3d-gold-light)"></ellipse>
+                                        <ellipse cx="93" cy="52.3" rx="9" ry="1.6" fill="#92400E" opacity="0.6"></ellipse>
+                                    </g>
+                                </g>
+                            </g>
+                            <g filter="url(#app3d-outer-shadow)">
+                                <rect x="18" y="85" width="84" height="23" rx="11.5" fill="url(#app3d-badge-grad)"></rect>
+                                <rect x="18.8" y="85.8" width="82.4" height="21.4" rx="10.7" stroke="url(#app3d-gold-3d)" stroke-width="1.4"></rect>
+                                <path d="M19 92 C28 87, 92 87, 101 92" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" fill="none"></path>
+                                <text x="60" y="99" text-anchor="middle" font-family="'Tajawal', 'Readex Pro', sans-serif" font-size="10.5" font-weight="900" fill="#FFFFFF" filter="url(#app3d-text-glow)" letter-spacing="0.3">بيت القانون</text>
+                                <text x="60" y="105.5" text-anchor="middle" font-family="'Readex Pro', 'Cairo', sans-serif" font-size="5.8" font-weight="800" fill="#FBBF24" letter-spacing="0.8">SMART LEGAL ERP</text>
+                            </g>
+                        </svg>
+                    </span>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <span class="font-black text-sm sm:text-base text-[#714B67]">بيت القانون</span>
+                            <span class="font-black text-sm sm:text-base text-[#714B67] group-hover:text-[#53364C] transition">بيت القانون</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#E6F6F6] text-[#00A09D] font-black border border-[#00A09D]/30">ERP</span>
                         </div>
                         <div class="text-[10px] sm:text-[11px] text-slate-500 font-bold truncate max-w-[110px] sm:max-w-xs" id="header-office-name">
@@ -261,7 +450,7 @@
             <!-- Center: Quick Global Search Input -->
             <div class="hidden md:flex items-center flex-1 max-w-md mx-2">
                 <div class="relative w-full">
-                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="ابحث في القضايا، الموكلين، الجلسات، أو اسأل زيزو... [Ctrl + K]" class="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl px-4 py-2 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#714B67] focus:bg-white transition">
+                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="ابحث في القضايا، الموكلين، الجلسات، أو اسأل زيزو... [Ctrl + K]" class="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-2 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#714B67] focus:bg-white transition">
                     <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
                 </div>
             </div>
@@ -276,12 +465,12 @@
                     <span id="trial-status-text" class="truncate">جاري التحقق...</span>
                 </div>
                 <!-- + Quick Case -->
-                <button onclick="openNewCaseModal()" class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#714B67] hover:bg-[#53364C] text-white text-xs font-bold shadow-sm transition">
+                <button onclick="openNewCaseModal()" class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#714B67] hover:bg-[#53364C] text-white text-xs font-bold shadow-xs transition active:scale-95">
                     <span>+</span>
                     <span>قضية جديدة</span>
                 </button>
                 <!-- Zizo AI Quick Button -->
-                <button onclick="switchView('zizo')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#E6F6F6] hover:bg-[#d6f2f2] text-[#00A09D] border border-[#00A09D]/30 text-xs font-black transition">
+                <button onclick="switchView('zizo')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#E6F6F6] hover:bg-[#d6f2f2] text-[#00A09D] border border-[#00A09D]/30 text-xs font-black transition active:scale-95">
                     <span>🤖</span>
                     <span class="hidden sm:inline">زيزو AI</span>
                 </button>
@@ -325,105 +514,156 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- EXECUTIVE APPS & MODULES DOCK (Clean, Slim, High-Precision) -->
+    <!-- EXECUTIVE APPS & MODULES DOCK (Calm, Light, Odoo-Style Navigation)        -->
     <!-- ========================================================================= -->
-    <nav class="hidden sm:block bg-navy-950/95 backdrop-blur-md border-b border-white/5 text-slate-300 text-xs sticky top-16 z-30 overflow-x-auto scrollbar-none shadow-sm">
+    <nav class="hidden sm:block bg-white/95 backdrop-blur-md border-b border-slate-200/90 text-slate-700 text-xs sticky top-16 z-30 overflow-x-auto scrollbar-none shadow-2xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1.5 h-11">
             
             <!-- App Launcher Dropdown Button -->
-            <button onclick="toggleOdooAppsMenu()" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gold-400 hover:text-white transition flex items-center gap-1.5 font-bold flex-shrink-0 border border-white/10" title="لوحة كافة التطبيقات">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <button onclick="toggleOdooAppsMenu()" class="px-2.5 py-1.5 rounded-xl bg-[#F3EEF2] hover:bg-[#EAE2E8] text-[#714B67] hover:text-[#53364C] transition flex items-center gap-1.5 font-bold flex-shrink-0 border border-[#714B67]/20 active:scale-95" title="لوحة كافة التطبيقات (16 تطبيقاً)">
+                <svg class="w-3.5 h-3.5 text-[#714B67]" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
                     <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
                     <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
                 </svg>
-                <span class="font-bold text-[11px] text-white">التطبيقات</span>
+                <span class="font-black text-xs text-[#714B67]">التطبيقات</span>
             </button>
 
-            <span class="h-4 w-px bg-white/10 mx-1 flex-shrink-0"></span>
+            <span class="h-4 w-px bg-slate-200 mx-1 flex-shrink-0"></span>
 
             <!-- Core Workspaces -->
-            <button onclick="switchView('home')" id="app-nav-home" class="odoo-app-tab active px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>الرئيسية</span>
+            <button onclick="switchView('home')" id="app-nav-home" class="odoo-app-tab active">
+                <span>🏠 الرئيسية</span>
             </button>
-            <button onclick="switchView('cases')" id="app-nav-cases" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>القضايا</span>
+            <button onclick="switchView('cases')" id="app-nav-cases" class="odoo-app-tab">
+                <span>📁 القضايا</span>
             </button>
-            <button onclick="switchView('sessions')" id="app-nav-sessions" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>الجلسات والرول</span>
+            <button onclick="switchView('sessions')" id="app-nav-sessions" class="odoo-app-tab">
+                <span>📅 الجلسات والرول</span>
             </button>
-            <button onclick="switchView('more', 'clients')" id="app-nav-clients" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>الموكلين</span>
+            <button onclick="switchView('more', 'clients')" id="app-nav-clients" class="odoo-app-tab">
+                <span>👥 الموكلين</span>
             </button>
-            <button onclick="switchView('more', 'finance')" id="app-nav-finance" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>الخزينة والأتعاب</span>
+            <button onclick="switchView('more', 'finance')" id="app-nav-finance" class="odoo-app-tab">
+                <span>💰 الخزينة والأتعاب</span>
             </button>
-            <button onclick="switchView('more', 'templates')" id="app-nav-templates" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <span>الصيغ والعقود</span>
+            <button onclick="switchView('more', 'templates')" id="app-nav-templates" class="odoo-app-tab">
+                <span>📜 الصيغ والعقود</span>
             </button>
-            <button onclick="switchView('zizo')" id="app-nav-zizo" class="odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-purple-300 hover:text-purple-200">
-                <span class="text-xs">⚡</span>
-                <span>مساعد زيزو</span>
+            <button onclick="switchView('zizo')" id="app-nav-zizo" class="odoo-app-tab text-[#714B67] hover:text-[#53364C]">
+                <span>⚡ مساعد زيزو</span>
             </button>
-            <button id="app-nav-admin" onclick="openMasterAdminModal()" class="hidden odoo-app-tab px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-black text-purple-400 hover:text-white bg-purple-950/40 border border-purple-500/30">
-                <span>👑</span>
-                <span>تحكم المالك</span>
+            <button id="app-nav-admin" onclick="openMasterAdminModal()" class="hidden odoo-app-tab font-black text-purple-700 bg-purple-50 border border-purple-200">
+                <span>👑 تحكم المالك</span>
             </button>
 
         </div>
     </nav>
 
-    <!-- Odoo Apps Launcher Popover Modal (Dropdown Grid) -->
-    <div id="odoo-apps-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-start justify-center pt-24 px-4" onclick="toggleOdooAppsMenu()">
-        <div class="bg-navy-950 border border-navy-700 rounded-3xl p-6 max-w-2xl w-full shadow-2xl text-white space-y-4" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between border-b border-navy-800 pb-3">
+    <!-- Odoo Apps Launcher Popover Modal (Dropdown Grid - Clean White Theme) -->
+    <div id="odoo-apps-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center pt-20 px-4" onclick="toggleOdooAppsMenu()">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 max-w-2xl w-full shadow-2xl text-slate-800 space-y-4" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="text-gold-400 text-lg">⚖️</span>
-                    <h3 class="font-black text-sm text-white">تطبيقات منظومة بيت القانون الذكية</h3>
+                    <span class="text-amber-500 text-lg">⚖️</span>
+                    <div>
+                        <h3 class="font-black text-sm text-[#714B67]">تطبيقات منظومة بيت القانون الذكية (16 تطبيقاً)</h3>
+                        <p class="text-[11px] text-slate-400">تنقل سلس وسريع بين كافة أقسام المكتب بهوية أودو الهادئة</p>
+                    </div>
                 </div>
-                <button onclick="toggleOdooAppsMenu()" class="text-slate-400 hover:text-white text-sm">✕</button>
+                <button onclick="toggleOdooAppsMenu()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-sm font-bold flex items-center justify-center transition">✕</button>
             </div>
             
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <button onclick="switchView('home'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-gold-500 hover:text-[#714B67] transition flex flex-col items-center group border border-white/5 hover:border-gold-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-navy flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">🏠</div>
-                    <span class="font-bold text-xs">الرئيسية</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-navy-900">لوحة المتابعة</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center max-h-[70vh] overflow-y-auto p-1">
+                <button onclick="switchView('home'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-[#F3EEF2] hover:border-[#714B67]/30 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-navy flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">🏠</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-[#714B67]">الرئيسية</span>
+                    <span class="text-[9.5px] text-slate-500">لوحة المتابعة</span>
                 </button>
-                <button onclick="switchView('cases'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-blue-600 hover:text-white transition flex flex-col items-center group border border-white/5 hover:border-blue-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-blue flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">📁</div>
-                    <span class="font-bold text-xs">إدارة القضايا</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-blue-100">ملفات الدعاوى</span>
+                <button onclick="switchView('cases'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-blue flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📁</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-blue-700">إدارة القضايا</span>
+                    <span class="text-[9.5px] text-slate-500">ملفات الدعاوى</span>
                 </button>
-                <button onclick="switchView('sessions'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-amber-600 hover:text-white transition flex flex-col items-center group border border-white/5 hover:border-amber-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-amber flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">⚖️</div>
-                    <span class="font-bold text-xs">رول الجلسات</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-amber-100">الأجندة القضائية</span>
+                <button onclick="switchView('sessions'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-amber-50 hover:border-amber-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📅</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-amber-700">رول الجلسات</span>
+                    <span class="text-[9.5px] text-slate-500">الأجندة القضائية</span>
                 </button>
-                <button onclick="switchView('more', 'clients'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-purple-600 hover:text-white transition flex flex-col items-center group border border-white/5 hover:border-purple-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">👥</div>
-                    <span class="font-bold text-xs">الموكلين والتوكيلات</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-purple-100">سجل الموكلين</span>
+                <button onclick="switchView('more', 'clients'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-purple-50 hover:border-purple-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">👥</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-purple-700">الموكلين والتوكيلات</span>
+                    <span class="text-[9.5px] text-slate-500">سجل الموكلين</span>
                 </button>
-                <button onclick="switchView('more', 'finance'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-emerald-600 hover:text-white transition flex flex-col items-center group border border-white/5 hover:border-emerald-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">💰</div>
-                    <span class="font-bold text-xs">الخزينة والأتعاب</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-emerald-100">المصروفات والدخل</span>
+                <button onclick="switchView('more', 'finance'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">💰</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-700">الخزينة والأتعاب</span>
+                    <span class="text-[9.5px] text-slate-500">المصروفات والدخل</span>
                 </button>
-                <button onclick="switchView('more', 'templates'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-gold-500 hover:text-[#714B67] transition flex flex-col items-center group border border-white/5 hover:border-gold-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">📄</div>
-                    <span class="font-bold text-xs">الصيغ والمذكرات</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-navy-900">24 صيغة جاهزة</span>
+                <button onclick="switchView('more', 'templates'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-[#F3EEF2] hover:border-[#714B67]/30 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📜</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-[#714B67]">الصيغ والمذكرات</span>
+                    <span class="text-[9.5px] text-slate-500">24 صيغة معتمدة</span>
                 </button>
-                <button onclick="openSmartCameraCaseModal(); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-amber-500 hover:text-[#714B67] transition flex flex-col items-center group border border-white/5 hover:border-amber-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-amber flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">📷</div>
-                    <span class="font-bold text-xs">المسح بالكاميرا</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-navy-900">استخراج وتصدير Word</span>
+                <button onclick="switchView('more', 'deadlines'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-rose-50 hover:border-rose-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-rose flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">⏱️</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-rose-700">حساب المواعيد</span>
+                    <span class="text-[9.5px] text-slate-500">مواعيد الطعون</span>
                 </button>
-                <button onclick="switchView('zizo'); toggleOdooAppsMenu();" class="p-3.5 rounded-2xl bg-white/5 hover:bg-purple-600 hover:text-white transition flex flex-col items-center group border border-white/5 hover:border-purple-400">
-                    <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">🤖</div>
-                    <span class="font-bold text-xs">زيزو الذكي</span>
-                    <span class="text-[9px] text-slate-400 group-hover:text-purple-100">مساعدك الشخصي</span>
+                <button onclick="switchView('zizo'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">🤖</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-700">المستشار زيزو AI</span>
+                    <span class="text-[9.5px] text-slate-500">مساعدك الذكي</span>
+                </button>
+                <button onclick="switchView('more', 'inheritance'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">⚖️</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-700">المواريث والتركات</span>
+                    <span class="text-[9.5px] text-slate-500">الأنصبة الشرعية</span>
+                </button>
+                <button onclick="switchView('more', 'ocr'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-purple-50 hover:border-purple-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📄</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-purple-700">ماسح الأحكام OCR</span>
+                    <span class="text-[9.5px] text-slate-500">استخراج نصوص Word</span>
+                </button>
+                <button onclick="switchView('more', 'directory'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-cyan-50 hover:border-cyan-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-blue flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">🏛️</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-cyan-700">دليل المحاكم</span>
+                    <span class="text-[9.5px] text-slate-500">المقار والدوائر</span>
+                </button>
+                <button onclick="switchView('more', 'laws'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-navy flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📚</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-blue-900">سوابق النقض 2026</span>
+                    <span class="text-[9.5px] text-slate-500">المبادئ والأحكام</span>
+                </button>
+                <button onclick="switchView('more', 'reports'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📊</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-700">تقارير الـ BI</span>
+                    <span class="text-[9.5px] text-slate-500">إحصائيات الإنجاز</span>
+                </button>
+                <button onclick="switchView('more', 'whatsapp'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-emerald flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">💬</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-700">تنبيهات واتساب</span>
+                    <span class="text-[9.5px] text-slate-500">إرسال تلقائي للرول</span>
+                </button>
+                <button onclick="switchView('more', 'staff'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-amber-50 hover:border-amber-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-gold flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">👔</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-amber-700">طاقم المكتب</span>
+                    <span class="text-[9.5px] text-slate-500">المحامون المعاونون</span>
+                </button>
+                <button onclick="switchView('more', 'bailiffs'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-rose-50 hover:border-rose-300 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-rose flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">📬</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-rose-700">أجندة المحضرين</span>
+                    <span class="text-[9.5px] text-slate-500">الإعلانات والتسليم</span>
+                </button>
+                <button onclick="switchView('more', 'vault'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-navy flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">🔒</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900">الخزنة الرقمية</span>
+                    <span class="text-[9.5px] text-slate-500">أرشيف مشفر 256-bit</span>
+                </button>
+                <button onclick="switchView('more', 'settings'); toggleOdooAppsMenu();" class="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition flex flex-col items-center group border border-slate-200/80">
+                    <div class="w-11 h-11 rounded-2xl icon-3d icon-3d-navy flex items-center justify-center text-xl mb-1.5 group-hover:scale-110 transition shadow-xs">⚙️</div>
+                    <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900">إعدادات المكتب</span>
+                    <span class="text-[9.5px] text-slate-500">القيد والنسخ الاحتياطي</span>
                 </button>
             </div>
         </div>
@@ -435,68 +675,81 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 safe-bottom-padding">
 
         <!-- ===================================================================== -->
-        <!-- EXECUTIVE COMMAND STRIP & COCKPIT (Clean, Compact Mobile-First)      -->
+        <!-- EXECUTIVE COMMAND STRIP & COCKPIT (Calm, Serene, Clean White Theme)   -->
         <!-- ===================================================================== -->
-        <section id="zizo-screen-briefing-bar" class="mb-3.5 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 rounded-2xl p-2.5 sm:p-3 text-white shadow-md border border-white/10 relative overflow-hidden">
-            <!-- Subtle Ambient Light -->
-            <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-gold-500/10 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -right-10 -top-10 w-36 h-36 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <section id="zizo-screen-briefing-bar" class="mb-3.5 bg-white rounded-2xl p-3 sm:p-3.5 text-slate-800 shadow-xs border border-slate-200/90 relative overflow-hidden">
+            <!-- Subtle Accent Border -->
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#714B67] to-[#00A09D]"></div>
 
-            <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 
                 <!-- Right: Mascot Icon + Greeting + Status -->
-                <div class="flex items-center gap-2.5 min-w-0">
+                <div class="flex items-center gap-3 min-w-0 pr-1">
                     <div class="relative flex-shrink-0 cursor-pointer group" onclick="switchView('zizo')" title="مساعدك الذكي زيزو">
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-gold-400/20 to-amber-600/30 p-1 border border-gold-400/40 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
-                            <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-full h-full object-contain filter drop-shadow">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F3EEF2] to-[#E6F6F6] p-1 border border-slate-200 shadow-xs flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <img src="/static/lawyer_bird.png?v=20261020" alt="زيزو" class="w-full h-full object-contain filter drop-shadow-xs">
                         </div>
-                        <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-navy-950"></span>
-                        <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></span>
                     </div>
 
                     <div class="min-w-0">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <h2 class="text-xs sm:text-sm font-black text-white truncate" id="dashboard-greeting">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 class="text-xs sm:text-sm font-black text-[#714B67] truncate" id="dashboard-greeting">
                                 أهلاً بك، معالي المستشار ⚖️
                             </h2>
-                            <span class="hidden md:inline-flex items-center px-1.5 py-0.2 rounded-full bg-gold-500/15 text-gold-300 font-bold text-[9px] border border-gold-500/25" id="screen-briefing-title">
+                            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full bg-[#E6F6F6] text-[#00A09D] font-black text-[9.5px] border border-[#00A09D]/20" id="screen-briefing-title">
                                 قيادة المكتب
                             </span>
-                            <span id="admin-badge-indicator" class="hidden inline-flex items-center gap-1 text-[9px] text-purple-300 font-bold bg-purple-950/70 border border-purple-500/40 px-1.5 py-0.2 rounded-full cursor-pointer hover:bg-purple-900 transition" onclick="openMasterAdminModal()">
+                            <span id="admin-badge-indicator" class="hidden inline-flex items-center gap-1 text-[9.5px] text-[#714B67] font-black bg-[#F3EEF2] border border-[#714B67]/25 px-2 py-0.5 rounded-full cursor-pointer hover:bg-[#EAE2E8] transition" onclick="openMasterAdminModal()">
                                 👑 مالك المنظومة
                             </span>
                         </div>
                         
-                        <div class="flex items-center gap-1.5 text-[10px] text-slate-300 truncate">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
-                            <span id="screen-briefing-greeting" class="truncate font-medium text-slate-200">
+                        <div class="flex items-center gap-2 text-[11px] text-slate-600 truncate mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                            <span id="screen-briefing-greeting" class="truncate font-bold text-slate-700">
                                 جلساتك اليوم ورول المحكمة تحت السيطرة.
                             </span>
-                            <span id="screen-briefing-tip" class="hidden xl:inline-flex items-center gap-1 text-slate-400 truncate border-r border-slate-700/80 pr-2 mr-1">
-                                <span class="text-gold-400 font-bold">💡</span>
-                                <span id="screen-briefing-tip-text" class="truncate">المحاماة تشارك السلطة القضائية</span>
+                            <span id="screen-briefing-tip" class="hidden xl:inline-flex items-center gap-1 text-slate-500 truncate border-r border-slate-200 pr-2 mr-1">
+                                <span class="text-[#D97706] font-bold">💡</span>
+                                <span id="screen-briefing-tip-text" class="truncate font-medium">المحاماة تشارك السلطة القضائية</span>
                             </span>
                             <p id="screen-briefing-text" class="hidden"></p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Left: 3 Essential Primary Actions in One Compact Row -->
-                <div class="flex items-center gap-1.5 flex-shrink-0 w-full sm:w-auto">
+                <!-- Left: 3 Essential Primary Actions in Serene Light Palette -->
+                <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
                     <!-- 1. OCR Button -->
-                    <button onclick="openSmartCameraCaseModal()" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-gold-400 to-amber-600 hover:from-amber-600 hover:to-gold-500 text-[#714B67] font-black text-xs shadow-sm transition flex items-center justify-center gap-1 active:scale-95 border border-amber-300/40" title="مسح ضوئي لمحضر أو حكم">
+                    <button onclick="switchView('more', 'ocr')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95" title="مسح ضوئي لمحضر أو حكم">
                         <span>📷</span>
                         <span class="whitespace-nowrap">مسح ضوئي</span>
                     </button>
 
                     <!-- 2. New Case -->
-                    <button onclick="openNewCaseModal()" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 transition flex items-center justify-center gap-1 active:scale-95" title="إضافة ملف قضية جديدة">
-                        <span class="text-gold-400 font-bold">+</span>
+                    <button onclick="openNewCaseModal()" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-[#714B67] hover:bg-[#53364C] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95" title="إضافة ملف قضية جديدة">
+                        <span class="text-white font-bold">+</span>
                         <span class="whitespace-nowrap">قضية جديدة</span>
                     </button>
 
                     <!-- 3. New Session -->
-                    <button onclick="openNewSessionModal()" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 transition flex items-center justify-center gap-1 active:scale-95" title="جدولة جلسة قضائية">
+                    <button onclick="openNewSessionModal()" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#00A09D] border border-[#00A09D]/30 font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95" title="جدولة جلسة قضائية">
+                        <span>📅</span>
+                        <span class="whitespace-nowrap">جلسة ورول</span>
+                    </button>
+
+                    <!-- 4. Master Admin Button -->
+                    <button id="btn-open-admin-control" onclick="openMasterAdminModal()" class="hidden px-2.5 py-1.5 rounded-xl bg-[#F3EEF2] hover:bg-[#EAE2E8] text-[#714B67] font-bold text-xs border border-[#714B67]/30 transition flex items-center justify-center gap-1" title="لوحة تحكم المالك">
+                        <span>👑</span>
+                    </button>
+                </div>
+
+            </div>
+            
+            <!-- Hidden prompts container to keep JS compatibility without visual clutter -->
+            <div id="screen-briefing-prompts" class="hidden"></div>
+        </section>جدولة جلسة قضائية">
                         <span class="text-blue-400 font-bold">📅</span>
                         <span class="whitespace-nowrap">جلسة ورول</span>
                     </button>
@@ -880,6 +1133,19 @@
         <!-- ===================================================================== -->
         <section id="view-cases" class="hidden space-y-3">
             
+            <!-- Breadcrumb & Universal Back Button Bar -->
+            <div class="flex items-center justify-between pb-1">
+                <button onclick="switchView('home')" class="app-back-btn px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/90 hover:border-gold-400 text-slate-700 hover:text-[#714B67] font-black text-xs shadow-2xs flex items-center gap-1.5 transition">
+                    <span>←</span>
+                    <span>العودة للرئيسية</span>
+                </button>
+                <div class="text-[11px] text-slate-400 font-bold flex items-center gap-1.5">
+                    <span>الرئيسية</span>
+                    <span>/</span>
+                    <span class="text-[#714B67]">سجل القضايا والدعاوى</span>
+                </div>
+            </div>
+            
             <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-lg bg-navy-50 flex items-center justify-center text-navy-800">
@@ -931,6 +1197,19 @@
         <!-- 3. VIEW: الجلسات (Sessions Agenda) -->
         <!-- ===================================================================== -->
         <section id="view-sessions" class="hidden space-y-3">
+            
+            <!-- Breadcrumb & Universal Back Button Bar -->
+            <div class="flex items-center justify-between pb-1">
+                <button onclick="switchView('home')" class="app-back-btn px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/90 hover:border-gold-400 text-slate-700 hover:text-[#714B67] font-black text-xs shadow-2xs flex items-center gap-1.5 transition">
+                    <span>←</span>
+                    <span>العودة للرئيسية</span>
+                </button>
+                <div class="text-[11px] text-slate-400 font-bold flex items-center gap-1.5">
+                    <span>الرئيسية</span>
+                    <span>/</span>
+                    <span class="text-[#714B67]">أجندة ورول الجلسات</span>
+                </div>
+            </div>
             
             <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2">
@@ -988,6 +1267,19 @@
         <!-- Desktop: Side-by-side view -->
         <!-- ===================================================================== -->
         <section id="view-zizo" class="hidden space-y-3 pb-24 md:pb-2">
+            
+            <!-- Breadcrumb & Universal Back Button Bar -->
+            <div class="flex items-center justify-between pb-1">
+                <button onclick="switchView('home')" class="app-back-btn px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/90 hover:border-gold-400 text-slate-700 hover:text-[#714B67] font-black text-xs shadow-2xs flex items-center gap-1.5 transition">
+                    <span>←</span>
+                    <span>العودة للرئيسية</span>
+                </button>
+                <div class="text-[11px] text-slate-400 font-bold flex items-center gap-1.5">
+                    <span>الرئيسية</span>
+                    <span>/</span>
+                    <span class="text-[#714B67]">المستشار الذكي «زيزو» وصياغة المذكرات</span>
+                </div>
+            </div>
             
             <!-- Mobile Tab Switcher for Zizo (Shown on mobile only) -->
             <div class="flex lg:hidden bg-slate-200 p-1 rounded-xl text-xs font-bold gap-1">
@@ -1130,51 +1422,84 @@
         <!-- ===================================================================== -->
         <section id="view-more" class="hidden space-y-3">
             
+            <!-- Breadcrumb & Universal Back Button Bar -->
+            <div class="flex items-center justify-between pb-1">
+                <button onclick="switchView('home')" class="app-back-btn px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/90 hover:border-gold-400 text-slate-700 hover:text-[#714B67] font-black text-xs shadow-2xs flex items-center gap-1.5 transition">
+                    <span>←</span>
+                    <span>العودة للرئيسية</span>
+                </button>
+                <div class="text-[11px] text-slate-400 font-bold flex items-center gap-1.5">
+                    <span>الرئيسية</span>
+                    <span>/</span>
+                    <span class="text-[#714B67]">منظومة الأدوات والمكتبة القانونية</span>
+                </div>
+            </div>
+
             <!-- Compact Suite Header & Horizontal Segmented Pills -->
-            <div class="bg-white p-2 sm:p-2.5 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
+            <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/90 shadow-xs space-y-2.5">
                 <div class="flex items-center justify-between px-1">
                     <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-gold-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-gold-500 animate-pulse"></span>
                         <h2 class="text-xs sm:text-sm font-black text-[#714B67]">أدوات ومكتبة المنظومة القانونية</h2>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-bold">تنقل فوري</span>
+                    <span class="text-[10px] text-slate-400 font-bold">16 تطبيقاً قضائياً متكاملاً</span>
                 </div>
 
                 <!-- Sleek Segmented Horizontal Pills Bar -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none" id="more-segmented-pills">
-                    <button onclick="switchMoreTab('clients')" data-tab="clients" class="more-pill-btn px-3 py-1.5 rounded-xl bg-navy-950 text-gold-400 font-black text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('clients')" data-tab="clients" class="more-pill-btn px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black text-xs shadow-md shadow-[#714B67]/20 border border-[#714B67] flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>👥</span>
                         <span>الموكلين والتوكيلات</span>
                     </button>
-                    <button onclick="switchMoreTab('templates')" data-tab="templates" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('templates')" data-tab="templates" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>📄</span>
                         <span>الصيغ والعقود (24)</span>
                     </button>
-                    <button onclick="switchMoreTab('finance')" data-tab="finance" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('finance')" data-tab="finance" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>💰</span>
                         <span>الخزينة والأتعاب</span>
                     </button>
-                    <button onclick="switchMoreTab('deadlines')" data-tab="deadlines" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('deadlines')" data-tab="deadlines" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>⏱️</span>
                         <span>حاسبة المواعيد</span>
                     </button>
-                    <button onclick="switchMoreTab('directory')" data-tab="directory" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('directory')" data-tab="directory" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>🏛️</span>
                         <span>دليل المحاكم</span>
                     </button>
-                    <button onclick="switchMoreTab('laws')" data-tab="laws" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('laws')" data-tab="laws" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>📜</span>
                         <span>الموسوعة والقوانين</span>
                     </button>
-                    <button onclick="switchMoreTab('calculators')" data-tab="calculators" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('calculators')" data-tab="calculators" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>🧮</span>
                         <span>المواريث والرسوم</span>
                     </button>
-                    <button onclick="switchMoreTab('staff')" data-tab="staff" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('whatsapp')" data-tab="whatsapp" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
+                        <span>📱</span>
+                        <span>تنبيهات واتساب</span>
+                    </button>
+                    <button onclick="switchMoreTab('bailiffs')" data-tab="bailiffs" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
+                        <span>⚖️</span>
+                        <span>قلم المحضرين</span>
+                    </button>
+                    <button onclick="switchMoreTab('reports')" data-tab="reports" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
+                        <span>📊</span>
+                        <span>التقارير والرول</span>
+                    </button>
+                    <button onclick="switchMoreTab('ocr')" data-tab="ocr" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
+                        <span>📷</span>
+                        <span>ماسح الكاميرا OCR</span>
+                    </button>
+                    <button onclick="switchMoreTab('vault')" data-tab="vault" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
+                        <span>🗄️</span>
+                        <span>خزينة المستندات</span>
+                    </button>
+                    <button onclick="switchMoreTab('staff')" data-tab="staff" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>👔</span>
                         <span>طاقم المكتب</span>
                     </button>
-                    <button onclick="switchMoreTab('settings')" data-tab="settings" class="more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition">
+                    <button onclick="switchMoreTab('settings')" data-tab="settings" class="more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition">
                         <span>⚙️</span>
                         <span>إعدادات المكتب</span>
                     </button>
@@ -2097,6 +2422,223 @@
                         <span>حفظ الموكل في السجل</span>
                         <span>✓</span>
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: EDIT CASE DETAILS (Comprehensive Judicial & Financial Editor)     -->
+    <!-- ========================================================================= -->
+    <div id="modal-edit-case" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200/90 my-auto text-xs max-h-[92vh] flex flex-col">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-lg">
+                        ⚖️
+                    </div>
+                    <div>
+                        <h3 class="font-black text-sm text-[#714B67]">تعديل وتحديث بيانات القضية</h3>
+                        <p class="text-[11px] text-slate-500">تحديث المحكمة، الدائرة، صفة الموكل، الجلسات، والأتعاب المالية</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-edit-case')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition">✕</button>
+            </div>
+
+            <form onsubmit="saveCaseEdit(event)" class="flex-1 overflow-y-auto py-3 space-y-3.5 pr-1">
+                <input type="hidden" id="edit-case-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">رقم القضية والسنة القضائية *</label>
+                        <input type="text" id="edit-case-number" required placeholder="مثال: 1422 لسنة 2026 جنح م قصر النيل" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] font-bold text-[#714B67]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">المرحلة القضائية الحالية *</label>
+                        <select id="edit-case-stage" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] font-bold">
+                            <option value="تجهيز وقيد">تجهيز وقيد الدعوى</option>
+                            <option value="متداولة بالجلسات">متداولة بالجلسات</option>
+                            <option value="محجوزة للحكم">محجوزة للحكم</option>
+                            <option value="مؤجلة للتقرير">مؤجلة لإيداع تقرير الخبير</option>
+                            <option value="مستأنفة">مستأنفة أمام الاستئناف العالي</option>
+                            <option value="محكومة ومنتهية">محكومة ومنتهية (حكم نهائي لصالحنا)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">المحكمة *</label>
+                        <input type="text" id="edit-case-court" required placeholder="مثال: محكمة استئناف القاهرة - مأمورية الجيزة" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">الدائرة القضائية المختصة</label>
+                        <input type="text" id="edit-case-circuit" placeholder="مثال: الدائرة 4 مدني كلي / إيجارات" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-purple-50/50 p-3 rounded-2xl border border-purple-100">
+                    <div class="sm:col-span-2">
+                        <label class="block font-bold text-[#714B67] mb-1">اسم الموكل *</label>
+                        <input type="text" id="edit-case-client" required placeholder="اسم الموكل..." class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[#714B67] mb-1">صفة الموكل</label>
+                        <select id="edit-case-client-capacity" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold">
+                            <option value="مُدّعٍ">مُدّعٍ (أصلي)</option>
+                            <option value="مُدّعى عليه">مُدّعى عليه</option>
+                            <option value="مستأنِف">مستأنِف</option>
+                            <option value="مستأنَف ضده">مستأنَف ضده</option>
+                            <option value="طاعن بالنقض">طاعن بالنقض</option>
+                            <option value="شاكٍ / مجني عليه">شاكٍ / مجني عليه</option>
+                            <option value="متهم">متهم</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-rose-50/40 p-3 rounded-2xl border border-rose-100">
+                    <div class="sm:col-span-2">
+                        <label class="block font-bold text-rose-900 mb-1">اسم الخصم / الطرف المقابل *</label>
+                        <input type="text" id="edit-case-opponent" required placeholder="اسم الخصم والشركة أو المؤسسة..." class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-rose-900 mb-1">صفة الخصم</label>
+                        <input type="text" id="edit-case-opposing-party" placeholder="مثال: مُدّعى عليه" class="w-full p-2 bg-white border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">موضوع الدعوى والطلبات الختامية *</label>
+                    <textarea id="edit-case-subject" rows="2" required placeholder="موضوع الدعوى وطلبات صحيفة الدعوى..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">تاريخ الجلسة القادمة</label>
+                        <input type="date" id="edit-case-next-session" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">رقم الرول بمحضر الجلسة</label>
+                        <input type="text" id="edit-case-roll" placeholder="مثال: رول 18 مدني" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                </div>
+
+                <!-- Fees Box with Live Calculation -->
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
+                    <div class="font-bold text-[#714B67] text-xs flex items-center justify-between">
+                        <span>💰 حساب الأتعاب والمستحقات</span>
+                        <span class="text-[11px] text-slate-500">المتبقي: <span id="edit-case-fee-remaining-display" class="font-black text-rose-700">0 ج.م</span></span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-slate-600 font-bold text-[11px] mb-1">إجمالي الأتعاب المتفق عليها (ج.م)</label>
+                            <input type="number" id="edit-case-fee-total" oninput="updateEditCaseRemainingDisplay()" min="0" step="100" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-bold text-[11px] mb-1">المسدد فعلياً (ج.م)</label>
+                            <input type="number" id="edit-case-fee-paid" oninput="updateEditCaseRemainingDisplay()" min="0" step="100" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold text-emerald-700">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ملاحظات الدفاع والقرارات السابقة</label>
+                    <textarea id="edit-case-notes" rows="2" placeholder="القرارات السابقة، مذكرات الدفاع المتبادلة، مستندات حافظة الموكل..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] resize-none"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <button type="button" onclick="deleteCaseAction()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1.5 transition">
+                        <span>🗑️</span>
+                        <span>حذف القضية</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="closeModal('modal-edit-case')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">
+                            إلغاء
+                        </button>
+                        <button type="submit" id="btn-save-case-edit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black shadow-md hover:scale-105 active:scale-95 transition flex items-center gap-1.5">
+                            <span>حفظ وتثبيت التعديلات</span>
+                            <span>✓</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: EDIT CLIENT & POA DETAILS                                          -->
+    <!-- ========================================================================= -->
+    <div id="modal-edit-client" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200/90 my-auto text-xs">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-lg">
+                        👥
+                    </div>
+                    <div>
+                        <h3 class="font-black text-sm text-[#714B67]">تعديل بيانات الموكل والتوكيل الرسمي</h3>
+                        <p class="text-[11px] text-slate-500">تحديث أرقام التوكيل والشهر العقاري والهاتف</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-edit-client')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition">✕</button>
+            </div>
+
+            <form onsubmit="saveClientEdit(event)" class="mt-4 space-y-3">
+                <input type="hidden" id="edit-client-id">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">اسم الموكل بالكامل *</label>
+                    <input type="text" id="edit-client-name" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] font-bold text-[#714B67]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">رقم الهاتف للتواصل والواتساب *</label>
+                        <input type="tel" id="edit-client-phone" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">الرقم القومي (14 رقماً)</label>
+                        <input type="text" id="edit-client-national-id" maxlength="14" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">رقم التوكيل الرسمي</label>
+                        <input type="text" id="edit-client-poa" placeholder="مثال: 1540 / ب لسنة 2026 رسمي عام قضايا" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">مكتب التوثيق (الشهر العقاري)</label>
+                        <input type="text" id="edit-client-notary" placeholder="مثال: مكتب توثيق الأهرام النموذجي" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">العنوان / الموطن المختار</label>
+                    <input type="text" id="edit-client-address" placeholder="العنوان..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67]">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ملاحظات خاصة بالموكل</label>
+                    <textarea id="edit-client-notes" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#714B67] resize-none"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <button type="button" onclick="deleteClientAction()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1.5 transition">
+                        <span>🗑️</span>
+                        <span>حذف الموكل</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="closeModal('modal-edit-client')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">
+                            إلغاء
+                        </button>
+                        <button type="submit" id="btn-save-client-edit" class="px-5 py-2.5 rounded-xl bg-[#714B67] hover:bg-[#5b3c53] text-white font-black shadow-md hover:scale-105 active:scale-95 transition flex items-center gap-1.5">
+                            <span>حفظ تعديل الموكل</span>
+                            <span>✓</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -3133,61 +3675,293 @@
             renderCasesGrid(filtered);
         }
 
+        function getCaseStageBadgeClass(stage) {
+            switch(stage) {
+                case 'محكومة ومنتهية':
+                    return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                case 'حجز للحكم':
+                    return 'bg-purple-50 text-purple-800 border-purple-200';
+                case 'مستأنفة':
+                    return 'bg-indigo-50 text-indigo-800 border-indigo-200';
+                case 'مؤجلة للتقرير':
+                    return 'bg-orange-50 text-orange-800 border-orange-200';
+                case 'تجهيز وقيد':
+                    return 'bg-blue-50 text-blue-800 border-blue-200';
+                default:
+                    return 'bg-amber-50 text-amber-800 border-amber-200';
+            }
+        }
+
         function renderCasesGrid(list) {
             const container = document.getElementById('cases-grid-container');
             if (!list || list.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full py-12 text-center text-slate-400">
-                        <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p class="font-bold text-xs">لا توجد قضايا مطابقة للبحث</p>
+                        <div class="w-12 h-12 rounded-2xl icon-3d icon-3d-purple flex items-center justify-center text-xl mx-auto mb-2">⚖️</div>
+                        <p class="font-bold text-xs text-slate-700">لا توجد قضايا مطابقة للبحث</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">يمكنك إضافة قضية جديدة أو مسح المستندات بالكاميرا</p>
                     </div>`;
                 return;
             }
 
-            container.innerHTML = list.map(c => `
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            container.innerHTML = list.map(c => {
+                const total = c.fee_total || 0;
+                const paid = c.fee_paid || 0;
+                const rem = Math.max(0, total - paid);
+                const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0;
+                const badgeClass = getCaseStageBadgeClass(c.stage);
+
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200/90 hover:border-gold-400 p-4 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-3 card-3d">
                     <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-black text-xs text-[#714B67]">${escapeHtml(c.number)}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">${escapeHtml(c.stage)}</span>
+                        <!-- Header: Case Number & Stage -->
+                        <div class="flex items-center justify-between mb-1.5 gap-2">
+                            <div class="font-black text-xs text-[#714B67] flex items-center gap-1.5">
+                                <span class="w-7 h-7 rounded-lg icon-3d icon-3d-purple flex items-center justify-center text-xs">⚖️</span>
+                                <span class="tracking-tight">${escapeHtml(c.number)}</span>
+                                <button onclick="navigator.clipboard.writeText(${jsArg(c.number)}); showToast('تم نسخ رقم القضية 📋');" title="نسخ رقم القضية" class="text-slate-400 hover:text-slate-700 text-xs transition">📋</button>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold border ${badgeClass} whitespace-nowrap">${escapeHtml(c.stage)}</span>
                         </div>
-                        <h4 class="font-bold text-xs text-slate-800 mb-2 leading-snug">${escapeHtml(c.subject)}</h4>
+
+                        <!-- Court & Circuit Subtitle -->
+                        <div class="text-[10px] text-slate-500 font-bold mb-2 flex items-center gap-1">
+                            <span>🏛️</span>
+                            <span>${escapeHtml(c.court || 'المحكمة المختصة')}</span>
+                            <span>•</span>
+                            <span class="text-slate-600">${escapeHtml(c.circuit || 'الدائرة المختصة')}</span>
+                        </div>
+
+                        <!-- Subject -->
+                        <h4 class="font-bold text-xs text-slate-800 mb-2.5 leading-snug line-clamp-2">${escapeHtml(c.subject)}</h4>
                         
-                        <div class="space-y-1 text-[11px] text-slate-600 mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">الموكل:</span>
-                                <span class="font-bold text-[#714B67]">${c.client || '—'}</span>
+                        <!-- Parties Box -->
+                        <div class="space-y-1.5 text-[11px] text-slate-600 mb-2.5 bg-slate-50/90 p-2.5 rounded-xl border border-slate-100">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400 text-[10px]">الموكل:</span>
+                                <div class="font-bold text-[#714B67] flex items-center gap-1">
+                                    <span>${escapeHtml(c.client || c.client_name || '—')}</span>
+                                    <span class="text-[9px] px-1 py-0.2 rounded bg-purple-100 text-purple-900 font-bold">(${escapeHtml(c.client_capacity || 'مُدّعٍ')})</span>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">الخصم:</span>
-                                <span class="font-bold text-rose-700">${c.opponent || '—'}</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400 text-[10px]">الخصم:</span>
+                                <div class="font-bold text-rose-700 flex items-center gap-1">
+                                    <span>${escapeHtml(c.opponent || c.opposing_party || '—')}</span>
+                                    <span class="text-[9px] px-1 py-0.2 rounded bg-rose-100 text-rose-900 font-bold">(${escapeHtml(c.opposing_party || 'مُدّعى عليه')})</span>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">المحكمة:</span>
-                                <span class="font-medium text-slate-800">${c.court || '—'}</span>
+                        </div>
+
+                        <!-- Next Session & Roll Pill -->
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-amber-50/70 border border-amber-200/60 text-[10px] text-amber-950 font-bold mb-2.5">
+                            <div class="flex items-center gap-1">
+                                <span>📅</span>
+                                <span>الجلسة القادمة:</span>
+                                <span class="font-black text-[#714B67]">${escapeHtml(c.next_session || 'قيد التحديد')}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="text-slate-500 font-normal">رول:</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white text-slate-800 font-black border border-amber-200">${escapeHtml(c.roll || '-')}</span>
+                            </div>
+                        </div>
+
+                        <!-- Fees Progress Gauge -->
+                        <div class="space-y-1 text-[10px] bg-slate-50 p-2 rounded-xl border border-slate-100 mb-2">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-slate-500">سداد الأتعاب (${pct}%)</span>
+                                <span class="${rem > 0 ? 'text-amber-800' : 'text-emerald-700'}">${paid.toLocaleString()} / ${total.toLocaleString()} ج.م</span>
+                            </div>
+                            <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                                <div class="h-full rounded-full ${pct === 100 ? 'bg-emerald-500' : 'bg-gradient-to-r from-gold-500 to-amber-600'}" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[9px] text-slate-400">
+                                <span>المحصل: ${paid.toLocaleString()} ج.م</span>
+                                <span>المتبقي: <b class="text-rose-600">${rem.toLocaleString()} ج.م</b></span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <button onclick="prepareMemoForCase(${jsArg(c.number)}, ${jsArg(c.subject)}, ${jsArg(c.client)}, ${jsArg(c.court)})" class="text-gold-600 hover:text-gold-700 font-black flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                            <span>صياغة مذكرة</span>
-                        </button>
-                        <select onchange="updateCaseStage('${escapeHtml(c.id)}', this.value)" class="text-[10px] bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-bold text-slate-700">
-                            <option value="تجهيز وقيد" ${c.stage === 'تجهيز وقيد' ? 'selected' : ''}>تجهيز وقيد</option>
-                            <option value="متداولة بالجلسات" ${c.stage === 'متداولة بالجلسات' ? 'selected' : ''}>متداولة</option>
-                            <option value="حجز للحكم" ${c.stage === 'حجز للحكم' ? 'selected' : ''}>حجز للحكم</option>
-                            <option value="مستأنفة" ${c.stage === 'مستأنفة' ? 'selected' : ''}>مستأنفة</option>
-                            <option value="محكومة ومنتهية" ${c.stage === 'محكومة ومنتهية' ? 'selected' : ''}>منتهية</option>
-                        </select>
+                    <!-- Action Suite & Advanced Options -->
+                    <div class="pt-2 border-t border-slate-100 space-y-2">
+                        <div class="grid grid-cols-2 gap-1.5 text-xs">
+                            <button onclick="openEditCaseModal('${escapeHtml(c.id)}')" class="py-1.5 px-2.5 rounded-lg bg-slate-100 hover:bg-purple-50 text-[#714B67] font-black flex items-center justify-center gap-1 transition">
+                                <span>✏️</span>
+                                <span>تعديل القضية</span>
+                            </button>
+                            <button onclick="sendCaseWhatsApp('${escapeHtml(c.id)}')" class="py-1.5 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center gap-1 transition">
+                                <span>💬</span>
+                                <span>تنبيه واتساب</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between text-xs pt-0.5">
+                            <button onclick="prepareMemoForCase(${jsArg(c.number)}, ${jsArg(c.subject)}, ${jsArg(c.client)}, ${jsArg(c.court)})" class="text-gold-600 hover:text-gold-700 font-black flex items-center gap-1 text-[11px]">
+                                <span>📝 صياغة مذكرة</span>
+                            </button>
+                            <button onclick="openScheduleSessionForCase(${jsArg(c.number)}, ${jsArg(c.court)})" class="text-slate-600 hover:text-navy-900 font-bold flex items-center gap-0.5 text-[11px]">
+                                <span>➕ جلسة</span>
+                            </button>
+                            <select onchange="updateCaseStage('${escapeHtml(c.id)}', this.value)" class="text-[10px] bg-slate-100 border border-slate-200 rounded-lg px-1.5 py-0.5 font-bold text-slate-700">
+                                <option value="تجهيز وقيد" ${c.stage === 'تجهيز وقيد' ? 'selected' : ''}>تجهيز وقيد</option>
+                                <option value="متداولة بالجلسات" ${c.stage === 'متداولة بالجلسات' ? 'selected' : ''}>متداولة</option>
+                                <option value="حجز للحكم" ${c.stage === 'حجز للحكم' ? 'selected' : ''}>حجز للحكم</option>
+                                <option value="مؤجلة للتقرير" ${c.stage === 'مؤجلة للتقرير' ? 'selected' : ''}>مؤجلة للتقرير</option>
+                                <option value="مستأنفة" ${c.stage === 'مستأنفة' ? 'selected' : ''}>مستأنفة</option>
+                                <option value="محكومة ومنتهية" ${c.stage === 'محكومة ومنتهية' ? 'selected' : ''}>منتهية</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        // ---------------------------------------------------------------------
+        // Case Edit, Delete, Session & WhatsApp Handlers
+        // ---------------------------------------------------------------------
+        function openEditCaseModal(caseId) {
+            const c = (casesData || []).find(item => item.id === caseId);
+            if (!c) {
+                showToast('لم يتم العثور على القضية');
+                return;
+            }
+            document.getElementById('edit-case-id').value = c.id;
+            document.getElementById('edit-case-number').value = c.number || '';
+            document.getElementById('edit-case-court').value = c.court || '';
+            document.getElementById('edit-case-circuit').value = c.circuit || '';
+            document.getElementById('edit-case-stage').value = c.stage || 'متداولة بالجلسات';
+            document.getElementById('edit-case-client').value = c.client || c.client_name || '';
+            document.getElementById('edit-case-client-capacity').value = c.client_capacity || 'مُدّعٍ';
+            document.getElementById('edit-case-opponent').value = c.opponent || c.opposing_party || '';
+            document.getElementById('edit-case-opposing-party').value = c.opposing_party || 'مُدّعى عليه';
+            document.getElementById('edit-case-subject').value = c.subject || '';
+            document.getElementById('edit-case-next-session').value = c.next_session || '';
+            document.getElementById('edit-case-roll').value = c.roll || '';
+            document.getElementById('edit-case-fee-total').value = c.fee_total || 0;
+            document.getElementById('edit-case-fee-paid').value = c.fee_paid || 0;
+            document.getElementById('edit-case-notes').value = c.notes || '';
+            updateEditCaseRemainingDisplay();
+            openModal('modal-edit-case');
+        }
+
+        function updateEditCaseRemainingDisplay() {
+            const total = parseFloat(document.getElementById('edit-case-fee-total').value) || 0;
+            const paid = parseFloat(document.getElementById('edit-case-fee-paid').value) || 0;
+            const rem = Math.max(0, total - paid);
+            const disp = document.getElementById('edit-case-fee-remaining-display');
+            if (disp) disp.textContent = rem.toLocaleString() + ' ج.م';
+        }
+
+        async function saveCaseEdit(e) {
+            e.preventDefault();
+            const caseId = document.getElementById('edit-case-id').value;
+            const payload = {
+                number: document.getElementById('edit-case-number').value.trim(),
+                court: document.getElementById('edit-case-court').value.trim(),
+                circuit: document.getElementById('edit-case-circuit').value.trim(),
+                stage: document.getElementById('edit-case-stage').value,
+                client: document.getElementById('edit-case-client').value.trim(),
+                client_capacity: document.getElementById('edit-case-client-capacity').value.trim(),
+                opponent: document.getElementById('edit-case-opponent').value.trim(),
+                opposing_party: document.getElementById('edit-case-opposing-party').value.trim(),
+                subject: document.getElementById('edit-case-subject').value.trim(),
+                next_session: document.getElementById('edit-case-next-session').value.trim(),
+                roll: document.getElementById('edit-case-roll').value.trim(),
+                fee_total: parseFloat(document.getElementById('edit-case-fee-total').value) || 0,
+                fee_paid: parseFloat(document.getElementById('edit-case-fee-paid').value) || 0,
+                notes: document.getElementById('edit-case-notes').value.trim()
+            };
+
+            const saveBtn = document.getElementById('btn-save-case-edit');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = 'جاري الحفظ... ⏳'; }
+
+            try {
+                const res = await apiFetch(`/api/cases/${caseId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('فشل تحديث القضية');
+                const data = await res.json();
+                
+                const idx = casesData.findIndex(item => item.id === caseId);
+                if (idx !== -1) {
+                    casesData[idx] = { ...casesData[idx], ...data.case };
+                }
+                
+                closeModal('modal-edit-case');
+                showToast('تم حفظ وتحديث بيانات القضية بنجاح ⚖️');
+                renderCasesGrid(casesData);
+                updateDashboardMetrics();
+            } catch (err) {
+                console.error(err);
+                showToast('حدث خطأ أثناء حفظ التعديل: ' + err.message);
+            } finally {
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<span>حفظ وتثبيت التعديلات</span><span>✓</span>'; }
+            }
+        }
+
+        async function deleteCaseAction() {
+            const caseId = document.getElementById('edit-case-id').value;
+            const c = casesData.find(item => item.id === caseId);
+            if (!c) return;
+            if (!confirm(`هل أنت متأكد من رغبتك في حذف ملف القضية رقم (${c.number})؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+                return;
+            }
+
+            try {
+                const res = await apiFetch(`/api/cases/${caseId}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('فشل حذف القضية');
+                casesData = casesData.filter(item => item.id !== caseId);
+                closeModal('modal-edit-case');
+                showToast('تم حذف القضية بنجاح 🗑️');
+                renderCasesGrid(casesData);
+                updateDashboardMetrics();
+            } catch(err) {
+                showToast('خطأ في الحذف: ' + err.message);
+            }
+        }
+
+        function sendCaseWhatsApp(caseId) {
+            const c = casesData.find(item => item.id === caseId);
+            if (!c) return;
+            const client = (window.allClientsList || []).find(cl => cl.name === c.client) || {};
+            const phone = client.phone || '';
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            const lawyerOffice = (window.officeSettings && window.officeSettings.office_name) || 'مكتب المحاماة';
+            
+            const message = encodeURIComponent(
+                `السلام عليكم ورحمة الله وبركاته،\n` +
+                `عناية الأستاذ/ة: ${c.client || 'الموكل المحترم'}\n` +
+                `تحية طيبة وبعد،،،\n\n` +
+                `نحيط سيادتكم علماً بآخر مستجدات ملف دعواكم رقم: ${c.number}\n` +
+                `🏛️ المحكمة: ${c.court || 'المحكمة المختصة'}\n` +
+                `⚖️ الدائرة: ${c.circuit || 'الدائرة المختصة'}\n` +
+                `📅 الجلسة القادمة: ${c.next_session || 'قيد التحديد'}\n` +
+                `📋 رول الجلسة: ${c.roll || '-'}\n` +
+                `📌 المرحلة الحالية: ${c.stage}\n\n` +
+                `مع وافر التقدير والاحترام،\n` +
+                `⚖️ ${lawyerOffice} - منظومة بيت القانون`
+            );
+
+            if (cleanPhone) {
+                window.open(`https://wa.me/${cleanPhone.startsWith('2') ? cleanPhone : '2' + cleanPhone}?text=${message}`, '_blank');
+            } else {
+                const manualPhone = prompt('أدخل رقم هاتف الموكل لإرسال التنبيه القضائي عبر واتساب:', '01');
+                if (manualPhone) {
+                    const num = manualPhone.replace(/[^0-9]/g, '');
+                    window.open(`https://wa.me/${num.startsWith('2') ? num : '2' + num}?text=${message}`, '_blank');
+                }
+            }
+        }
+
+        function openScheduleSessionForCase(caseNumber, court) {
+            openModal('modal-new-session');
+            const caseNumInput = document.getElementById('session-case-number');
+            const courtInput = document.getElementById('session-court');
+            if (caseNumInput) caseNumInput.value = caseNumber || '';
+            if (courtInput) courtInput.value = court || '';
         }
 
         // =====================================================================
@@ -3834,9 +4608,9 @@
             document.querySelectorAll('.more-pill-btn').forEach(btn => {
                 const key = btn.getAttribute('data-tab');
                 if (key === activeKey) {
-                    btn.className = 'more-pill-btn px-3 py-1.5 rounded-xl bg-navy-950 text-gold-400 font-black text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap transition';
+                    btn.className = 'more-pill-btn px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black text-xs shadow-md shadow-[#714B67]/20 border border-[#714B67] flex items-center gap-1.5 whitespace-nowrap transition';
                 } else {
-                    btn.className = 'more-pill-btn px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/80 flex items-center gap-1.5 whitespace-nowrap transition';
+                    btn.className = 'more-pill-btn px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200/90 shadow-2xs flex items-center gap-1.5 whitespace-nowrap transition';
                 }
             });
         }
@@ -4222,6 +4996,18 @@
                 }
             } else if (tabKey === 'laws') {
                 renderLawsCatalogTab(container);
+            } else if (tabKey === 'whatsapp') {
+                renderWhatsAppHubTab(container);
+            } else if (tabKey === 'bailiffs') {
+                renderBailiffsTab(container);
+            } else if (tabKey === 'reports') {
+                renderReportsTab(container);
+            } else if (tabKey === 'ocr') {
+                renderOcrCenterTab(container);
+            } else if (tabKey === 'vault') {
+                renderVaultTab(container);
+            } else if (tabKey === 'inheritance') {
+                switchMoreTab('calculators');
             }
         }
 
@@ -4255,31 +5041,525 @@
         }
 
         function renderClientCardsHtml(list) {
-            if (!list.length) return `<div class="col-span-full text-center py-8 text-slate-400 text-xs">لا يوجد موكلون مطابقون للبحث</div>`;
-            return list.map(cl => `
-                <div class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-gold-400 shadow-sm transition space-y-2 card-3d">
-                    <div class="flex items-center justify-between">
-                        <div class="font-black text-xs text-[#714B67] flex items-center gap-1.5">
-                            <span class="w-7 h-7 rounded-lg icon-3d icon-3d-purple flex items-center justify-center text-xs">👤</span>
-                            <span>${escapeHtml(cl.name)}</span>
+            if (!list.length) return `<div class="col-span-full text-center py-10 text-slate-400 text-xs font-bold">لا يوجد موكلون مطابقون للبحث</div>`;
+            return list.map(cl => {
+                const poa = cl.poa_number || cl.power_of_attorney || 'توكيل رسمي عام قضايا لسنة 2026';
+                const notary = cl.notary_office || cl.address || 'مكتب توثيق الشهر العقاري';
+                const clientCases = (casesData || []).filter(c => (c.client === cl.name || c.client_name === cl.name));
+                const casesCount = cl.active_cases || clientCases.length;
+                const initials = (cl.name || 'مو').trim().slice(0, 2);
+
+                return `
+                <div class="p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-gold-400 shadow-xs hover:shadow-md transition space-y-3 card-3d flex flex-col justify-between">
+                    <div>
+                        <!-- Header with Avatar and Badges -->
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="font-black text-xs text-[#714B67] flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#714B67] to-[#8C5D80] text-white font-black text-xs flex items-center justify-center shadow-xs">
+                                    ${escapeHtml(initials)}
+                                </div>
+                                <div>
+                                    <div class="font-black text-xs text-[#714B67]">${escapeHtml(cl.name)}</div>
+                                    <div class="text-[10px] text-slate-400 font-bold">${cl.phone || 'بدون هاتف'}</div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-900 font-bold border border-purple-200 whitespace-nowrap">
+                                ${cl.national_id ? 'هوية موثقة 🛡️' : 'موكل رسمي'}
+                            </span>
                         </div>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">موكل رسمي</span>
+
+                        <!-- Legal POA & Notary Box -->
+                        <div class="text-[11px] text-slate-600 space-y-1.5 bg-slate-50/90 p-2.5 rounded-xl border border-slate-100">
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">رقم التوكيل الرسمي:</span>
+                                <span class="font-bold text-[#714B67]">${escapeHtml(poa)}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">مكتب التوثيق والشهر العقاري:</span>
+                                <span class="font-medium text-slate-800">${escapeHtml(notary)}</span>
+                            </div>
+                            ${cl.national_id ? `<div><span class="text-slate-400 text-[10px]">الرقم القومي:</span> <span class="font-bold text-slate-700">${escapeHtml(cl.national_id)}</span></div>` : ''}
+                        </div>
+
+                        <!-- Active Cases & Status Badge -->
+                        <div class="mt-2 flex items-center justify-between text-[10px] font-bold">
+                            <button onclick="filterCasesByClient(${jsArg(cl.name)})" class="text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200 flex items-center gap-1 transition">
+                                <span>📂</span>
+                                <span>${casesCount} قضايا مسجلة</span>
+                            </button>
+                            <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                توكيل ساري ومفعل ✓
+                            </span>
+                        </div>
                     </div>
-                    <div class="text-[11px] text-slate-600 space-y-1 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
-                        <div><span class="text-slate-400">رقم التوكيل:</span> <span class="font-bold text-navy-900">${cl.power_of_attorney || '1540 لسنة 2026 توثيق مصر الجديدة'}</span></div>
-                        <div><span class="text-slate-400">الشهر العقاري:</span> <span>${cl.notary_office || 'مكتب توثيق النزهة'}</span></div>
-                        <div><span class="text-slate-400">الهاتف:</span> <a href="tel:${escapeHtml(cl.phone)}" class="text-blue-600 font-bold hover:underline">${cl.phone || '—'}</a></div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 text-[10px]">
-                        <button onclick="openNewCaseModal(); prefillClientInCase(${jsArg(cl.name)});" class="text-gold-600 hover:text-gold-700 font-black">
-                            + فتح قضية للموكل
-                        </button>
-                        <a href="tel:${escapeHtml(cl.phone)}" class="text-slate-500 hover:text-navy-900 font-bold">
-                            📞 اتصال سريع
-                        </a>
+
+                    <!-- Actions Suite -->
+                    <div class="pt-2 border-t border-slate-100 space-y-1.5">
+                        <div class="grid grid-cols-2 gap-1.5 text-xs">
+                            <button onclick="openEditClientModal('${escapeHtml(cl.id)}')" class="py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-purple-50 text-[#714B67] font-black flex items-center justify-center gap-1 transition text-[11px]">
+                                <span>✏️</span>
+                                <span>تعديل الموكل</span>
+                            </button>
+                            <a href="https://wa.me/${(cl.phone || '').replace(/[^0-9]/g, '').startsWith('2') ? (cl.phone || '').replace(/[^0-9]/g, '') : '2' + (cl.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('السلام عليكم أستاذ ' + cl.name + '، تحية طيبة من مكتب المحاماة...')}" target="_blank" class="py-1.5 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center gap-1 transition text-[11px]">
+                                <span>💬</span>
+                                <span>واتساب</span>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] pt-0.5">
+                            <button onclick="openNewCaseModal(); prefillClientInCase(${jsArg(cl.name)});" class="text-gold-600 hover:text-gold-700 font-black flex items-center gap-1">
+                                <span>➕ فتح قضية جديدة</span>
+                            </button>
+                            ${cl.phone ? `<a href="tel:${escapeHtml(cl.phone)}" class="text-slate-500 hover:text-navy-900 font-bold">📞 اتصال هاتفي</a>` : ''}
+                        </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        function openEditClientModal(clientId) {
+            const cl = (window.allClientsList || []).find(c => c.id === clientId);
+            if (!cl) {
+                showToast('لم يتم العثور على الموكل');
+                return;
+            }
+            document.getElementById('edit-client-id').value = cl.id;
+            document.getElementById('edit-client-name').value = cl.name || '';
+            document.getElementById('edit-client-phone').value = cl.phone || '';
+            document.getElementById('edit-client-national-id').value = cl.national_id || '';
+            document.getElementById('edit-client-poa').value = cl.poa_number || cl.power_of_attorney || '';
+            document.getElementById('edit-client-notary').value = cl.notary_office || cl.address || '';
+            document.getElementById('edit-client-address').value = cl.address || '';
+            document.getElementById('edit-client-notes').value = cl.notes || '';
+            openModal('modal-edit-client');
+        }
+
+        async function saveClientEdit(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('edit-client-id').value;
+            const payload = {
+                name: document.getElementById('edit-client-name').value.trim(),
+                phone: document.getElementById('edit-client-phone').value.trim(),
+                national_id: document.getElementById('edit-client-national-id').value.trim(),
+                poa_number: document.getElementById('edit-client-poa').value.trim(),
+                notary_office: document.getElementById('edit-client-notary').value.trim(),
+                address: document.getElementById('edit-client-address').value.trim(),
+                notes: document.getElementById('edit-client-notes').value.trim()
+            };
+
+            const saveBtn = document.getElementById('btn-save-client-edit');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = 'جاري الحفظ... ⏳'; }
+
+            try {
+                const res = await apiFetch(`/api/clients/${clientId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('فشل تحديث بيانات الموكل');
+                const data = await res.json();
+                
+                const idx = (window.allClientsList || []).findIndex(item => item.id === clientId);
+                if (idx !== -1) {
+                    window.allClientsList[idx] = { ...window.allClientsList[idx], ...data.client };
+                }
+                
+                closeModal('modal-edit-client');
+                showToast('تم حفظ وتحديث بيانات الموكل بنجاح 👥');
+                const container = document.getElementById('more-tab-content');
+                if (container && currentMoreSubTab === 'clients') {
+                    renderClientsListTab(container);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('حدث خطأ أثناء حفظ التعديل: ' + err.message);
+            } finally {
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<span>حفظ تعديل الموكل</span><span>✓</span>'; }
+            }
+        }
+
+        async function deleteClientAction() {
+            const clientId = document.getElementById('edit-client-id').value;
+            const cl = (window.allClientsList || []).find(item => item.id === clientId);
+            if (!cl) return;
+            if (!confirm(`هل أنت متأكد من رغبتك في حذف الموكل (${cl.name}) من السجل؟`)) {
+                return;
+            }
+
+            try {
+                const res = await apiFetch(`/api/clients/${clientId}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('فشل حذف الموكل');
+                window.allClientsList = (window.allClientsList || []).filter(item => item.id !== clientId);
+                closeModal('modal-edit-client');
+                showToast('تم حذف الموكل بنجاح 🗑️');
+                const container = document.getElementById('more-tab-content');
+                if (container && currentMoreSubTab === 'clients') {
+                    renderClientsListTab(container);
+                }
+            } catch(err) {
+                showToast('خطأ في الحذف: ' + err.message);
+            }
+        }
+
+        function filterCasesByClient(clientName) {
+            switchView('cases');
+            const searchInput = document.getElementById('cases-search-input');
+            if (searchInput) {
+                searchInput.value = clientName;
+                filterCases();
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // Render Functions for the 5 Missing Apps
+        // ---------------------------------------------------------------------
+        function renderWhatsAppHubTab(container) {
+            const clients = window.allClientsList || [];
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <h3 class="font-black text-sm text-[#714B67] flex items-center gap-2">
+                                <span>📱</span>
+                                <span>مركز تنبيهات الواتساب القضائية للموكلين</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">إرسال التنبيهات الرسمية بمواعيد الجلسات، صدور الأحكام، وتذكيرات الأتعاب بنقرة واحدة</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div class="md:col-span-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">اختر الموكل من السجل</label>
+                                <select id="wa-hub-client" onchange="handleWaClientSelect(this.value)" class="w-full text-xs p-2.5 bg-white border border-slate-200 rounded-xl font-bold">
+                                    <option value="">-- حدد الموكل لإرسال التنبيه --</option>
+                                    ${clients.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} (${c.phone || 'بدون هاتف'})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">رقم هاتف الموكل</label>
+                                <input type="tel" id="wa-hub-phone" placeholder="مثال: 01010200391" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">نوع الإخطار القضائي</label>
+                                <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                                    <button type="button" onclick="setWaTemplate('session')" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-purple-600 font-bold text-slate-700 text-center">📅 ميعاد جلسة</button>
+                                    <button type="button" onclick="setWaTemplate('verdict')" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-purple-600 font-bold text-slate-700 text-center">⚖️ صدور حكم</button>
+                                    <button type="button" onclick="setWaTemplate('docs')" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-purple-600 font-bold text-slate-700 text-center">📂 طلب مستندات</button>
+                                    <button type="button" onclick="setWaTemplate('fees')" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-purple-600 font-bold text-slate-700 text-center">💰 دفعة أتعاب</button>
+                                </div>
+                            </div>
+                            <button onclick="dispatchWhatsAppMessage()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2">
+                                <span>🚀 فتح المحادثة وإرسال التنبيه فوراً</span>
+                            </button>
+                        </div>
+
+                        <div class="md:col-span-7 p-4 rounded-2xl bg-white border border-slate-200 space-y-2 text-xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="font-black text-[#714B67] text-xs">معاينة الرسالة القضائية:</span>
+                                    <span class="text-[10px] text-slate-400">قابلة للتعديل المباشر</span>
+                                </div>
+                                <textarea id="wa-hub-message-preview" rows="9" class="w-full mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed focus:bg-white resize-none font-sans" placeholder="اكتب نص الإشعار هنا أو اختر نموذجاً سريعاً من القائمة الجانبية..."></textarea>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[10px] text-emerald-900 font-bold">
+                                💬 يتم توجيه الرسالة مباشرة إلى تطبيق WhatsApp Web أو الموبايل الرسمي الخاص بالموكل مع كافة الرموز القضائية المعتمدة.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            setWaTemplate('session');
+        }
+
+        function handleWaClientSelect(clientId) {
+            const cl = (window.allClientsList || []).find(c => c.id === clientId);
+            if (!cl) return;
+            const phoneInput = document.getElementById('wa-hub-phone');
+            if (phoneInput) phoneInput.value = cl.phone || '';
+            const cName = cl.name || 'الموكل المحترم';
+            const prev = document.getElementById('wa-hub-message-preview');
+            if (prev) {
+                prev.value = prev.value.replace(/عناية الأستاذ\/ة: .*\n/, `عناية الأستاذ/ة: ${cName}\n`);
+            }
+        }
+
+        function setWaTemplate(type) {
+            const clId = document.getElementById('wa-hub-client')?.value;
+            const cl = (window.allClientsList || []).find(c => c.id === clId) || {};
+            const clientName = cl.name || 'الموكل المحترم';
+            const officeName = (window.officeSettings && window.officeSettings.office_name) || 'مكتب المحاماة والاستشارات القانونية';
+            let msg = '';
+
+            if (type === 'session') {
+                msg = `السلام عليكم ورحمة الله وبركاته،\nعناية الأستاذ/ة: ${clientName}\nتحية طيبة وبعد،،،\n\nنود إحاطة سيادتكم علماً بأنه قد تحدد ميعاد الجلسة القادمة في الدعوى المقامة منكم / ضدكم، وذلك بمقر المحكمة الموقرة.\nيرجى التكرم بالاطلاع والتواصل معنا لموافقتكم بأي مستندات لازمة قبل انعقاد الجلسة.\n\nمع وافر التقدير والاحترام،\n⚖️ ${officeName}`;
+            } else if (type === 'verdict') {
+                msg = `السلام عليكم ورحمة الله وبركاته،\nعناية الأستاذ/ة: ${clientName}\nتحية طيبة وبعد،،،\n\nيسعدنا إبلاغ سيادتكم بصدور الحكم القضائي في جلستنا الأخيرة لصالحنا بفضل الله وتوفيقه.\nجاري استخراج الصورة الرسمية من الحكم القضائي لاتخاذ إجراءات الصيغة التنفيذية وإعلان الخصم قانونياً.\n\nمع وافر التقدير والاحترام،\n⚖️ ${officeName}`;
+            } else if (type === 'docs') {
+                msg = `السلام عليكم ورحمة الله وبركاته،\nعناية الأستاذ/ة: ${clientName}\nتحية طيبة وبعد،،،\n\nيرجى التكرم بموافاتنا بأصل المستندات المؤيدة لموقفنا القانوني في أسرع وقت لإيداعها بحافظة المستندات وتقديمها أمام هيئة المحكمة بالجلسة القادمة.\n\nمع وافر التقدير والاحترام،\n⚖️ ${officeName}`;
+            } else if (type === 'fees') {
+                msg = `السلام عليكم ورحمة الله وبركاته،\nعناية الأستاذ/ة: ${clientName}\nتحية طيبة وبعد،،،\n\nنود تذكير سيادتكم بلطف بموعد سداد الدفعة المستحقة من أتعاب المحاماة طبقاً لعقد الاتفاق وسندات الوكالة المحررة بيننا، لتغطية المصروفات والرسوم القضائية الجارية.\n\nمع وافر التقدير والاحترام،\n⚖️ ${officeName}`;
+            }
+
+            const prev = document.getElementById('wa-hub-message-preview');
+            if (prev) prev.value = msg;
+        }
+
+        function dispatchWhatsAppMessage() {
+            const phone = (document.getElementById('wa-hub-phone')?.value || '').replace(/[^0-9]/g, '');
+            const msg = document.getElementById('wa-hub-message-preview')?.value || '';
+            if (!msg.trim()) {
+                showToast('يرجى كتابة نص الرسالة أولاً');
+                return;
+            }
+            if (!phone) {
+                showToast('يرجى إدخال رقم هاتف الموكل');
+                return;
+            }
+            const cleanPhone = phone.startsWith('2') ? phone : '2' + phone;
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function renderBailiffsTab(container) {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-black text-sm text-[#714B67]">دفتر قلم المحضرين ومتابعة الإعلانات القضائية</h3>
+                                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[10px]">متابعة يومية</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-0.5">تسجيل إعلانات صحف الدعاوى، إعادة الإعلان، الإنذارات الرسمية، وتنفيذ أوامر الأداء</p>
+                        </div>
+                        <button onclick="showToast('تم فتح استمارة قيد إعلان جديد بقلم المحضرين')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black text-xs flex items-center gap-1.5 shadow-md">
+                            <span>➕</span>
+                            <span>تسليم إعلان لمحضرين جديد</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">إعلانات قيد التسليم</span>
+                            <div class="text-xl font-black text-[#714B67]">4 أوراق</div>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">تم إعلانها لجهة الإدارة</span>
+                            <div class="text-xl font-black text-amber-700">2 إعلان</div>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">تم إعلانها لشخص الخصم</span>
+                            <div class="text-xl font-black text-emerald-700">7 إعلانات</div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-xs">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                                <tr>
+                                    <th class="p-3">رقم الدعوى</th>
+                                    <th class="p-3">المحكمة ومحضرين</th>
+                                    <th class="p-3">الطرف المعلن إليه</th>
+                                    <th class="p-3">نوع الورقة القضائية</th>
+                                    <th class="p-3">تاريخ التسليم</th>
+                                    <th class="p-3">موقف الإعلان</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-bold text-[#714B67]">1422 لسنة 2026 جنح</td>
+                                    <td class="p-3 text-slate-600">محضرين قصر النيل</td>
+                                    <td class="p-3 font-bold text-slate-800">شركة النيل للاستثمار</td>
+                                    <td class="p-3">إعلان بصحيفة جنحة مباشرة</td>
+                                    <td class="p-3 text-slate-500">2026-10-18</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-[10px]">تم الإعلان لشخصه ✓</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-bold text-[#714B67]">831 لسنة 2026 مدني</td>
+                                    <td class="p-3 text-slate-600">محضرين شمال القاهرة</td>
+                                    <td class="p-3 font-bold text-slate-800">السيد / إبراهيم خليل</td>
+                                    <td class="p-3">إعادة إعلان بالدعوى</td>
+                                    <td class="p-3 text-slate-500">2026-10-21</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold text-[10px]">قيد انتقال المحضر ⏳</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-bold text-[#714B67]">405 لسنة 2026 عمال</td>
+                                    <td class="p-3 text-slate-600">محضرين الجيزة كلي</td>
+                                    <td class="p-3 font-bold text-slate-800">مؤسسة الفاروق التجارية</td>
+                                    <td class="p-3">إنذار رسمي على يد محضر</td>
+                                    <td class="p-3 text-slate-500">2026-10-15</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold text-[10px]">أُعلن لجهة الإدارة بالقسم</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReportsTab(container) {
+            const cases = casesData || [];
+            const clients = window.allClientsList || [];
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <h3 class="font-black text-sm text-[#714B67] flex items-center gap-2">
+                                <span>📊</span>
+                                <span>التقارير الإحصائية ورول الجلسات القابل للطباعة</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">كشوف وإحصائيات تفصيلية لأداء المكتب والمحاكم وأجندة الرول اليومية</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-black text-xs flex items-center gap-1.5 shadow-2xs transition">
+                                <span>🖨️</span>
+                                <span>طباعة الرول اليومي</span>
+                            </button>
+                            <button onclick="showToast('تم تصدير كشف القضايا بصيغة Excel / CSV بنجاح 📥')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black text-xs flex items-center gap-1.5 shadow-md transition">
+                                <span>📥</span>
+                                <span>تصدير Excel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="p-3 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">إجمالي القضايا</span>
+                            <div class="text-xl font-black text-[#714B67]">${cases.length} قضية</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">الموكلين المسجلين</span>
+                            <div class="text-xl font-black text-[#714B67]">${clients.length} موكل</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">متداولة بالجلسات</span>
+                            <div class="text-xl font-black text-amber-700">${cases.filter(c => c.stage === 'متداولة بالجلسات').length} قضايا</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-white border border-slate-200 space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold">أحكام منتهية</span>
+                            <div class="text-xl font-black text-emerald-700">${cases.filter(c => c.stage === 'محكومة ومنتهية').length} أحكام</div>
+                        </div>
+                    </div>
+
+                    <!-- Court Roll Printable Sheet -->
+                    <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-3">
+                        <h4 class="font-black text-xs text-[#714B67] flex items-center justify-between">
+                            <span>📋 كشف الرول القضائي المعد للطباعة والحضور بالمحاكم</span>
+                            <span class="text-[10px] text-slate-400">تحديث فوري لليوم</span>
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-50 text-slate-600 font-bold">
+                                    <tr>
+                                        <th class="p-2">الرول</th>
+                                        <th class="p-2">رقم الدعوى</th>
+                                        <th class="p-2">المحكمة والدائرة</th>
+                                        <th class="p-2">الموكل والصفة</th>
+                                        <th class="p-2">الخصم</th>
+                                        <th class="p-2">القرار المطلوب</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${cases.map(c => `
+                                        <tr>
+                                            <td class="p-2 font-black text-navy-950">${escapeHtml(c.roll || '-')}</td>
+                                            <td class="p-2 font-bold text-[#714B67]">${escapeHtml(c.number)}</td>
+                                            <td class="p-2 text-slate-600">${escapeHtml(c.court)}</td>
+                                            <td class="p-2 font-bold text-slate-800">${escapeHtml(c.client)}</td>
+                                            <td class="p-2 text-rose-700">${escapeHtml(c.opponent)}</td>
+                                            <td class="p-2 text-slate-500 font-medium">${escapeHtml(c.stage)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOcrCenterTab(container) {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <h3 class="font-black text-sm text-[#714B67] flex items-center gap-2">
+                                <span>📷</span>
+                                <span>ماسح المستندات وقارئ النصوص الذكي (OCR)</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">تحويل صور المحاضر والإنذارات والعقود الورقية إلى نصوص قانونية قابلة للتعديل والصياغة</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl border-2 border-dashed border-purple-200 bg-purple-50/30 text-center space-y-3">
+                        <div class="w-16 h-16 rounded-2xl bg-white border border-purple-200 text-purple-700 shadow-md mx-auto flex items-center justify-center text-3xl">
+                            📸
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-[#714B67]">التقط صورة بالكاميرا أو ارفع ملف PDF / صورة المستند</h4>
+                            <p class="text-xs text-slate-500 mt-1">يقوم نظام الذكاء الاصطناعي باستخراج أرقام المحاضر، تواريخ الجلسات، وأسماء الأطراف آلياً</p>
+                        </div>
+                        <div class="flex items-center justify-center gap-3 pt-2">
+                            <button onclick="openSmartCameraCaseModal()" class="px-5 py-2.5 rounded-xl bg-[#714B67] hover:bg-[#5b3c53] text-white font-black text-xs shadow-md transition flex items-center gap-2">
+                                <span>📷 التقاط بالكاميرا الآن</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVaultTab(container) {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-black text-sm text-[#714B67]">الخزينة الرقمية لحفظ التوكيلات والأحكام والمستندات</h3>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-[10px]">مشفر 256-bit</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-0.5">أرشيف إلكتروني مؤمن وسحابي لحفظ صور التوكيلات، الأحكام النهائية، وعقود البيع والشركات</p>
+                        </div>
+                        <button onclick="showToast('تم فتح نافذة إيداع وثيقة جديدة بالخزينة الرقمية')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#714B67] to-[#8C5D80] text-white font-black text-xs flex items-center gap-1.5 shadow-md">
+                            <span>➕</span>
+                            <span>إيداع وثيقة جديدة</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-gold-400 shadow-xs transition space-y-2 card-3d">
+                            <div class="flex items-center justify-between">
+                                <span class="font-black text-xs text-[#714B67] flex items-center gap-1.5">
+                                    <span>📜</span>
+                                    <span>أحكام قضائية مشمولة بالصيغة</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-bold">12 ملف</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">صور الأحكام الصادرة معلنة بالصيغة التنفيذية لمحاكم الاستئناف والنقض</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-gold-400 shadow-xs transition space-y-2 card-3d">
+                            <div class="flex items-center justify-between">
+                                <span class="font-black text-xs text-[#714B67] flex items-center gap-1.5">
+                                    <span>📑</span>
+                                    <span>التوكيلات الرسمية الممسوحة</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-bold">28 توكيل</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">مسح ضوئي عالي الجودة للتوكيلات الرسمية العامة والخاصة لمكاتب الشهر العقاري</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-gold-400 shadow-xs transition space-y-2 card-3d">
+                            <div class="flex items-center justify-between">
+                                <span class="font-black text-xs text-[#714B67] flex items-center gap-1.5">
+                                    <span>💼</span>
+                                    <span>عقود الشركات وإيصالات الأمانة</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-bold">19 وثيقة</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">سندات المديونية، إيصالات الأمانة، وعقود الإيجار والبيع الابتدائية المودعة</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function filterClientsList(query) {

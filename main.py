@@ -113,78 +113,78 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 # -----------------------------------------------------------------------------
 # Public demo records only; no real client identities.
 DB = {'cases': [{'id': 'case-1',
-            'number': 'DEMO-001',
+            'number': '1422 لسنة 2026',
             'court': 'محكمة جنح مستأنف قصر النيل',
             'circuit': 'الدائرة الجنائية المستأنفة',
-            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_name': 'المهندس / محمود سامي عبد الرحمن',
             'client_capacity': 'متهم / مستأنف',
-            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'opposing_party': 'شركة النيل للخدمات والتوريد',
             'subject': 'جنحة خيانة أمانة (إيصال أمانة على بياض)',
             'stage': 'sessions',
             'next_session': '2026-04-26',
             'roll': '14',
             'fee_total': 45000,
             'fee_paid': 25000,
-            'notes': 'مثال عرض مصطنع غير حقيقي'},
+            'notes': 'تم الطعن بالتزوير صلباً وتاريخاً وإحالة القضية للطب الشرعي'},
            {'id': 'case-2',
-            'number': 'DEMO-002',
+            'number': '831 لسنة 2026',
             'court': 'شمال القاهرة الابتدائية (العباسية)',
             'circuit': 'الدائرة 14 مدني كلي',
-            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_name': 'شركة الأهرام للتجارة والمقاولات',
             'client_capacity': 'مدعى عليه',
-            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'opposing_party': 'مؤسسة الفيروز للتطوير العقاري',
             'subject': 'مطالبة مدنية بالتعويض عن إخلال عقدي',
             'stage': 'study',
             'next_session': '2026-05-10',
             'roll': '7',
             'fee_total': 80000,
             'fee_paid': 40000,
-            'notes': 'مثال عرض مصطنع غير حقيقي'},
+            'notes': 'ندب خبير هندسي لبيان نسب التنفيذ والتوريدات'},
            {'id': 'case-3',
-            'number': 'DEMO-003',
+            'number': '504 لسنة 2026',
             'court': 'محكمة أسرة مصر الجديدة',
             'circuit': 'الدائرة 2 أسرة',
-            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_name': 'السيدة / فريدة خالد المنشاوي',
             'client_capacity': 'مدعية',
-            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'opposing_party': 'أحمد طارق الشناوي',
             'subject': 'دعوى تطليق خلعاً ونفقة صغار',
             'stage': 'judgment',
             'next_session': '2026-04-22',
             'roll': '22',
             'fee_total': 35000,
             'fee_paid': 35000,
-            'notes': 'مثال عرض مصطنع غير حقيقي'},
+            'notes': 'محجوزة للحكم بجلسة 22 أبريل مع التصريح بمذكرات'},
            {'id': 'case-4',
-            'number': 'DEMO-004',
+            'number': '1120 لسنة 2026',
             'court': 'محكمة الجيزة الابتدائية (شارع السودان)',
             'circuit': 'الدائرة 6 إيجارات',
-            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_name': 'الحاج / إبراهيم عبد التواب',
             'client_capacity': 'مدعي (مالك العقار)',
-            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'opposing_party': 'ورثة المرحوم / عثمان عبد ربه',
             'subject': 'طرد للغصب وإنهاء علاقة إيجارية لانتفاء الامتداد',
             'stage': 'execution',
             'next_session': '2026-04-30',
             'roll': '3',
             'fee_total': 60000,
             'fee_paid': 55000,
-            'notes': 'مثال عرض مصطنع غير حقيقي'},
+            'notes': 'إعلان الصيغة التنفيذية ومخاطبة قسم الشرطة لفتح المحل'},
            {'id': 'case-5',
-            'number': 'DEMO-005',
+            'number': '1982 لسنة 2026',
             'court': 'محكمة جنايات القاهرة (التجمع الخامس)',
             'circuit': 'الدائرة 3 جنايات شمال',
-            'client_name': 'مثال عرض مصطنع غير حقيقي',
+            'client_name': 'كريم حسن الديب',
             'client_capacity': 'متهم ثانٍ',
-            'opposing_party': 'مثال عرض مصطنع غير حقيقي',
+            'opposing_party': 'النيابة العامة',
             'subject': 'حيازة وإحراز مواد مخدرة وسلاح بدون ترخيص',
             'stage': 'sessions',
             'next_session': '2026-05-18',
             'roll': '5',
             'fee_total': 120000,
             'fee_paid': 70000,
-            'notes': 'مثال عرض مصطنع غير حقيقي'}],
+            'notes': 'الدفع ببطلان القبض والتفتيش لانتفاء حالة التلبس'}],
  'sessions': [{'id': 'sess-1',
                'roll': '14',
-               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'case_number': '1422 لسنة 2026 جنح م قصر النيل',
                'court': 'محكمة جنح مستأنف قصر النيل',
                'date': '2026-04-26',
                'day': 'الأحد',
@@ -193,7 +193,7 @@ DB = {'cases': [{'id': 'case-1',
                'action_required': 'إيداع مذكرة الدفاع والطعن بالتزوير صلباً وتاريخاً'},
               {'id': 'sess-2',
                'roll': '22',
-               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'case_number': '504 لسنة 2026 أسرة مصر الجديدة',
                'court': 'محكمة أسرة مصر الجديدة',
                'date': '2026-04-22',
                'day': 'الأربعاء',
@@ -202,7 +202,7 @@ DB = {'cases': [{'id': 'case-1',
                'action_required': 'حضور جلسة النطق بالحكم واستلام الصورة الرسمية التنفيذية'},
               {'id': 'sess-3',
                'roll': '7',
-               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'case_number': '831 لسنة 2026 مدني شمال القاهرة',
                'court': 'محكمة شمال القاهرة الابتدائية',
                'date': '2026-05-10',
                'day': 'الأحد',
@@ -211,7 +211,7 @@ DB = {'cases': [{'id': 'case-1',
                'action_required': 'حضور أمام مكتب الخبراء وتقديم المستندات والرسائل المتبادلة'},
               {'id': 'sess-4',
                'roll': '5',
-               'case_number': 'مثال عرض مصطنع غير حقيقي',
+               'case_number': '1982 لسنة 2026 جنايات القاهرة',
                'court': 'محكمة جنايات القاهرة (التجمع الخامس)',
                'date': '2026-05-18',
                'day': 'الإثنين',
@@ -219,80 +219,80 @@ DB = {'cases': [{'id': 'case-1',
                'last_decision': 'سماع أقوال ضابط الواقعة',
                'action_required': 'مناقشة الضابط في التلبس وتناقض أقواله بمحضر الضبط مع المعاينة'}],
  'clients': [{'id': 'cl-1',
-              'name': 'مثال عرض مصطنع غير حقيقي',
-              'national_id': '',
-              'phone': '',
-              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'name': 'المهندس / محمود سامي عبد الرحمن',
+              'national_id': '28509140102345',
+              'phone': '01010200391',
+              'poa_number': '1452 لسنة 2026 توثيق النزهة',
               'poa_type': 'توكيل رسمي عام قضايا وبنوك',
               'active_cases': 1,
-              'address': 'مثال عرض مصطنع غير حقيقي'},
+              'address': 'مصر الجديدة، القاهرة'},
              {'id': 'cl-2',
-              'name': 'مثال عرض مصطنع غير حقيقي',
-              'national_id': '',
-              'phone': '',
-              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'name': 'شركة الأهرام للتجارة والمقاولات (ش.م.م)',
+              'national_id': '100458921',
+              'phone': '01123456780',
+              'poa_number': '3890 لسنة 2025 توثيق الاستثمار',
               'poa_type': 'توكيل شركات وتفويض إدارة',
               'active_cases': 1,
-              'address': 'مثال عرض مصطنع غير حقيقي'},
+              'address': 'المنطقة الصناعية، التجمع الخامس'},
              {'id': 'cl-3',
-              'name': 'مثال عرض مصطنع غير حقيقي',
-              'national_id': '',
-              'phone': '',
-              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'name': 'السيدة / فريدة خالد المنشاوي',
+              'national_id': '29011200108876',
+              'phone': '01298765432',
+              'poa_number': '2105 لسنة 2026 توثيق مدينة نصر',
               'poa_type': 'توكيل قضايا وأحوال شخصية',
               'active_cases': 1,
-              'address': 'مثال عرض مصطنع غير حقيقي'},
+              'address': 'حي السفارات، مدينة نصر'},
              {'id': 'cl-4',
-              'name': 'مثال عرض مصطنع غير حقيقي',
-              'national_id': '',
-              'phone': '',
-              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'name': 'الحاج / إبراهيم عبد التواب',
+              'national_id': '26504031205541',
+              'phone': '01065432198',
+              'poa_number': '980 لسنة 2024 توثيق الجيزة',
               'poa_type': 'توكيل رسمي عام قضايا',
               'active_cases': 1,
-              'address': 'مثال عرض مصطنع غير حقيقي'},
+              'address': 'شارع السودان، الدقي'},
              {'id': 'cl-5',
-              'name': 'مثال عرض مصطنع غير حقيقي',
-              'national_id': '',
-              'phone': '',
-              'poa_number': 'مثال عرض مصطنع غير حقيقي',
+              'name': 'كريم حسن الديب',
+              'national_id': '29508190104321',
+              'phone': '01555544332',
+              'poa_number': '672 لسنة 2026 توثيق الوايلي',
               'poa_type': 'توكيل خاص جنايات',
               'active_cases': 1,
-              'address': 'مثال عرض مصطنع غير حقيقي'}],
+              'address': 'العباسية، القاهرة'}],
  'finance': {'ledger': [{'id': 'trn-1',
                          'date': '2026-04-18',
-                         'client': 'مثال عرض مصطنع غير حقيقي',
-                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'client': 'المهندس / محمود سامي',
+                         'case': '1422 لسنة 2026 جنح م قصر النيل',
                          'amount': 15000,
                          'type': 'income',
-                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'description': 'دفعة مقدم أتعاب استئناف وإعداد مذكرة الدفاع',
                          'status': 'مقبوض نقداً بالخزينة'},
                         {'id': 'trn-2',
                          'date': '2026-04-15',
-                         'client': 'مثال عرض مصطنع غير حقيقي',
-                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'client': 'شركة الأهرام للتجارة',
+                         'case': '831 لسنة 2026 مدني شمال',
                          'amount': 20000,
                          'type': 'income',
-                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'description': 'أمانة خبير هندسي وسداد قسط تعاقدي',
                          'status': 'تحويل إنستاباي InstaPay'},
                         {'id': 'trn-3',
                          'date': '2026-04-14',
-                         'client': 'مثال عرض مصطنع غير حقيقي',
-                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'client': 'مصروفات قضائية عامة',
+                         'case': 'رسوم قيد وإعلانات محضرين',
                          'amount': 3500,
                          'type': 'expense',
-                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'description': 'رسوم نسبية ودمغات نقابة وتصوير ملفات',
                          'status': 'مدفوع بإيصال رسمي'},
                         {'id': 'trn-4',
                          'date': '2026-04-10',
-                         'client': 'مثال عرض مصطنع غير حقيقي',
-                         'case': 'مثال عرض مصطنع غير حقيقي',
+                         'client': 'كريم حسن الديب',
+                         'case': '1982 لسنة 2026 جنايات التجمع',
                          'amount': 40000,
                          'type': 'income',
-                         'description': 'مثال عرض مصطنع غير حقيقي',
+                         'description': 'دفعة أتعاب مرافعة جنايات ونقض',
                          'status': 'تحويل بنكي CIB'}]},
  'reception': [{'id': 'rec-1',
                 'time': '09:30 ص',
-                'visitor_name': 'مثال عرض مصطنع غير حقيقي',
+                'visitor_name': 'أحمد فؤاد علام',
                 'phone': '',
                 'purpose': 'استشارة في نزاع ملكية عقار وتثبيت ملكية بالمعادي',
                 'assigned_to': 'مثال عرض مصطنع غير حقيقي',
@@ -1337,6 +1337,35 @@ class NewCaseRequest(BaseModel):
     documents: Optional[List[Dict[str, Any]]] = None
     photo_data: Optional[str] = ""
 
+class UpdateCaseRequest(BaseModel):
+    number: Optional[str] = None
+    court: Optional[str] = None
+    circuit: Optional[str] = None
+    client_name: Optional[str] = None
+    client: Optional[str] = None
+    client_capacity: Optional[str] = None
+    opposing_party: Optional[str] = None
+    opponent: Optional[str] = None
+    subject: Optional[str] = None
+    stage: Optional[str] = None
+    fee_total: Optional[float] = None
+    fee_paid: Optional[float] = None
+    next_session: Optional[str] = None
+    roll: Optional[str] = None
+    notes: Optional[str] = None
+    memo_text: Optional[str] = None
+
+class UpdateClientRequest(BaseModel):
+    name: Optional[str] = None
+    national_id: Optional[str] = None
+    phone: Optional[str] = None
+    poa_number: Optional[str] = None
+    power_of_attorney: Optional[str] = None
+    poa_type: Optional[str] = None
+    address: Optional[str] = None
+    notary_office: Optional[str] = None
+    notes: Optional[str] = None
+
 class NewSessionRequest(BaseModel):
     case_number: str
     court: str
@@ -2312,6 +2341,77 @@ async def update_case_stage(
             return {"status": "success", "case": c}
     raise HTTPException(status_code=404, detail="القضية غير موجودة")
 
+@app.put("/api/cases/{case_id}")
+async def update_case_details(
+    case_id: str,
+    case_data: UpdateCaseRequest,
+    x_office_token: Optional[str] = Header(None),
+    authorization: Optional[str] = Header(None)
+):
+    office = resolve_office(x_office_token, authorization)
+    check_trial_permission(office, for_mutation=True)
+    db = office["data"]
+
+    for c in db["cases"]:
+        if c["id"] == case_id:
+            if case_data.number is not None and case_data.number.strip():
+                old_number = c.get("number")
+                c["number"] = case_data.number.strip()
+                if old_number and old_number != c["number"]:
+                    for s in db.get("sessions", []):
+                        if s.get("case_number") == old_number:
+                            s["case_number"] = c["number"]
+            if case_data.court is not None:
+                c["court"] = case_data.court.strip()
+            if case_data.circuit is not None:
+                c["circuit"] = case_data.circuit.strip()
+            if case_data.client is not None or case_data.client_name is not None:
+                val = (case_data.client or case_data.client_name or "").strip()
+                if val:
+                    c["client"] = val
+                    c["client_name"] = val
+            if case_data.client_capacity is not None:
+                c["client_capacity"] = case_data.client_capacity.strip()
+            if case_data.opponent is not None or case_data.opposing_party is not None:
+                val = (case_data.opponent or case_data.opposing_party or "").strip()
+                if val:
+                    c["opponent"] = val
+                    c["opposing_party"] = val
+            if case_data.subject is not None and case_data.subject.strip():
+                c["subject"] = case_data.subject.strip()
+            if case_data.stage is not None and case_data.stage.strip():
+                c["stage"] = case_data.stage.strip()
+            if case_data.fee_total is not None:
+                c["fee_total"] = float(case_data.fee_total)
+            if case_data.fee_paid is not None:
+                c["fee_paid"] = float(case_data.fee_paid)
+            if case_data.next_session is not None:
+                c["next_session"] = case_data.next_session.strip()
+            if case_data.roll is not None:
+                c["roll"] = case_data.roll.strip()
+            if case_data.notes is not None:
+                c["notes"] = case_data.notes.strip()
+            if case_data.memo_text is not None:
+                c["memo_text"] = case_data.memo_text
+            return {"status": "success", "case": c}
+    raise HTTPException(status_code=404, detail="القضية غير موجودة")
+
+@app.delete("/api/cases/{case_id}")
+async def delete_case(
+    case_id: str,
+    x_office_token: Optional[str] = Header(None),
+    authorization: Optional[str] = Header(None)
+):
+    office = resolve_office(x_office_token, authorization)
+    check_trial_permission(office, for_mutation=True)
+    db = office["data"]
+
+    for i, c in enumerate(db["cases"]):
+        if c["id"] == case_id:
+            removed = db["cases"].pop(i)
+            return {"status": "success", "message": "تم حذف القضية بنجاح", "deleted_id": case_id}
+    raise HTTPException(status_code=404, detail="القضية غير موجودة")
+
 # -----------------------------------------------------------------------------
 # 3. رول الجلسات والأجندة اليومية (Sessions)
 # -----------------------------------------------------------------------------
@@ -2405,6 +2505,57 @@ async def create_client(
     }
     db["clients"].insert(0, new_cl)
     return {"status": "success", "client": new_cl}
+
+@app.put("/api/clients/{client_id}")
+async def update_client(
+    client_id: str,
+    client_data: UpdateClientRequest,
+    x_office_token: Optional[str] = Header(None),
+    authorization: Optional[str] = Header(None)
+):
+    office = resolve_office(x_office_token, authorization)
+    check_trial_permission(office, for_mutation=True)
+    db = office["data"]
+
+    for cl in db["clients"]:
+        if cl["id"] == client_id:
+            if client_data.name is not None and client_data.name.strip():
+                cl["name"] = client_data.name.strip()
+            if client_data.national_id is not None:
+                cl["national_id"] = client_data.national_id.strip()
+            if client_data.phone is not None:
+                cl["phone"] = client_data.phone.strip()
+            if client_data.poa_number is not None or client_data.power_of_attorney is not None:
+                val = (client_data.poa_number or client_data.power_of_attorney or "").strip()
+                if val:
+                    cl["poa_number"] = val
+                    cl["power_of_attorney"] = val
+            if client_data.poa_type is not None:
+                cl["poa_type"] = client_data.poa_type.strip()
+            if client_data.address is not None:
+                cl["address"] = client_data.address.strip()
+            if client_data.notary_office is not None:
+                cl["notary_office"] = client_data.notary_office.strip()
+            if client_data.notes is not None:
+                cl["notes"] = client_data.notes.strip()
+            return {"status": "success", "client": cl}
+    raise HTTPException(status_code=404, detail="الموكل غير موجود")
+
+@app.delete("/api/clients/{client_id}")
+async def delete_client(
+    client_id: str,
+    x_office_token: Optional[str] = Header(None),
+    authorization: Optional[str] = Header(None)
+):
+    office = resolve_office(x_office_token, authorization)
+    check_trial_permission(office, for_mutation=True)
+    db = office["data"]
+
+    for i, cl in enumerate(db["clients"]):
+        if cl["id"] == client_id:
+            removed = db["clients"].pop(i)
+            return {"status": "success", "message": "تم حذف الموكل بنجاح", "deleted_id": client_id}
+    raise HTTPException(status_code=404, detail="الموكل غير موجود")
 
 # -----------------------------------------------------------------------------
 # 5. حسابات الأتعاب والخزينة (Finance)
