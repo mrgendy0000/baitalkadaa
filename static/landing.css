@@ -1,6 +1,6 @@
 /* ============================================================
    BAYT AL-QADAA — ODOO DESIGN SYSTEM (هوية أودو الرسمية)
-   Colors: Signature Odoo Purple (#714B67), Odoo Teal (#00A09D),
+   Colors: Signature Odoo Purple (#102c46), Odoo Teal (#00A09D),
            Pure White (#FFFFFF), Clean Charcoal (#212529)
    ============================================================ */
 
@@ -143,7 +143,7 @@ p {
     padding: 11px 22px !important;
     border-radius: 9px !important;
     border: none !important;
-    box-shadow: 0 4px 14px rgba(113, 75, 103, 0.25) !important;
+    box-shadow: 0 4px 14px rgba(16, 44, 70, 0.25) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 8px !important;
@@ -155,7 +155,7 @@ p {
 .odoo-btn-primary:hover, .odoo-btn-burgundy:hover, .odoo-hero-btn-primary:hover {
     background: var(--primary-dark) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 22px rgba(113, 75, 103, 0.35) !important;
+    box-shadow: 0 8px 22px rgba(16, 44, 70, 0.35) !important;
 }
 
 .odoo-btn-secondary, .odoo-hero-btn-secondary {
@@ -184,7 +184,7 @@ p {
    TOP ANNOUNCEMENT BAR
    ============================================================ */
 .announcement-bar {
-    background: linear-gradient(90deg, #714B67 0%, #53364C 50%, #714B67 100%) !important;
+    background: linear-gradient(90deg, #102c46 0%, #091d30 50%, #102c46 100%) !important;
     color: #FFFFFF !important;
     padding: 10px 24px !important;
     text-align: center !important;
@@ -456,7 +456,7 @@ p {
     background: var(--primary) !important;
     color: #FFFFFF !important;
     border-color: var(--primary) !important;
-    box-shadow: 0 6px 18px rgba(113, 75, 103, 0.3) !important;
+    box-shadow: 0 6px 18px rgba(16, 44, 70, 0.3) !important;
 }
 
 .sector-feature-card {

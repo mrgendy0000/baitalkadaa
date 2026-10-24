@@ -57,6 +57,14 @@
     const privacyNote=node('p','Gemini المجاني للأسئلة العامة فقط. لا تُرسل ملفات المكتب. استخدم الأدوات المحلية للبيانات الخاصة.','zizo-public-note');
     document.querySelector('.zizo-tools').append(privacy,privacyNote);
     const toolsLink=node('a','أدوات مجانية ↗'); toolsLink.href='/static/legal-tools.html'; toolsLink.target='_blank'; toolsLink.rel='noopener'; document.querySelector('.zizo-tools-row').append(toolsLink);
+    const accountLink=node('button','استخدام حسابي في Gemini ↗','zizo-action'); accountLink.type='button';
+    accountLink.onclick=()=>{
+        const dialog=node('dialog',undefined,'zizo-account-dialog');
+        dialog.append(node('h3','فتح Gemini بحساب Google الخاص بك'),node('p','يفتح موقع Gemini في تبويب مستقل. هذا ليس ربطاً آلياً بالمساعد ولا يرفع حصة API. لن يُرسل سؤالك أو سجل المحادثة أو ملفات المكتب. راجع أي نص بنفسك قبل لصقه هناك.'));
+        const link=node('a','فتح Gemini ↗','zizo-action');link.href='https://gemini.google.com/';link.target='_blank';link.rel='noopener noreferrer';dialog.append(link);
+        action(dialog,'إغلاق',()=>dialog.close());dialog.addEventListener('close',()=>dialog.remove());document.body.append(dialog);dialog.showModal();
+    };
+    document.querySelector('.zizo-tools-row').append(accountLink);
     function welcome() {
         stream.replaceChildren();
         append('assistant', 'أهلاً بيك، أنا زيزو. اسأل عن مادة من الدستور بالمصدر، أو استخدم أدوات ترتيب الوقائع ومقارنة النصوص.\nتحليل Gemini مخصص للأسئلة العامة غير السرية ويتطلب توافر الخدمة. لا أملك اعتماداً قضائياً ولا أضمن نتيجة حكم.', { engine: 'guide', actions: [] });
@@ -84,7 +92,7 @@
             try { const saved = JSON.parse(sessionStorage.getItem(storageKey) || '[]'); history = Array.isArray(saved) ? saved.filter(m => ['user','assistant'].includes(m.role) && typeof m.content === 'string' && m.content.length <= 16000).slice(-20) : []; } catch { history = []; }
             welcome(); history.forEach(m => append(m.role, m.content, m.response || { engine: 'guide' }));
         }
-        try { const response = await apiFetch('/api/ai/status'); if (!response.ok) throw Error(); const data = await response.json(); publicOnly = data.public_questions_only !== false; const researchLabel=document.querySelector('.zizo-research'); if(publicOnly && researchLabel?.lastChild?.nodeType===Node.TEXT_NODE)researchLabel.lastChild.textContent=' مراجع الدستور'; privacy.hidden=!publicOnly; privacyNote.hidden=!publicOnly; caseSelect.disabled=publicOnly; if(publicOnly)caseSelect.value=''; input.placeholder=publicOnly?'سؤال قانوني عام بدون أسماء أو بيانات سرية…':'اكتب سؤالك…'; status.textContent = data.configured ? (publicOnly?'Gemini جاهز · أسئلة عامة':'جاهز للاتصال بالنموذج') : 'الأدوات المحلية جاهزة · مفتاح Gemini غير مفعّل'; } catch { status.textContent = 'تعذر فحص الاتصال'; }
+        try { const response = await apiFetch('/api/ai/status'); if (!response.ok) throw Error(); const data = await response.json(); publicOnly = data.public_questions_only !== false; const researchLabel=document.querySelector('.zizo-research'); if(publicOnly && researchLabel?.lastChild?.nodeType===Node.TEXT_NODE)researchLabel.lastChild.textContent=' مراجع الدستور'; privacy.hidden=!publicOnly; privacyNote.hidden=!publicOnly; caseSelect.disabled=publicOnly; if(publicOnly)caseSelect.value=''; input.placeholder=publicOnly?'سؤال قانوني عام بدون أسماء أو بيانات سرية…':'اكتب سؤالك…'; status.textContent = data.configured ? (publicOnly?'Gemini مُعدّ · التوفر حسب حصة Google':'جاهز للاتصال بالنموذج') : 'الأدوات المحلية جاهزة · مفتاح Gemini غير مفعّل'; } catch { status.textContent = 'تعذر فحص الاتصال'; }
     }
     function boundedHistory() {
         const messages = history.slice(-16).map(m => ({ role:m.role, content:m.content.slice(0,16000), public_query:m.public_query===true }));

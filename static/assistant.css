@@ -4,9 +4,9 @@
 #zizo-panel-chat > div:first-child > div > div:last-child > div:first-child { flex-wrap: wrap; }
 #zizo-connection-status { line-height: 1.9; }
 .zizo-tools { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; background: #fafbfc; color: #475569; font-size: 11px; }
-.zizo-tools > label { display: block; margin-bottom: 4px; font-weight: 700; color: #714B67; }
+.zizo-tools > label { display: block; margin-bottom: 4px; font-weight: 700; color: #102c46; }
 .zizo-tools select { max-width: 100%; color: #1e293b; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 6px 10px; min-height: 36px; font-weight: 600; outline: none; transition: all 0.2s; }
-.zizo-tools select:focus { border-color: #714B67; box-shadow: 0 0 0 2px rgba(113, 75, 103, 0.2); }
+.zizo-tools select:focus { border-color: #102c46; box-shadow: 0 0 0 2px rgba(16, 44, 70, 0.2); }
 #zizo-case-context { width: 100%; }
 .zizo-tools-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 .zizo-tools-row a { color: #00A09D; margin-inline-start: auto; font-weight: 800; text-decoration: none; }
@@ -17,25 +17,25 @@
 .zizo-message { display: flex; margin: 0 0 16px; animation: zizo-msg-fade 0.25s ease-out; }
 @keyframes zizo-msg-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .zizo-message.user { justify-content: flex-end; }
-.zizo-bubble { max-width: 94%; padding: 15px 18px; border-radius: 18px 4px 18px 18px; background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13.5px; line-height: 2.0; overflow-wrap: anywhere; box-shadow: 0 3px 12px rgba(113, 75, 103, 0.05); }
+.zizo-bubble { max-width: 94%; padding: 15px 18px; border-radius: 18px 4px 18px 18px; background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; font-size: 13.5px; line-height: 2.0; overflow-wrap: anywhere; box-shadow: 0 3px 12px rgba(16, 44, 70, 0.05); }
 .zizo-message:not(.user) .zizo-bubble { border-right: 4px solid #00A09D; background: #ffffff; }
-.user .zizo-bubble { white-space: pre-wrap; background: linear-gradient(135deg, #714B67 0%, #53364C 100%); color: #ffffff; border: 0; border-radius: 18px 18px 4px 18px; max-width: 87%; box-shadow: 0 4px 16px rgba(113, 75, 103, 0.25); font-weight: 500; }
+.user .zizo-bubble { white-space: pre-wrap; background: linear-gradient(135deg, #102c46 0%, #091d30 100%); color: #ffffff; border: 0; border-radius: 18px 18px 4px 18px; max-width: 87%; box-shadow: 0 4px 16px rgba(16, 44, 70, 0.25); font-weight: 500; }
 .zizo-bubble p { margin: 0 0 10px; }
 .zizo-bubble p:last-child { margin-bottom: 0; }
-.zizo-bubble h3 { color: #714B67; font-weight: 900; margin: 6px 0 12px; font-size: 16px; border-bottom: 2px solid #F3EEF2; padding-bottom: 6px; }
-.zizo-bubble h4 { color: #714B67; font-weight: 800; margin: 16px 0 8px; font-size: 14.5px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; }
-.zizo-bubble blockquote { margin: 10px 0; padding: 10px 14px; background: #FBF9FA; border-right: 3px solid #714B67; border-radius: 4px 8px 8px 4px; font-style: italic; color: #475569; }
-.zizo-message-label { font-size: 11px; color: #714B67; margin-bottom: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; background: #F3EEF2; border-radius: 8px; border: 1px solid rgba(113, 75, 103, 0.15); }
+.zizo-bubble h3 { color: #102c46; font-weight: 900; margin: 6px 0 12px; font-size: 16px; border-bottom: 2px solid #edf3f8; padding-bottom: 6px; }
+.zizo-bubble h4 { color: #102c46; font-weight: 800; margin: 16px 0 8px; font-size: 14.5px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; }
+.zizo-bubble blockquote { margin: 10px 0; padding: 10px 14px; background: #f9fafb; border-right: 3px solid #102c46; border-radius: 4px 8px 8px 4px; font-style: italic; color: #475569; }
+.zizo-message-label { font-size: 11px; color: #102c46; margin-bottom: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; background: #edf3f8; border-radius: 8px; border: 1px solid rgba(16, 44, 70, 0.15); }
 .zizo-bubble a { color: #00A09D; text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }
 .zizo-message-actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid #f1f5f9; margin-top: 14px; padding-top: 12px; }
-.zizo-action { min-height: 32px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; background: #F3EEF2; color: #714B67; border: 1px solid rgba(113, 75, 103, 0.25); border-radius: 8px; cursor: pointer; transition: all 0.15s ease-in-out; display: inline-flex; align-items: center; gap: 5px; }
-.zizo-action:hover { background: #714B67; color: #ffffff; border-color: #714B67; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(113, 75, 103, 0.2); }
+.zizo-action { min-height: 32px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; background: #edf3f8; color: #102c46; border: 1px solid rgba(16, 44, 70, 0.25); border-radius: 8px; cursor: pointer; transition: all 0.15s ease-in-out; display: inline-flex; align-items: center; gap: 5px; }
+.zizo-action:hover { background: #102c46; color: #ffffff; border-color: #102c46; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(16, 44, 70, 0.2); }
 .zizo-sources { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid #f1f5f9; }
-.zizo-sources summary { cursor: pointer; font-size: 11.5px; font-weight: 800; color: #714B67; padding: 4px 0; }
+.zizo-sources summary { cursor: pointer; font-size: 11.5px; font-weight: 800; color: #102c46; padding: 4px 0; }
 .zizo-sources a { display: block; padding: 5px 8px; font-size: 11.5px; border-radius: 6px; margin: 4px 0; background: #f8fafc; border: 1px solid #e2e8f0; }
-.zizo-sources a:hover { background: #F3EEF2; color: #714B67; }
+.zizo-sources a:hover { background: #edf3f8; color: #102c46; }
 .zizo-error { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
-.zizo-thinking { color: #714B67; font-size: 12.5px; font-weight: 700; padding: 10px 16px; background: #F3EEF2; border-radius: 12px; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(113, 75, 103, 0.2); box-shadow: 0 2px 6px rgba(113, 75, 103, 0.08); }
+.zizo-thinking { color: #102c46; font-size: 12.5px; font-weight: 700; padding: 10px 16px; background: #edf3f8; border-radius: 12px; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(16, 44, 70, 0.2); box-shadow: 0 2px 6px rgba(16, 44, 70, 0.08); }
 .zizo-thinking::after { content: '⏳'; font-size: 13px; animation: zizo-pulse 1.2s ease infinite alternate; }
 @keyframes zizo-pulse { to { opacity: .2; transform: scale(0.9); } }
 .zizo-privacy { color: #64748b; font-size: 9.5px; line-height: 1.7; padding: 4px 14px 8px; margin: 0; background: #fff; }
@@ -57,4 +57,5 @@
 }
 @media (prefers-reduced-motion: reduce) { .zizo-thinking::after { animation: none; } }
 
-.zizo-public-label{display:flex;align-items:flex-start;gap:6px;font-size:11px;line-height:1.6}.zizo-public-label input{margin-top:4px;flex-shrink:0}.zizo-public-note{font-size:10px;line-height:1.7;color:#6b5265;margin:5px 0 0}.zizo-search-widget{width:100%;height:140px;border:0;background:white;border-radius:10px;margin-top:8px}.zizo-public-label[hidden],.zizo-public-note[hidden]{display:none}
+.zizo-public-label{display:flex;align-items:flex-start;gap:6px;font-size:11px;line-height:1.6}.zizo-public-label input{margin-top:4px;flex-shrink:0}.zizo-public-note{font-size:10px;line-height:1.7;color:#445e79;margin:5px 0 0}.zizo-search-widget{width:100%;height:140px;border:0;background:white;border-radius:10px;margin-top:8px}.zizo-public-label[hidden],.zizo-public-note[hidden]{display:none}
+.zizo-account-dialog{width:min(92vw,440px);max-height:80dvh;overflow:auto;border:1px solid #c69740;border-radius:20px;padding:24px;background:#fff;color:#123545;direction:rtl;line-height:1.8;box-shadow:0 24px 70px #071c3560}.zizo-account-dialog::backdrop{background:#071c3575}.zizo-account-dialog h3{font-weight:800;font-size:18px;margin-bottom:12px}.zizo-account-dialog .zizo-action{display:inline-block;margin:14px 0 0 8px}

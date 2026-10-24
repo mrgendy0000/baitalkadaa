@@ -52,12 +52,25 @@ def generate(model,payload):
     try:
         with urlopen(request,timeout=40) as response: result=json.load(response)
     except HTTPError as error:
-        if error.code!=404: raise
+        if error.code not in (404,429): raise
         try:
             details=json.loads(error.read(8192)).get('error',{})
             message=str(details.get('message',''))
         except (ValueError,TypeError):
             details={};message='Provider returned a non-JSON 404 response.'
+        if error.code==429:
+            retry_seconds=None
+            zero_quota=False
+            for item in details.get('details',[]):
+                if not isinstance(item,dict): continue
+                delay=item.get('retryDelay','')
+                if isinstance(delay,str) and re.fullmatch(r'\d+(?:\.\d+)?s',delay):
+                    retry_seconds=min(86400,int(float(delay[:-1]))+1)
+                for violation in item.get('violations',[]):
+                    if isinstance(violation,dict) and str(violation.get('quotaValue'))=='0': zero_quota=True
+            text='Google رفضت الطلب بسبب حد استخدام للمشروع أو النموذج؛ هذا لا يثبت انتهاء الحصة اليومية. راجع Rate Limit في AI Studio.'
+            if zero_quota: text='Google أعادت حصة صفرية لهذا الطلب؛ راجع إتاحة النموذج وحدود مشروعك في AI Studio. تغيير تسجيل الدخول وحده لا يرفع الحصة.'
+            raise HTTPException(503,detail={'code':'provider_quota','message':text+' الأدوات المحلية متاحة، ولن يتم التحويل لخدمة مدفوعة.','retry_after_seconds':retry_seconds,'zero_quota':zero_quota}) from None
         # Error diagnostics only: never expose keys or a provider response body.
         message=message.replace(os.environ.get('GEMINI_API_KEY',''),'[redacted]')
         message=re.sub(r'AIza[A-Za-z0-9_-]+|[\w.+-]+@[\w.-]+|\d{7,}','[redacted]',message)

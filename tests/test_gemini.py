@@ -37,3 +37,14 @@ class InteractionTests(unittest.TestCase):
         self.assertIn('جواب عام',reply[0]);self.assertFalse(reply[2])
     def test_retired_model_migrates(self):
         with patch.dict('os.environ',{'GEMINI_MODEL':'gemini-2.5-flash'}):self.assertEqual(gemini.model_for(True),'gemini-3.8-flash')
+
+class QuotaDiagnosticsTests(unittest.TestCase):
+    def test_zero_quota_and_retry_are_safe_without_model_rotation(self):
+        import io,json
+        from urllib.error import HTTPError
+        error={'error':{'message':'secret provider detail','details':[{'retryDelay':'12.5s'},{'violations':[{'quotaValue':'0'}]}]}}
+        with patch.dict('os.environ',{'GEMINI_API_KEY':'synthetic-secret'}),patch.object(gemini,'urlopen',side_effect=HTTPError('https://example.invalid',429,'quota',{},io.BytesIO(json.dumps(error).encode()))) as call:
+            with self.assertRaises(HTTPException) as raised:gemini.generate('gemini-3.8-flash',{})
+        detail=raised.exception.detail
+        self.assertTrue(detail['zero_quota']);self.assertEqual(detail['retry_after_seconds'],13)
+        self.assertNotIn('secret',str(detail));self.assertEqual(call.call_count,1)

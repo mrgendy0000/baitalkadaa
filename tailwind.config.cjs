@@ -4,10 +4,10 @@
                 extend: {
                     colors: {
                         odoo: {
-                            purple: '#714B67',
-                            'purple-dark': '#53364C',
-                            'purple-light': '#8A5C7E',
-                            'purple-tint': '#F3EEF2',
+                            purple: '#102c46',
+                            'purple-dark': '#091d30',
+                            'purple-light': '#254e70',
+                            'purple-tint': '#edf3f8',
                             teal: '#00A09D',
                             'teal-dark': '#017E84',
                             'teal-light': '#E6F6F6',
@@ -19,12 +19,12 @@
                         },
                         navy: {
                             50: '#F8FAFA',
-                            100: '#F3EEF2',
+                            100: '#edf3f8',
                             200: '#E9ECEF',
-                            700: '#53364C',
-                            800: '#714B67',
-                            900: '#53364C',
-                            950: '#351E30',
+                            700: '#091d30',
+                            800: '#102c46',
+                            900: '#091d30',
+                            950: '#1e2935',
                         },
                         gold: {
                             50: '#FEF9EE',

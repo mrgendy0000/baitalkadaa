@@ -210,7 +210,7 @@ async def answer_query(request, office):
         logger.warning('Zizo upstream HTTP status=%s', exc.code)
         errors = {401:('provider_auth','مفتاح خدمة الذكاء غير صالح؛ يحتاج مسؤول المكتب مراجعة إعداد المفتاح.'),403:('provider_access','الحساب لا يملك صلاحية للنموذج المختار؛ راجع صلاحيات المفتاح والنموذج.'),429:('provider_quota','خدمة الذكاء وصلت لحد الاستخدام أو الرصيد؛ راجع فوترة OpenAI ثم أعد المحاولة.'),404:('provider_model','النموذج المختار غير متاح لهذا الحساب؛ راجع إعداد ZIZO_MODEL.')}
         if provider=='gemini':
-            errors[429]=('provider_quota','حصة Gemini المجانية انتهت مؤقتاً؛ انتظر تجددها أو استخدم الأدوات المحلية. لن يتم التحويل لخدمة مدفوعة.')
+            errors[429]=('provider_quota','Google رفضت الطلب بسبب حد استخدام؛ راجع حصة المشروع والنموذج في AI Studio. الأدوات المحلية متاحة، ولن يتم التحويل لخدمة مدفوعة.')
             errors[403]=('provider_access','راجع تفعيل Gemini API وصلاحية المفتاح والمنطقة المتاحة.')
             errors[404]=('provider_model','نموذج Gemini غير متاح لهذا المشروع؛ راجع GEMINI_MODEL أو GEMINI_RESEARCH_MODEL.')
         code, message = errors.get(exc.code, ('provider_error','خدمة الذكاء غير متاحة مؤقتاً؛ أعد المحاولة بعد قليل.'))
