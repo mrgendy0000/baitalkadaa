@@ -67,8 +67,8 @@ def selected_provider():
 def assistant_status():
     provider=selected_provider()
     configured=bool(os.environ.get('GEMINI_API_KEY' if provider=='gemini' else 'OPENAI_API_KEY','').strip())
-    model=os.environ.get('GEMINI_MODEL','gemini-3.8-flash') if provider=='gemini' else os.environ.get('ZIZO_MODEL','gpt-6-astra')
-    return {'provider':provider,'configured':configured,'model':model,'constitution_articles':len(constitution()['articles']),'constitution_edition':'2019-04','web_search_enabled':True if provider=='gemini' else os.environ.get('ZIZO_WEB_SEARCH','true').lower()=='true','public_questions_only':provider=='gemini','status':'configured' if configured else 'setup_required','free_tools_url':'/static/legal-tools.html'}
+    model=__import__('gemini_service').model_for() if provider=='gemini' else os.environ.get('ZIZO_MODEL','gpt-6-astra')
+    return {'provider':provider,'configured':configured,'model':model,'constitution_articles':len(constitution()['articles']),'constitution_edition':'2019-04','web_search_enabled':False if provider=='gemini' else os.environ.get('ZIZO_WEB_SEARCH','true').lower()=='true','public_questions_only':provider=='gemini','status':'configured' if configured else 'setup_required','free_tools_url':'/static/legal-tools.html'}
 
 
 def result(advice, *, engine='guide', sources=None, draft=None, actions=None):

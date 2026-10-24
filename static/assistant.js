@@ -6,7 +6,7 @@
     const caseSelect = document.getElementById('zizo-case-context');
     const status = document.getElementById('zizo-connection-status');
     let history = [], controller, busy = false, generation = 0, contextKey = '', storageKey = '', publicOnly = true;
-    const engineNames = { guide: 'إرشاد المنظومة', constitution: 'نص الدستور الرسمي', openai: 'تحليل OpenAI', gemini: 'Gemini · سؤال عام', local_tools: 'أدوات محلية مجانية', setup_required: 'الخدمة تحتاج تفعيل' };
+    const engineNames = { guide: 'إرشاد المنظومة', constitution: 'نص الدستور الرسمي', legal_knowledge: 'محتوى سابق يحتاج مراجعة', openai: 'تحليل OpenAI', gemini: 'Gemini · سؤال عام', local_tools: 'أدوات محلية مجانية', setup_required: 'الخدمة تحتاج تفعيل' };
     const node = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
     function safeURL(value) {
         try { const u = new URL(value, location.origin); return ['https:', 'http:'].includes(u.protocol) && !u.username ? u.href : null; } catch { return null; }
@@ -34,34 +34,34 @@
         const bubble = node('div', undefined, 'zizo-bubble');
         if (role === 'user') bubble.textContent = text;
         else {
-            bubble.append(node('div', engineNames[data.engine] || 'زيزو', 'zizo-message-label'));
+            bubble.append(node('div', engineNames[data.engine] || 'المستشار زيزو', 'zizo-message-label'));
             renderText(bubble, text);
             if (data.sources?.length) {
                 const details = node('details', undefined, 'zizo-sources');
-                details.append(node('summary', 'المصادر (' + data.sources.length + ')'));
+                details.append(node('summary', 'المصادر والمراجع (' + data.sources.length + ')'));
                 data.sources.forEach(source => { const url = safeURL(source.url); if (!url) return; const a = node('a', source.title || 'المصدر'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; details.append(a); });
                 bubble.append(details);
             }
             if (typeof data.search_widget === 'string' && data.search_widget.length <= 30000) { const frame=node('iframe'); frame.title='اقتراحات بحث Google'; frame.setAttribute('sandbox','allow-popups allow-popups-to-escape-sandbox'); frame.srcdoc=data.search_widget; frame.className='zizo-search-widget'; bubble.append(frame); }
             const actions = node('div', undefined, 'zizo-message-actions');
-            action(actions, 'نسخ الرد', async () => { try { await navigator.clipboard.writeText(text); showToast('تم نسخ الرد'); } catch { showToast('تعذر النسخ'); } });
-            if (data.draft_memo) action(actions, 'فتح المسودة للمراجعة', () => applyMemoFromResponse(data.draft_memo));
+            action(actions, 'نسخ الاستشارة', async () => { try { await navigator.clipboard.writeText(text); showToast('تم نسخ الاستشارة القانونية'); } catch { showToast('تعذر النسخ'); } });
+            if (data.draft_memo) action(actions, 'فتح المسودة في المحرر ✍️', () => applyMemoFromResponse(data.draft_memo));
             (data.actions || []).forEach(a => { if (['cases','sessions','home','more'].includes(a.view)) action(actions, a.label, () => switchView(a.view)); });
             bubble.append(actions);
         }
         row.append(bubble); stream.append(row); stream.scrollTop = stream.scrollHeight;
     }
     const privacy = node('label', undefined, 'zizo-public-label');
-    const publicCheck = node('input'); publicCheck.type='checkbox'; publicCheck.id='zizo-public-query';
+    const publicCheck = node('input'); publicCheck.type='checkbox'; publicCheck.id='zizo-public-query'; publicCheck.checked = false;
     privacy.append(publicCheck,document.createTextNode('سؤالي عام وخالٍ من البيانات الشخصية وأسرار القضايا'));
     const privacyNote=node('p','Gemini المجاني للأسئلة العامة فقط. لا تُرسل ملفات المكتب. استخدم الأدوات المحلية للبيانات الخاصة.','zizo-public-note');
     document.querySelector('.zizo-tools').append(privacy,privacyNote);
     const toolsLink=node('a','أدوات مجانية ↗'); toolsLink.href='/static/legal-tools.html'; toolsLink.target='_blank'; toolsLink.rel='noopener'; document.querySelector('.zizo-tools-row').append(toolsLink);
     function welcome() {
         stream.replaceChildren();
-        append('assistant', 'أهلاً بيك. اسألني سؤالاً قانونياً عاماً بدون بيانات شخصية، أو اطلب نص مادة من الدستور بمصدرها.\nترتيب الوقائع ومقارنة النصوص وهيكل المذكرة متاحين مجاناً في الأدوات المحلية؛ ملفات المكتب لا تُرسل لـGemini المجاني.', { engine: 'guide', actions: [] });
+        append('assistant', 'أهلاً بيك، أنا زيزو. اسأل عن مادة من الدستور بالمصدر، أو استخدم أدوات ترتيب الوقائع ومقارنة النصوص.\nتحليل Gemini مخصص للأسئلة العامة غير السرية ويتطلب توافر الخدمة. لا أملك اعتماداً قضائياً ولا أضمن نتيجة حكم.', { engine: 'guide', actions: [] });
         const chips = node('div', undefined, 'zizo-message-actions');
-        ['تقدر تساعدني في إيه؟', 'نص المادة 54 من الدستور', 'الأدوات المجانية'].forEach(text => action(chips, text, () => { input.value = text; submit(); }));
+        ['تقدر تساعدني في إيه؟','نص المادة 54 من الدستور','الأدوات المجانية'].forEach(text => action(chips,text,()=>{input.value=text;submit();}));
         stream.append(chips);
     }
     function save() { try { if (storageKey) sessionStorage.setItem(storageKey, JSON.stringify(history.slice(-20))); } catch {} }
@@ -80,11 +80,11 @@
         if (contextKey !== token) {
             generation++; controller?.abort(); busy = false; send.disabled = false; caseSelect.disabled = publicOnly; history = []; contextKey = token;
             const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
-            storageKey = 'zizo-v2-' + Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+            storageKey = 'zizo-launch-'  + Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
             try { const saved = JSON.parse(sessionStorage.getItem(storageKey) || '[]'); history = Array.isArray(saved) ? saved.filter(m => ['user','assistant'].includes(m.role) && typeof m.content === 'string' && m.content.length <= 16000).slice(-20) : []; } catch { history = []; }
             welcome(); history.forEach(m => append(m.role, m.content, m.response || { engine: 'guide' }));
         }
-        try { const response = await apiFetch('/api/ai/status'); if (!response.ok) throw Error(); const data = await response.json(); publicOnly = data.public_questions_only !== false; privacy.hidden=!publicOnly; privacyNote.hidden=!publicOnly; caseSelect.disabled=publicOnly; if(publicOnly)caseSelect.value=''; input.placeholder=publicOnly?'سؤال قانوني عام بدون أسماء أو بيانات سرية…':'اكتب سؤالك…'; status.textContent = data.configured ? (publicOnly?'Gemini جاهز · أسئلة عامة':'جاهز للاتصال بالنموذج') : 'الأدوات المحلية جاهزة · مفتاح Gemini غير مفعّل'; } catch { status.textContent = 'تعذر فحص الاتصال'; }
+        try { const response = await apiFetch('/api/ai/status'); if (!response.ok) throw Error(); const data = await response.json(); publicOnly = data.public_questions_only !== false; const researchLabel=document.querySelector('.zizo-research'); if(publicOnly && researchLabel?.lastChild?.nodeType===Node.TEXT_NODE)researchLabel.lastChild.textContent=' مراجع الدستور'; privacy.hidden=!publicOnly; privacyNote.hidden=!publicOnly; caseSelect.disabled=publicOnly; if(publicOnly)caseSelect.value=''; input.placeholder=publicOnly?'سؤال قانوني عام بدون أسماء أو بيانات سرية…':'اكتب سؤالك…'; status.textContent = data.configured ? (publicOnly?'Gemini جاهز · أسئلة عامة':'جاهز للاتصال بالنموذج') : 'الأدوات المحلية جاهزة · مفتاح Gemini غير مفعّل'; } catch { status.textContent = 'تعذر فحص الاتصال'; }
     }
     function boundedHistory() {
         const messages = history.slice(-16).map(m => ({ role:m.role, content:m.content.slice(0,16000), public_query:m.public_query===true }));

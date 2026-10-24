@@ -1699,13 +1699,43 @@
             .odoo-apps-grid, .odoo-sectors-tabs, .odoo-stats-container, .odoo-pricing-grid, .odoo-testimonials-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .hx-phone { display: none; }
         }
         @media (max-width: 640px) {
             .odoo-nav-links { display: none; }
             .hx-hero-title { font-size: 30px; }
-            .odoo-apps-grid, .odoo-sectors-tabs, .odoo-stats-container, .odoo-pricing-grid, .odoo-testimonials-grid {
+            .odoo-sectors-tabs, .odoo-stats-container, .odoo-pricing-grid, .odoo-testimonials-grid {
                 grid-template-columns: 1fr;
+            }
+            .odoo-apps-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 8px !important;
+            }
+            .odoo-app-card {
+                padding: 8px 3px 6px 3px !important;
+                border-radius: 14px !important;
+                min-height: 80px !important;
+            }
+            .odoo-3d-icon-tile {
+                width: 44px !important;
+                height: 44px !important;
+                border-radius: 13px !important;
+                margin-bottom: 4px !important;
+            }
+            .odoo-3d-icon-tile svg {
+                width: 22px !important;
+                height: 22px !important;
+            }
+            .odoo-app-name {
+                font-size: 10.5px !important;
+                font-weight: 800 !important;
+                line-height: 1.25 !important;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+            }
+            .odoo-app-desc {
+                display: none !important;
             }
             .sector-perks { grid-template-columns: 1fr; }
         }
@@ -2167,7 +2197,9 @@
         }
 </style>
     <link rel="stylesheet" href="/static/landing.css?v=mobile-3"/>
-    <script src="/static/landing.js?v=mobile-3" defer></script>
+    <script src="/static/landing.js?v=launch-20261025" defer></script>
+    <link rel="stylesheet" href="/static/launch.css?v=20261025">
+    <script src="/static/launch.js?v=20261025" defer></script>
 </head>
 <body>
 
@@ -2338,7 +2370,7 @@
                 </span>
                 <span class="site-brand-name">
                     <strong style="color: #714B67; font-size: 22px; font-weight: 900; line-height: 1.2;">بيت القانون</strong>
-                    <small style="color: #00A09D; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; display: block; margin-top: 2px;">منظومة المحاماة المتكاملة • على طريقة Odoo</small>
+                    <small style="color: #00A09D; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; display: block; margin-top: 2px;">منظومة المحاماة المتكاملة • على </small>
                 </span>
             </a>
 
@@ -2369,13 +2401,10 @@
         <div class="hx-hero-grid">
             
             <div class="hx-hero-copy">
-                <span class="hx-hero-kicker">🇪🇬 المنظومة السحابية الأولى لإدارة مكاتب المحاماة في مصر</span>
-                <h1 class="odoo-hero-headline hx-hero-title">
-                    كل ما يحتاجه مكتبك القانوني.. في<br/>
-                    <span class="odoo-marker-highlight">منظومة واحدة متكاملة</span>
-                </h1>
+                <span class="hx-hero-kicker">مساحة عمل سحابية لمكاتب المحاماة في مصر</span>
+                <h1 class="odoo-hero-headline hx-hero-title">مكتبك القانوني.<br><span class="hero-legal-accent">كل خطوة أوضح.</span></h1>
                 <p class="hx-hero-lead">
-                    ودّع فوضى الدفاتر الورقية وجداول الإكسيل المبعثرة. سجّل رول الجلسات، صُغ عرائضك ومذكراتك بالذكاء الاصطناعي بنقض 2026، وأدِر خزينتك وفواتير الأتعاب بالجنيه المصري من شاشة واحدة بالغة البساطة.
+                    من أول ملف لآخر جلسة: قضاياك، مواعيدك، موكّلوك ومستنداتك في مساحة منظمة. أدوات نصوص مجانية، ودستور بالمصادر، ومساعد بحث للأسئلة العامة عند إتاحة خدمة الذكاء.
                 </p>
                 <div class="odoo-hero-ctas hx-hero-ctas">
                     <button onclick="openRegisterModal()" class="odoo-btn-primary">
@@ -2388,7 +2417,7 @@
                 <ul class="hx-hero-points">
                     <li><span>✓</span> اشتراك مرن وشامل كل الأقسام، بدون أي رسوم تأسيس</li>
                     <li><span>✓</span> بدون كارت ائتمان نهائياً للتجربة (شهر كامل 30 يوماً / 720 ساعة)</li>
-                    <li><span>✓</span> بوابة للموكل ومساعد ذكي «زيزو AI» بالصيغ المعتمدة ونقض 2026</li>
+                    <li><span>✓</span> أدوات للمحامي، ومكتبة دستور موثقة، ومسودات للمراجعة</li>
                 </ul>
             </div>
 
@@ -2464,15 +2493,15 @@
                 <span class="marquee-text">«العدالة تبدأ من التنظيم.. ودّع فوضى الدفاتر وسجّل رولك إلكترونياً»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">⚡ حماية المواعيد الإجرائية</span>
-                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض بدقة 100%»</span>
+                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض مع مراجعة المحامي»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">💼 إدارة الأتعاب والخزينة</span>
                 <span class="marquee-text">«أتعابك في أمان.. فواتير إلكترونية فورية ومتابعة تحصيل مستحقات الموكلين»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">🤖 المستشار زيزو AI</span>
-                <span class="marquee-text">«سوابق محكمة النقض المصرية والدستورية بين يديك لصياغة المذكرات في دقائق»</span>
+                <span class="marquee-text">«الدستور بالمصادر وأدوات تنظيم الوقائع والمسودات للمراجعة»</span>
                 <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">📱 واتساب الموكلين التلقائي</span>
+                <span class="marquee-badge">📱 رسائل واتساب يدوية</span>
                 <span class="marquee-text">«تحديث تلقائي لموكلك فور صدور قرار الجلسة من المحكمة مباشرة»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">🎁 هدية المحامين بمصر</span>
@@ -2484,15 +2513,15 @@
                 <span class="marquee-text">«العدالة تبدأ من التنظيم.. ودّع فوضى الدفاتر وسجّل رولك إلكترونياً»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">⚡ حماية المواعيد الإجرائية</span>
-                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض بدقة 100%»</span>
+                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض مع مراجعة المحامي»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">💼 إدارة الأتعاب والخزينة</span>
                 <span class="marquee-text">«أتعابك في أمان.. فواتير إلكترونية فورية ومتابعة تحصيل مستحقات الموكلين»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">🤖 المستشار زيزو AI</span>
-                <span class="marquee-text">«سوابق محكمة النقض المصرية والدستورية بين يديك لصياغة المذكرات في دقائق»</span>
+                <span class="marquee-text">«الدستور بالمصادر وأدوات تنظيم الوقائع والمسودات للمراجعة»</span>
                 <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">📱 واتساب الموكلين التلقائي</span>
+                <span class="marquee-badge">📱 رسائل واتساب يدوية</span>
                 <span class="marquee-text">«تحديث تلقائي لموكلك فور صدور قرار الجلسة من المحكمة مباشرة»</span>
                 <span class="marquee-dot">✦</span>
                 <span class="marquee-badge">🎁 هدية المحامين بمصر</span>

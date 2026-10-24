@@ -20,9 +20,9 @@ class GeminiTests(unittest.TestCase):
     def test_only_public_history_and_general_reference_are_sent(self):
         req=service.AdvisorRequest(query='سؤال عام',public_query=True,history=[{'role':'user','content':'private history'},{'role':'assistant','content':'public history','public_query':True}],research=True)
         model,payload=gemini.build_payload(req,self.office,'instructions',[])
-        self.assertEqual(model,'gemini-2.5-flash')
+        self.assertEqual(model,'gemini-3.8-flash')
         self.assertNotIn('private history',str(payload));self.assertIn('public history',str(payload))
-        self.assertEqual(payload['tools'],[{'google_search':{}}])
+        self.assertFalse(payload['store']);self.assertNotIn('tools',payload)
         self.assertNotIn('Known private client',str(payload))
     def test_grounded_sources_and_suggestions_are_preserved(self):
         data={'candidates':[{'finishReason':'STOP','content':{'parts':[{'text':'Fact'}]},'groundingMetadata':{'webSearchQueries':['public question'],'groundingChunks':[{'web':{'uri':'https://www.presidency.eg/','title':'Official'}}],'groundingSupports':[{'segment':{'text':'Fact'},'groundingChunkIndices':[0]}],'searchEntryPoint':{'renderedContent':'<div>Google Search</div>'}}}]}
@@ -30,3 +30,10 @@ class GeminiTests(unittest.TestCase):
         self.assertIn('[Official]',text);self.assertTrue(searched);self.assertEqual(len(sources),1);self.assertIn('Google',widget)
     def test_partial_output_is_not_a_completed_legal_answer(self):
         with self.assertRaises(HTTPException):gemini.parse_response({'candidates':[{'finishReason':'MAX_TOKENS','content':{'parts':[{'text':'partial'}]}}]},service.safe_url)
+
+class InteractionTests(unittest.TestCase):
+    def test_current_steps_response(self):
+        reply=gemini.parse_response({'status':'completed','steps':[{'type':'thought','signature':'ignored'},{'type':'model_output','content':[{'type':'text','text':'جواب عام'}]}]},service.safe_url)
+        self.assertIn('جواب عام',reply[0]);self.assertFalse(reply[2])
+    def test_retired_model_migrates(self):
+        with patch.dict('os.environ',{'GEMINI_MODEL':'gemini-2.5-flash'}):self.assertEqual(gemini.model_for(True),'gemini-3.8-flash')

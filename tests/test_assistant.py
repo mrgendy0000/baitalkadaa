@@ -86,5 +86,11 @@ class AdvisorTests(unittest.IsolatedAsyncioTestCase):
     async def test_blank_query_rejected(self):
         with self.assertRaises(HTTPException) as error: await service.answer_query(service.AdvisorRequest(query='   '),self.office)
         self.assertEqual(error.exception.status_code,422)
+    async def test_unverified_prebuilt_judgments_are_not_used(self):
+        with patch.dict(os.environ,{'OPENAI_API_KEY':''}):
+            reply=await service.answer_query(service.AdvisorRequest(query='دفوع إيصال الأمانة المادة 341'),self.office)
+        self.assertEqual(reply['engine'],'setup_required')
+        self.assertIsNone(reply['draft_memo'])
+        self.assertNotIn('الطعن',reply['advice'])
 
 if __name__=='__main__': unittest.main()

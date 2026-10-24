@@ -88,7 +88,7 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
         response.headers['X-Content-Type-Options']='nosniff'
         response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
         response.headers['Permissions-Policy']='camera=(self), microphone=(self), geolocation=()'
-        response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' 'unsafe-inline' ; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
         if request.url.scheme=='https' or os.environ.get('VERCEL'):
             response.headers['Strict-Transport-Security']='max-age=31536000'
         if path.startswith('/api/') or path=='/app':
@@ -1984,11 +1984,12 @@ async def get_current_user_profile(
     hours_left = max(0, int((trial_end - now).total_seconds() // 3600))
     is_expired = now > trial_end
 
+    display_settings=office['data'].get('workspace',{}).get('settings',{})
     office_dict = {
         "id": office["id"],
-        "name": office["name"],
-        "office_name": office["name"],
-        "lawyer_name": office["lawyer_name"],
+        "name": display_settings.get("office_name",office["name"]),
+        "office_name": display_settings.get("office_name",office["name"]),
+        "lawyer_name": display_settings.get("lawyer_name",office["lawyer_name"]),
         "email": office["email"],
         "phone": office["phone"],
         "trial_start": office["trial_start"],
@@ -2222,7 +2223,7 @@ async def checkin_reception(
     db = office["data"]
 
     new_entry = {
-        "id": f"rec-{len(db['reception']) + 1}",
+        "id": "rec-" + uuid4().hex[:16],
         "time": datetime.now().strftime("%I:%M %p").replace("AM", "ص").replace("PM", "م"),
         "visitor_name": item.visitor_name,
         "phone": item.phone,
@@ -2302,7 +2303,7 @@ async def create_case(
         })
 
     new_item = {
-        "id": f"case-{len(db['cases']) + 1}",
+        "id": "case-" + uuid4().hex[:16],
         "number": case.number,
         "court": case.court,
         "circuit": "الدائرة المختصة",
@@ -2443,7 +2444,7 @@ async def create_session(
     p_dec = sess.previous_decision or sess.action_required or "حضور ومرافعة"
 
     new_sess = {
-        "id": f"sess-{len(db['sessions']) + 1}",
+        "id": "sess-" + uuid4().hex[:16],
         "roll": r_num,
         "roll_number": r_num,
         "case_number": sess.case_number,
@@ -2491,7 +2492,7 @@ async def create_client(
         poa = f"توكيل رسمي عام قضايا لسنة {datetime.now().year}"
 
     new_cl = {
-        "id": f"cl-{len(db['clients']) + 1}",
+        "id": "cl-" + uuid4().hex[:16],
         "name": client.name.strip(),
         "national_id": (client.national_id or "").strip(),
         "phone": (client.phone or "").strip(),
@@ -2594,7 +2595,7 @@ async def create_transaction(
     db = office["data"]
 
     new_trn = {
-        "id": f"trn-{len(db['finance']['ledger']) + 1}",
+        "id": "trn-" + uuid4().hex[:16],
         "date": datetime.now().strftime("%Y-%m-%d"),
         "client": trn.client,
         "case": trn.case,

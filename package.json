@@ -1,0 +1,10 @@
+{
+  "name": "bayt-alqanoon-web",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.cjs -i static/tailwind-input.css -o static/app.bundle.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
