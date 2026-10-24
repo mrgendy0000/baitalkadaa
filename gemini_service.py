@@ -68,29 +68,24 @@ def available_models():
 
 
 def generate(model,payload):
-    def call(chosen,body):
-        request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+chosen+':generateContent',data=json.dumps(body,ensure_ascii=False).encode(),headers={'x-goog-api-key':os.environ['GEMINI_API_KEY'].strip(),'Content-Type':'application/json'},method='POST')
-        with urlopen(request,timeout=40) as response:result=json.load(response)
-        result['_used_model']=chosen
-        return result
-    try:return call(model,payload)
-    except HTTPError as exc:
-        if exc.code!=404:raise
-        try: names=available_models()
-        except HTTPError as catalog_error:
-            raise HTTPException(503,detail={'code':'gemini_catalog_error','message':'Google رفض عرض النماذج المتاحة. تحقق من مفتاح Gemini ومشروعه وتفعيل Gemini API.','http_status':catalog_error.code}) from None
-        preferred=['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-3.8-flash','gemini-3.5-flash-lite']
-        chosen=next((name for name in preferred if name in names and name!=model),None)
-        if not chosen:
-            raise HTTPException(503,detail={'code':'free_model_unavailable','message':'المشروع لا يتيح حالياً أحد النماذج المجانية المعتمدة. الأدوات المحلية متاحة بدون API.','available_models':names[:12]}) from None
-        body=copy.deepcopy(payload)
-        body['generationConfig'].pop('thinkingConfig',None)
-        search_disabled=chosen not in {'gemini-2.5-flash','gemini-2.5-flash-lite'} and bool(body.pop('tools',None))
-        try: result=call(chosen,body)
-        except HTTPError as model_error:
-            raise HTTPException(503,detail={'code':'gemini_generation_error','message':'Google يعرض النموذج في قائمة الحساب لكنه رفض التوليد؛ راجع صلاحية المفتاح وقيود المشروع.','http_status':model_error.code,'model':chosen,'available_free_models':[name for name in names if name in FREE_MODELS]}) from None
-        result['_research_unavailable']=search_disabled
-        return result
+    # One generation per action. Never rotate models after a failed request.
+    request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',data=json.dumps(payload,ensure_ascii=False).encode('utf-8'),headers={'x-goog-api-key':os.environ['GEMINI_API_KEY'].strip(),'Content-Type':'application/json'},method='POST')
+    try:
+        with urlopen(request,timeout=40) as response: result=json.load(response)
+    except HTTPError as error:
+        if error.code!=404: raise
+        try:
+            details=json.loads(error.read(8192)).get('error',{})
+            message=str(details.get('message',''))
+        except (ValueError,TypeError):
+            details={};message='Provider returned a non-JSON 404 response.'
+        # Error diagnostics only: never expose keys or a provider response body.
+        message=message.replace(os.environ.get('GEMINI_API_KEY',''),'[redacted]')
+        message=re.sub(r'AIza[A-Za-z0-9_-]+|[\w.+-]+@[\w.-]+|\d{7,}','[redacted]',message)
+        message=re.sub(r'<[^>]+>','',message)[:450]
+        raise HTTPException(503,detail={'code':'gemini_model_unavailable','message':'تعذر تشغيل نموذج Gemini. الأدوات المحلية متاحة دون إرسال بياناتك.','model':model,'provider_status':str(details.get('status','NOT_FOUND'))[:50],'provider_message':message}) from None
+    result['_used_model']=model
+    return result
 
 
 def parse_response(response,safe_url):
