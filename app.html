@@ -5099,30 +5099,7 @@
                     body: body
                 });
 
-                if (res.status === 403) {
-                    const newCaseObj = {
-                        id: 'case_demo_' + Date.now(),
-                        ...body,
-                        created_at: new Date().toISOString()
-                    };
-                    casesData.unshift(newCaseObj);
-                    saveDemoCasesToStorage(casesData);
-                    showToast('✅ تم قيد وحفظ القضية الجديدة والمستندات بنجاح ⚖️');
-                    closeModal('modal-new-case');
-                    
-                    // Clear inputs
-                    document.getElementById('case-number').value = '';
-                    document.getElementById('case-subject').value = '';
-                    document.getElementById('case-client').value = '';
-                    document.getElementById('case-opponent').value = '';
-                    document.getElementById('case-court').value = '';
-                    document.getElementById('case-memo-text').value = '';
-                    resetCaseScan();
-
-                    renderCasesGrid(casesData);
-                    updateDashboardMetrics();
-                    return;
-                }
+                if (res.status === 403) throw new Error('لا توجد صلاحية للحفظ؛ لم يتم تغيير البيانات.');
 
                 if (res.ok) {
                     showToast('✅ تم حفظ ملف القضية والمذكرة والمستندات في الأرشيف بنجاح!');
@@ -5345,17 +5322,7 @@
                     body: { stage: newStage }
                 });
 
-                if (res.status === 403) {
-                    const idx = casesData.findIndex(item => item.id === caseId);
-                    if (idx !== -1) {
-                        casesData[idx].stage = newStage;
-                        saveDemoCasesToStorage(casesData);
-                    }
-                    showToast('تم تحديث مرحلة القضية بنجاح ⚖️');
-                    renderCasesGrid(casesData);
-                    updateDashboardMetrics();
-                    return;
-                }
+                if (res.status === 403) throw new Error('لا توجد صلاحية للحفظ؛ لم يتم تغيير البيانات.');
 
                 if (res.ok) {
                     showToast('تم تحديث مرحلة القضية بنجاح ⚖️');
