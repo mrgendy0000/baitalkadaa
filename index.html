@@ -2201,8 +2201,9 @@
     <link rel="stylesheet" href="/static/launch.css?v=navy-motion-4">
     <script src="/static/launch.js?v=navy-motion-4" defer></script>
 <link rel="stylesheet" href="/static/identity.css?v=browser-fit-6">
+<link rel="stylesheet" href="/static/layout.css?v=natural-7">
 </head>
-<body>
+<body class="marketing-site">
 
     <!-- 0. Announcement Bar -->
     <div class="announcement-bar">
@@ -2397,6 +2398,15 @@
         </div>
     </header>
 
+    <aside class="legal-benefits" aria-label="مزايا بيت القانون">
+        <div class="legal-benefits-inner">
+            <div class="legal-benefit"><span class="legal-benefit-icon" aria-hidden="true">⚖</span><div><strong>ملفات القضايا</strong><p>تنظيم بيانات كل دعوى ومستنداتها</p></div></div>
+            <div class="legal-benefit"><span class="legal-benefit-icon" aria-hidden="true">▦</span><div><strong>الجلسات والمتابعة</strong><p>رول يومي ومتابعة قرارات الجلسات</p></div></div>
+            <div class="legal-benefit"><span class="legal-benefit-icon" aria-hidden="true">§</span><div><strong>دستور بالمصادر</strong><p>نصوص الدستور وأدوات نصية محلية</p></div></div>
+            <div class="legal-benefit"><span class="legal-benefit-icon" aria-hidden="true">✓</span><div><strong>جرّب لمدة 30 يومًا</strong><p>بدون إدخال بطاقة بنكية</p></div></div>
+        </div>
+    </aside>
+
     <!-- 2. Hero Section (hx-hero) -->
     <section class="odoo-hero-section hx-hero" id="top">
         <div class="hx-hero-grid">
@@ -2486,54 +2496,8 @@
 
         </div>
     </section>
-    <!-- الشريط القضائي المتحرك اللانهائي (Infinite Marquee Legal Slogans Ticker) -->
-    <div class="legal-marquee-container" aria-label="شريط السلوجنات القضائية">
-        <div class="marquee-track">
-            <div class="marquee-group">
-                <span class="marquee-badge">⚖️ قانون المرافعات 2026</span>
-                <span class="marquee-text">«العدالة تبدأ من التنظيم.. ودّع فوضى الدفاتر وسجّل رولك إلكترونياً»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">⚡ حماية المواعيد الإجرائية</span>
-                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض مع مراجعة المحامي»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">💼 إدارة الأتعاب والخزينة</span>
-                <span class="marquee-text">«أتعابك في أمان.. فواتير إلكترونية فورية ومتابعة تحصيل مستحقات الموكلين»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">🤖 المستشار زيزو AI</span>
-                <span class="marquee-text">«الدستور بالمصادر وأدوات تنظيم الوقائع والمسودات للمراجعة»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">📱 رسائل واتساب يدوية</span>
-                <span class="marquee-text">«تحديث تلقائي لموكلك فور صدور قرار الجلسة من المحكمة مباشرة»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">🎁 هدية المحامين بمصر</span>
-                <span class="marquee-text">«شهر كامل مجاناً (30 يوماً / 720 ساعة) بدون أي بطاقة بنكية»</span>
-                <span class="marquee-dot">✦</span>
-            </div>
-            <div class="marquee-group" aria-hidden="true">
-                <span class="marquee-badge">⚖️ قانون المرافعات 2026</span>
-                <span class="marquee-text">«العدالة تبدأ من التنظيم.. ودّع فوضى الدفاتر وسجّل رولك إلكترونياً»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">⚡ حماية المواعيد الإجرائية</span>
-                <span class="marquee-text">«لا يسقط حقك بفوات ميعاد.. حساب تلقائي للاستئناف والنقض مع مراجعة المحامي»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">💼 إدارة الأتعاب والخزينة</span>
-                <span class="marquee-text">«أتعابك في أمان.. فواتير إلكترونية فورية ومتابعة تحصيل مستحقات الموكلين»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">🤖 المستشار زيزو AI</span>
-                <span class="marquee-text">«الدستور بالمصادر وأدوات تنظيم الوقائع والمسودات للمراجعة»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">📱 رسائل واتساب يدوية</span>
-                <span class="marquee-text">«تحديث تلقائي لموكلك فور صدور قرار الجلسة من المحكمة مباشرة»</span>
-                <span class="marquee-dot">✦</span>
-                <span class="marquee-badge">🎁 هدية المحامين بمصر</span>
-                <span class="marquee-text">«شهر كامل مجاناً (30 يوماً / 720 ساعة) بدون أي بطاقة بنكية»</span>
-                <span class="marquee-dot">✦</span>
-            </div>
-        </div>
-    </div>
 
 
-    <!-- 3. Sectors Section -->
     <section id="sectors" class="odoo-sectors-section">
         <div class="odoo-section-header">
             <span class="odoo-section-tag">حلول متخصصة لقطاعك القانوني</span>

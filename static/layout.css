@@ -1,0 +1,44 @@
+/* Natural document sizing: marketing content and full-width application shell. */
+body.marketing-site{font-size:16px!important;line-height:1.8!important}
+.legal-benefits{background:#0b2136;border-block:1px solid #c9a152;color:#fff;padding:20px 24px}
+.legal-benefits-inner{width:100%;max-width:1440px;margin:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.legal-benefit{display:flex;align-items:center;gap:12px;min-width:0;text-align:right}
+.legal-benefit-icon{display:grid;place-items:center;flex:none;width:38px;height:38px;border:1px solid #c9a15266;border-radius:12px;background:#ffffff09;color:#e0bb70;font-size:20px}
+.legal-benefit strong{display:block;font-size:14px;font-weight:800;color:#f0f5fa;line-height:1.7}
+.legal-benefit p{margin:2px 0 0;font-size:12px;line-height:1.8;color:#b8c9d8;white-space:normal;overflow-wrap:anywhere}
+@media(min-width:768px){
+ body.marketing-site .odoo-nav-container{width:100%!important;max-width:1488px!important;height:76px!important;padding-inline:24px!important;gap:18px!important;box-sizing:border-box}
+ body.marketing-site .site-brand-name strong{font-size:22px!important}.site-brand-name small{font-size:10px!important}
+ body.marketing-site .odoo-nav-actions>button{font-size:14px!important;min-height:44px!important;padding:10px 15px!important}
+ body.marketing-site .odoo-nav-link{font-size:13px!important;padding:9px 8px!important}
+ body.marketing-site .hx-hero{width:100%!important;max-width:1488px!important;height:auto!important;min-height:0!important;padding:48px 24px!important;box-sizing:border-box}
+ body.marketing-site .hx-hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,.95fr)!important;gap:clamp(28px,4vw,72px)!important;align-items:center!important}
+ body.marketing-site .hx-hero-copy{max-width:660px;justify-self:start}
+ body.marketing-site .hx-hero-title{font-size:44px!important;line-height:1.45!important;margin:16px 0 22px!important}
+ body.marketing-site .hx-hero-lead{font-size:17px!important;line-height:1.9!important;max-width:600px!important;margin-bottom:24px!important}
+ body.marketing-site .hx-hero-kicker{font-size:12px!important;padding:6px 12px!important}
+ body.marketing-site .hx-hero-ctas>*{font-size:14px!important;min-height:46px!important;padding:11px 18px!important}
+ body.marketing-site .hx-hero-points li{font-size:13px!important;line-height:1.8!important}.hx-hero-points{gap:10px!important}
+ body.marketing-site .hx-hero-visual{width:100%!important;max-width:580px;justify-self:center}
+ body.marketing-site .justice-scene{width:100%!important;height:auto!important;min-height:300px;aspect-ratio:1.42;max-width:none!important}
+ body.marketing-site .justice-emblem{width:54%!important;height:auto!important;max-height:300px!important;aspect-ratio:260/240}
+ body.marketing-site .justice-scene-caption{font-size:10px!important}.justice-mini-card strong{font-size:12px!important}.justice-mini-card small{font-size:10px!important}
+ body.marketing-site>section:not(.hx-hero){width:100%!important;max-width:1488px!important;box-sizing:border-box!important;margin-inline:auto!important;padding:44px 24px!important;min-height:0!important;height:auto!important}
+ body.marketing-site .odoo-section-header{margin:0 auto 28px!important;max-width:850px!important}
+ body.marketing-site .odoo-section-title{font-size:32px!important;line-height:1.55!important;margin:10px 0!important}
+ body.marketing-site .odoo-section-sub{font-size:16px!important;line-height:1.85!important}
+ body.marketing-site .odoo-section-tag{font-size:12px!important}
+ body.marketing-site .odoo-apps-grid,body.marketing-site .odoo-sectors-tabs,body.marketing-site .sector-feature-card,body.marketing-site .odoo-pricing-grid{max-width:none!important;width:100%!important;box-sizing:border-box}
+ body.marketing-site .odoo-app-name{font-size:16px!important}.odoo-app-cat{font-size:12px!important}
+ body.legal-app>main{width:100%!important;max-width:none!important;padding:24px clamp(18px,2vw,40px) 100px!important;box-sizing:border-box}
+ body.legal-app>header>div{max-width:none!important;padding-inline:clamp(18px,2vw,40px)!important}
+}
+@media(min-width:768px) and (max-width:1099px){body.marketing-site .odoo-nav-links{display:none!important}.nav-menu-toggle{display:inline-flex!important}body.marketing-site .odoo-main-nav.menu-open .odoo-nav-links{display:flex!important}body.marketing-site .hx-hero-title{font-size:34px!important}body.marketing-site .hx-hero-lead{font-size:15px!important}body.marketing-site .hx-hero-points li{font-size:11px!important}}
+@media(min-width:1100px) and (max-width:1279px){body.marketing-site .odoo-nav-container{gap:10px!important}body.marketing-site .odoo-nav-actions>button{font-size:12px!important;padding:9px 11px!important}body.marketing-site .odoo-nav-link{font-size:12px!important;padding:8px 6px!important}body.marketing-site .odoo-nav-brand{max-width:180px!important}body.marketing-site .site-brand-name strong{font-size:20px!important}}
+@media(min-width:1100px){body.marketing-site .odoo-nav-links{display:flex!important}.nav-menu-toggle{display:none!important}}
+@media(max-width:767px){.legal-benefits{padding:18px 16px}.legal-benefits-inner{grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 12px}.legal-benefit{gap:8px;align-items:flex-start}.legal-benefit-icon{width:29px;height:29px;font-size:16px;border-radius:9px}.legal-benefit strong{font-size:11px}.legal-benefit p{font-size:9px;line-height:1.8}.justice-mini-card strong{font-size:9px!important}.justice-mini-card small{font-size:7px!important}}
+
+/* Benefits sit below navigation; reserve a clear gap before page content. */
+body.marketing-site .legal-benefits{position:relative;z-index:1}
+@media(min-width:768px){body.marketing-site .hx-hero{padding-top:64px!important;padding-bottom:48px!important}}
+@media(max-width:767px){body.marketing-site .hx-hero{padding-top:30px!important}.legal-benefits{padding-block:14px}.legal-benefits-inner{gap:12px}.legal-benefit strong{font-size:10px}.legal-benefit p{font-size:8px}}
